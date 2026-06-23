@@ -1,10 +1,14 @@
 "use client";
 
+import api from "@/axios/api";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { FiUser, FiMail, FiLock, FiUpload } from "react-icons/fi";
+import { toast } from "react-toastify";
 
 export default function SignUpPage() {
+  const [loading, setLoading] = useState(false);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,11 +21,31 @@ export default function SignUpPage() {
     setAvatar(file);
   };
 
-  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData();
-    if (avatar) formData.append("image", avatar);
-    console.log(email, password, fullName, avatar);
+    if (avatar) formData.append("avatar", avatar);
+    formData.append("email", email);
+    formData.append("password", password);
+    formData.append("name", fullName);
+
+    try {
+      setLoading(true);
+      setEmail("");
+      setPassword("");
+      setAvatar(null);
+      setFullName("");
+      await api.post("/auth/sign-up", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      toast.success(
+        "Registered successfully. Please check mail for link to verify your account",
+      );
+    } catch (error) {
+      toast.error(`${error}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -47,6 +71,7 @@ export default function SignUpPage() {
               <FiUser className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
 
               <input
+                required
                 id="fullName"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
@@ -68,6 +93,7 @@ export default function SignUpPage() {
               <FiMail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
 
               <input
+                required
                 id="email"
                 type="email"
                 value={email}
@@ -90,6 +116,7 @@ export default function SignUpPage() {
               <FiLock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
 
               <input
+                required
                 id="password"
                 type="password"
                 value={password}
@@ -102,12 +129,14 @@ export default function SignUpPage() {
 
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-14 h-14 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
+              <div className="w-14 h-14 bg-gray-200 rounded-full overflow-hidden flex items-center justify-center">
                 {avatar ? (
-                  <img
+                  <Image
+                    width={56}
+                    height={56}
                     src={URL.createObjectURL(avatar)}
                     alt="avatar preview"
-                    className="w-full h-full object-cover"
+                    className="object-cover"
                   />
                 ) : (
                   <FiUser className="text-gray-500 text-xl" />
@@ -124,6 +153,7 @@ export default function SignUpPage() {
 
             <label className="cursor-pointer flex items-center gap-3">
               <input
+                required={true}
                 type="file"
                 accept=".jpg, .jpeg, .png"
                 className="hidden"
@@ -139,9 +169,17 @@ export default function SignUpPage() {
           <button
             type="submit"
             aria-label="Create account"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium transition"
+            className="cursor-pointer w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium transition"
           >
-            Sign up
+            {loading ? (
+              <div className="flex justify-center items-center py-2 gap-1">
+                <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:-0.3s]" />
+                <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:-0.15s]" />
+                <span className="w-2 h-2 bg-white rounded-full animate-bounce" />
+              </div>
+            ) : (
+              "Sign up"
+            )}
           </button>
 
           <p className="text-sm text-center text-gray-600">

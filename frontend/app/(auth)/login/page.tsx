@@ -1,17 +1,34 @@
 "use client";
 
+import api from "@/axios/api";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
+import { toast } from "react-toastify";
 
 export default function LoginPage() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isVisible, setIsVisible] = useState(false);
 
-  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(email, password);
+    try {
+      setLoading(true);
+      setEmail("");
+      setPassword("");
+      await api.post("/auth/login", { email, password });
+      toast.success("Logged In successfully");
+      router.push("/");
+    } catch (error) {
+      console.log(error);
+      toast.error(`${error}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -38,6 +55,7 @@ export default function LoginPage() {
 
               <input
                 id="email"
+                required={true}
                 name="email"
                 type="email"
                 autoComplete="email"
@@ -61,6 +79,7 @@ export default function LoginPage() {
               <FiLock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
 
               <input
+                required={true}
                 id="password"
                 name="password"
                 type={isVisible ? "text" : "password"}
@@ -75,7 +94,7 @@ export default function LoginPage() {
                 type="button"
                 onClick={() => setIsVisible((prev) => !prev)}
                 aria-label={isVisible ? "Hide password" : "Show password"}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
               >
                 {isVisible ? <FiEyeOff /> : <FiEye />}
               </button>
@@ -107,7 +126,15 @@ export default function LoginPage() {
             aria-label="Login to account"
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium transition"
           >
-            Login
+            {loading ? (
+              <div className="flex justify-center items-center py-2 gap-1">
+                <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:-0.3s]" />
+                <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:-0.15s]" />
+                <span className="w-2 h-2 bg-white rounded-full animate-bounce" />
+              </div>
+            ) : (
+              "Login"
+            )}
           </button>
 
           <p className="text-sm text-center text-gray-600">
