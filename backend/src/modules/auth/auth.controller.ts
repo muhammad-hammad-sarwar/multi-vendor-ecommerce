@@ -142,16 +142,15 @@ export const login = async (
     expiresIn: "7d",
   });
 
+  // lax means different domains for frontend and backend
   res
-    .cookie("token", token, { httpOnly: true, secure: true })
+    .cookie("token", token, { httpOnly: true, secure: false, sameSite: "lax" })
     .json({ success: true, message: "Welcome back" });
 };
 
 export const loadUser = async (req: Request, res: Response) => {
   try {
     const token = req.cookies?.token;
-
-    console.log(req.cookies);
     if (!token) {
       return res.status(401).json({
         success: false,
@@ -160,10 +159,10 @@ export const loadUser = async (req: Request, res: Response) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
-      id: string;
+      userId: string;
     };
 
-    const user = await User.findById(decoded.id).select("-password");
+    const user = await User.findById(decoded.userId).select("-password");
 
     if (!user) {
       return res.status(404).json({

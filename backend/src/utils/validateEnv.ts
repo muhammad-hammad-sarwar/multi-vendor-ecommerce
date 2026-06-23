@@ -1,6 +1,6 @@
 export default function validateEnv() {
   const required = [
-    "JWTSecretKey",
+    "JWT_SECRET",
     // "RESEND_API_KEY",
     "DB_URL",
     "APP_EMAIL",
