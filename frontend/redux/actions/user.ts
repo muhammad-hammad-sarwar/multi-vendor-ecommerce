@@ -4,6 +4,7 @@ import { loadUserFailed, loadUserStart, loadUserSuccess } from "../slices/user";
 
 export const loadUserProfile = () => async (dispatch: AppDispatch) => {
   try {
+    console.log("LoadUser");
     dispatch(loadUserStart());
 
     const res = await api.get("/auth/me", { withCredentials: true });

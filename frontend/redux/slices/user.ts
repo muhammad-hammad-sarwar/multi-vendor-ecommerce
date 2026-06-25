@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { toast } from "react-toastify";
 
 export interface IUser {
   name: string;
@@ -41,7 +42,6 @@ const userSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
       state.user = null;
-      console.log(state.error);
     },
   },
 });

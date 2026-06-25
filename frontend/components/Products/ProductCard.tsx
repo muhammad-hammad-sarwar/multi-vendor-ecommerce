@@ -74,7 +74,7 @@ export function ProductCard({ product }: { product: Product }) {
   return (
     <>
       <div className="relative">
-        <Link href={`/products/${product.id}`}>
+        <Link href={`/products/${product.name}`}>
           <div className="bg-white border rounded-xl p-4 hover:shadow-md transition flex flex-col gap-3">
             <div className="relative w-full h-40">
               <img

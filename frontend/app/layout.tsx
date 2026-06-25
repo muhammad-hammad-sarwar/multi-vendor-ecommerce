@@ -3,7 +3,6 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import { ToastContainer } from "react-toastify";
 import AppProvider from "@/redux/Provider";
-import AppInitializer from "@/redux/AppInitializer";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -26,7 +25,6 @@ export default function RootLayout({
         <AppProvider>
           <ToastContainer theme="colored" />
           {children}
-          <AppInitializer />
         </AppProvider>
       </body>
     </html>

@@ -6,6 +6,7 @@ export const useInitApp = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
+    console.log("UseAppInit");
     dispatch(loadUserProfile());
   }, [dispatch]);
 };

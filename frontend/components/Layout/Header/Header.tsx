@@ -12,6 +12,8 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useAppSelector } from "@/redux/hooks/hooks";
 import Image from "next/image";
+import CartDrawer from "../Cart/Drawer";
+import { FavouritesDrawer } from "../Favourites/Drawer";
 
 const activePage: Record<string, number> = {
   "/": 1,
@@ -26,21 +28,21 @@ export default function Header() {
     (state) => state.user,
   );
   const [open, setOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
+  const [favouriteOpen, setFavouriteOpen] = useState(false);
   const pathname = usePathname();
   const active = activePage[pathname];
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "auto";
   }, [open]);
 
+  console.log("Header");
+
   return (
     <>
       <header className="w-full border-b bg-white">
         <div className="hidden md:flex md:items-center md:justify-between px-4 md:px-10 py-4">
           <Link href={"/"}>
-            {/* <h1 className="text-lg md:text-xl font-semibold text-gray-900">
-              Multi Vendor
-            </h1> */}
-
             <Image
               src={"/logo.png"}
               width={50}
@@ -88,14 +90,21 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center gap-3 text-gray-700 text-xl">
-            <CgHeart className="cursor-pointer hover:text-red-500 transition" />
-            <BsCart className="cursor-pointer hover:text-blue-600 transition" />
+            <CgHeart
+              onClick={() => setFavouriteOpen(true)}
+              className="cursor-pointer hover:text-red-500 transition"
+            />
+            <BsCart
+              onClick={() => setCartOpen(true)}
+              className="cursor-pointer hover:text-blue-600 transition"
+            />
+
             {isAuthenticated && user && user.avatar ? (
               <Link href={"/profile"}>
-                <div className="w-9 h-9 bg-gray-200 rounded-full overflow-hidden flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center">
                   <Image
-                    width={36}
-                    height={36}
+                    width={40}
+                    height={40}
                     src={`http://localhost:8000/uploads/${user.avatar}`}
                     alt="avatar"
                     className="object-cover"
@@ -104,10 +113,7 @@ export default function Header() {
                 </div>
               </Link>
             ) : (
-              <CgProfile
-                size={36}
-                className="cursor-pointer hover:text-gray-900 transition"
-              />
+              <CgProfile className="cursor-pointer hover:text-gray-900 transition" />
             )}
           </div>
         </div>
@@ -193,6 +199,9 @@ export default function Header() {
           </div>
         </div>
       </div>
+
+      <CartDrawer open={cartOpen} setOpen={setCartOpen} />
+      <FavouritesDrawer open={favouriteOpen} setOpen={setFavouriteOpen} />
     </>
   );
 }

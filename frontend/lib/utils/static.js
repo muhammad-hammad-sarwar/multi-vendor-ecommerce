@@ -251,7 +251,7 @@ export const productData = [
   },
   {
     id: 111234,
-    name: "Gaming Headphone Asus with mutiple color and free delivery",
+    name: "Gaming Headphone Asus with mutiple color and fast delivery",
     description:
       "Product details are a crucial part of any eCommerce website or online marketplace. These details help the potential customers to make an informed decision about the product they are interested in buying. A well-written product description can also be a powerful marketing tool that can help to increase sales.Product details typically include information about the product's features, specifications, dimensions, weight, materials, and other relevant information that can help customers to understand the product better. The product details section should also include high-quality images and videos of the product, as well as customer reviews and ratings.",
     image_Url: [
