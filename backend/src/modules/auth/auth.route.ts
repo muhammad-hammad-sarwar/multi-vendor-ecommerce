@@ -31,6 +31,6 @@ authRouter.post(
   catchAsync(authController.resendVerification),
 );
 
-authRouter.get("/me", authController.loadUser);
+authRouter.get("/me", catchAsync(authController.loadUser));
 
 export default authRouter;

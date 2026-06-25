@@ -138,7 +138,7 @@ export const login = async (
   const isSame = await bcrypt.compare(password, user.password);
   if (!isSame) throw new AppError("Password is incorrect", 401);
 
-  const token = jwt.sign({ userId: user._id }, `${process.env.JWTSecretKey}`, {
+  const token = jwt.sign({ userId: user._id }, `${process.env.JWT_SECRET}`, {
     expiresIn: "7d",
   });
 
@@ -149,36 +149,27 @@ export const login = async (
 };
 
 export const loadUser = async (req: Request, res: Response) => {
-  try {
-    const token = req.cookies?.token;
-    if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: "Not authenticated",
-      });
-    }
+  const token = req.cookies?.token;
+  console.log("token", token);
+  if (!token) throw new AppError("Not authenticated", 401);
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
-      userId: string;
-    };
+  const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
+    userId: string;
+  };
 
-    const user = await User.findById(decoded.userId).select("-password");
+  console.log("Decoded ", decoded);
 
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    }
+  const user = await User.findById(decoded.userId);
+  if (!user) throw new AppError("User not found", 404);
 
-    return res.status(200).json({
-      success: true,
-      user,
-    });
-  } catch (error) {
-    return res.status(401).json({
-      success: false,
-      message: "Invalid or expired token",
-    });
-  }
+  res.status(200).json({
+    success: true,
+    user,
+  });
+};
+
+export const logout = async (req: Request, res: Response) => {
+  res.cookie("token", null);
+
+  res.json({ success: true, message: "Logged out successfully" });
 };
