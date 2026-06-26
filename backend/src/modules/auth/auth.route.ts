@@ -6,19 +6,13 @@ import { validate } from "../../middlewares/validate.js";
 import { upload } from "../../middlewares/upload.middleware.js";
 
 const authRouter = Router();
-
 authRouter.post(
   "/sign-up",
   upload.single("avatar"),
-  // validate(authSchema.signUpSchema),
   catchAsync(authController.signUp),
 );
 
-authRouter.post(
-  "/verify",
-  // validate(authSchema.verifyTokenSchema),
-  catchAsync(authController.verifyToken),
-);
+authRouter.post("/verify", catchAsync(authController.verifyToken));
 
 authRouter.post(
   "/login",
@@ -32,5 +26,6 @@ authRouter.post(
 );
 
 authRouter.get("/me", catchAsync(authController.loadUser));
+authRouter.post("/logout", catchAsync(authController.logout));
 
 export default authRouter;

@@ -11,6 +11,7 @@ export const signUp = async (
   res: Response,
   next: NextFunction,
 ) => {
+  console.log(process.env?.DB_URL);
   const { name, email, password, address } = req.body;
   const user = await User.findOne({ email });
   if (user) {
@@ -131,6 +132,7 @@ export const login = async (
   res: Response,
   next: NextFunction,
 ) => {
+  console.log(process.env?.DB_URL);
   const { email, password } = req.body;
   const user = await User.findOne({ email }).select("+password");
   if (!user) throw new AppError("User not found", 404);
@@ -169,7 +171,7 @@ export const loadUser = async (req: Request, res: Response) => {
 };
 
 export const logout = async (req: Request, res: Response) => {
-  res.cookie("token", null);
+  res.clearCookie("token");
 
   res.json({ success: true, message: "Logged out successfully" });
 };
