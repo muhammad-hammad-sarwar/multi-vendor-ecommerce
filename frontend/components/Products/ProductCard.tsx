@@ -7,6 +7,7 @@ import { FaStar } from "react-icons/fa";
 import Link from "next/link";
 import { AiFillHeart } from "react-icons/ai";
 import ProductModal from "../Layout/ProductModal";
+import useBodyScrollLock from "@/hooks/useBodyScrollLock";
 
 export interface Product {
   id: number;
@@ -70,12 +71,13 @@ export interface Product {
 export function ProductCard({ product }: { product: Product }) {
   const [open, setOpen] = useState(false);
   const [isFavourite, setIsFavourite] = useState(false);
+  useBodyScrollLock(open);
 
   return (
     <>
       <div className="relative">
         <Link href={`/products/${product.name}`}>
-          <div className="bg-white border rounded-xl p-4 hover:shadow-md transition flex flex-col gap-3">
+          <div className="h-88 bg-white border rounded-xl p-4 hover:shadow-md transition flex flex-col gap-3">
             <div className="relative w-full h-40">
               <img
                 src={product.image_Url[0].url}

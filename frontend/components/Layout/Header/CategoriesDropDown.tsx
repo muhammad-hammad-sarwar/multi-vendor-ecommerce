@@ -21,15 +21,17 @@ export default function CategoriesDropdown() {
     <div className="relative">
       <button
         onClick={() => setOpen((prev) => !prev)}
-        className="cursor-pointer flex items-center gap-2 text-sm font-medium px-3 py-2 border rounded-md hover:bg-gray-200"
+        className="cursor-pointer flex items-center justify-between gap-2 text-sm font-medium px-3 py-4 border rounded-md bg-white hover:bg-gray-50 w-60"
       >
-        <CgMenuRight />
-        All Categories
+        <div className="flex items-center gap-2">
+          <CgMenuRight />
+          All Categories
+        </div>
         {open ? <FiChevronUp /> : <FiChevronDown />}
       </button>
 
       {open && (
-        <div className="absolute left-0 top-12 w-[90vw] md:w-150 lg:w-200 bg-white border shadow-lg rounded-xl p-4 z-50">
+        <div className="absolute left-0 top-16 w-[90vw] md:w-150 lg:w-200 bg-white border shadow-lg rounded-xl p-4 z-50">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {categoriesData.map((cat) => (
               <Link

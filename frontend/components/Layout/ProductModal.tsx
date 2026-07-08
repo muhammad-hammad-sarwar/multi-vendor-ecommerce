@@ -1,15 +1,8 @@
 "use client";
-
 import { useState } from "react";
 import Image from "next/image";
 import { AiFillHeart } from "react-icons/ai";
-import {
-  FiHeart,
-  FiMessageCircle,
-  FiMessageSquare,
-  FiShoppingCart,
-  FiX,
-} from "react-icons/fi";
+import { FiHeart, FiMessageCircle, FiShoppingCart, FiX } from "react-icons/fi";
 import { FaStar } from "react-icons/fa";
 import { Product } from "../Products/ProductCard";
 
@@ -24,15 +17,20 @@ export default function ProductModal({
   const [qty, setQty] = useState(1);
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
-      <div className="bg-white w-full max-w-5xl rounded-xl overflow-hidden flex flex-col md:flex-row">
+    <div
+      onClick={() => setOpen(false)}
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="bg-white w-full max-w-5xl rounded-xl overflow-hidden flex flex-col md:flex-row"
+      >
         <div className="w-full md:w-1/2 p-6 border-r">
           <div className="w-full h-72 relative rounded-lg overflow-hidden">
             <Image
               src={product.image_Url[0].url}
               alt={product.name}
               fill
-              // priority
               className="object-contain"
             />
           </div>

@@ -1,6 +1,5 @@
 "use client";
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FiUser,
   FiPackage,
@@ -12,6 +11,16 @@ import {
   FiLogOut,
 } from "react-icons/fi";
 import ProfileDetails from "./ProfileDetails/ProfileDetails";
+import ChangePassword from "./ChangePassword/ChangePassword";
+import AddressDetails from "./AddressDetails/AddressDetails";
+import Orders from "./Orders/Orders";
+import Refunds from "./Refund/Refund";
+import TrackOrders from "./TrackOrders/TrackOrders";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import api from "@/axios/api";
+import { logout } from "@/redux/slices/user";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
 
 const tabs = [
   { name: "Profile", icon: FiUser },
@@ -26,10 +35,28 @@ const tabs = [
 
 export default function ProfilePage() {
   const [active, setActive] = useState("Profile");
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+  const { isAuthenticated, loading } = useAppSelector((state) => state.user);
+
+  const handleLogout = async () => {
+    try {
+      await api.post("/auth/logout");
+      toast.success("Logged out successfully");
+      dispatch(logout());
+      router.push("/");
+    } catch (error) {
+      toast.error(error?.message);
+    }
+  };
+
+  const handleInbox = () => {
+    router.push("/inbox");
+  };
 
   return (
-    <section className="min-h-screen bg-gray-100 flex">
-      <aside className="bg-white border-r w-20 md:w-64 flex flex-col">
+    <section className=" flex p-3 md:px-10 md:py-6">
+      <aside className="bg-white border-r w-16 md:w-60 flex flex-col h-90 md:h-100 rounded-lg">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = active === tab.name;
@@ -37,7 +64,13 @@ export default function ProfilePage() {
           return (
             <button
               key={tab.name}
-              onClick={() => setActive(tab.name)}
+              onClick={
+                tab.name == "Log out"
+                  ? handleLogout
+                  : tab.name == "Inbox"
+                    ? handleInbox
+                    : () => setActive(tab.name)
+              }
               className={`cursor-pointer flex items-center gap-3 px-4 py-3 transition ${
                 isActive
                   ? "bg-blue-50 text-blue-600"
@@ -46,7 +79,7 @@ export default function ProfilePage() {
             >
               <Icon className="text-xl shrink-0" />
 
-              <span className="hidden md:inline text-sm font-medium">
+              <span className="hidden md:inline text-start text-sm font-medium">
                 {tab.name}
               </span>
             </button>
@@ -54,10 +87,13 @@ export default function ProfilePage() {
         })}
       </aside>
 
-      <main className="flex-1 p-6">
-        <div className="rounded-xl p-6 min-h-75">
-          {active === "Profile" ? <ProfileDetails /> : <>NON PROFILE</>}
-        </div>
+      <main className="min-w-0 flex-1 px-6">
+        {active === "Profile" && <ProfileDetails />}
+        {active === "Change Password" && <ChangePassword />}
+        {active === "Address" && <AddressDetails />}
+        {active === "Orders" && <Orders />}
+        {active === "Refunds" && <Refunds />}
+        {active === "Track Order" && <TrackOrders />}
       </main>
     </section>
   );

@@ -1,5 +1,4 @@
 "use client";
-
 import api from "@/axios/api";
 import Image from "next/image";
 import Link from "next/link";

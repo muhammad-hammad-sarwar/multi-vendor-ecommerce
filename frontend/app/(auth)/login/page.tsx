@@ -1,6 +1,6 @@
 "use client";
-
 import api from "@/axios/api";
+import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -126,15 +126,7 @@ export default function LoginPage() {
             aria-label="Login to account"
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium transition"
           >
-            {loading ? (
-              <div className="flex justify-center items-center py-2 gap-1">
-                <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:-0.3s]" />
-                <span className="w-2 h-2 bg-white rounded-full animate-bounce [animation-delay:-0.15s]" />
-                <span className="w-2 h-2 bg-white rounded-full animate-bounce" />
-              </div>
-            ) : (
-              "Login"
-            )}
+            {loading ? <ButtonLoader /> : "Login"}
           </button>
 
           <p className="text-sm text-center text-gray-600">

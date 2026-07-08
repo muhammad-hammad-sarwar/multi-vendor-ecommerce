@@ -3,8 +3,8 @@ import Link from "next/link";
 import { BiSearch } from "react-icons/bi";
 import { CgHeart, CgProfile } from "react-icons/cg";
 import { BsCart } from "react-icons/bs";
-import { FiMenu } from "react-icons/fi";
-import { navItems } from "@/lib/utils/static";
+import { FiMenu, FiX } from "react-icons/fi";
+import { navItems, productData } from "@/lib/utils/static";
 import CategoriesDropDown from "./CategoriesDropDown";
 import { ChevronRightIcon } from "lucide-react";
 import clsx from "clsx";
@@ -24,10 +24,9 @@ const activePage: Record<string, number> = {
 };
 
 export default function Header() {
-  const { user, isAuthenticated, loading } = useAppSelector(
-    (state) => state.user,
-  );
+  const { user, isAuthenticated } = useAppSelector((state) => state.user);
   const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
   const [cartOpen, setCartOpen] = useState(false);
   const [favouriteOpen, setFavouriteOpen] = useState(false);
   const pathname = usePathname();
@@ -36,7 +35,9 @@ export default function Header() {
     document.body.style.overflow = open ? "hidden" : "auto";
   }, [open]);
 
-  console.log("Header");
+  const filteredProducts = productData.filter((product) =>
+    product?.name?.toLowerCase()?.includes(search?.toLowerCase()),
+  );
 
   return (
     <>
@@ -44,19 +45,60 @@ export default function Header() {
         <div className="hidden md:flex md:items-center md:justify-between px-4 md:px-10 py-4">
           <Link href={"/"}>
             <Image
-              src={"/logo.png"}
-              width={50}
-              height={50}
+              className="w-20 h-16"
+              src={
+                "https://cdn.dribbble.com/userupload/17039933/file/original-dbbc84c08bd6b4b49fc97827fa5be468.jpg?resize=752x&vertical=center"
+              }
+              width={80}
+              height={80}
               alt="multi-vendor"
             />
           </Link>
 
-          <div className="hidden md:flex items-center w-1/2 border rounded-lg px-3 py-2 bg-gray-50 focus-within:ring-2 focus-within:ring-blue-500">
+          <div className="relative hidden md:flex items-center w-1/2 border rounded-lg px-3 py-2 bg-gray-50 focus-within:ring-2 focus-within:ring-blue-500">
             <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               placeholder="Search products..."
               className="w-full bg-transparent outline-none text-sm"
             />
-            <BiSearch className="text-gray-500 text-lg" />
+            {search ? (
+              <FiX
+                className="cursor-pointer text-gray-500"
+                onClick={() => setSearch("")}
+              />
+            ) : (
+              <BiSearch className="text-gray-500 text-lg" />
+            )}
+            {search.trim() && (
+              <div className="absolute top-full left-0 hidden md:block mt-2 w-full bg-white border rounded-lg shadow-lg max-h-96 overflow-y-auto z-50">
+                {filteredProducts.length ? (
+                  filteredProducts.map((product) => (
+                    <Link
+                      key={product?.id}
+                      href={`/products/${product?.name}`}
+                      className="flex items-center gap-3 p-3 hover:bg-gray-100"
+                    >
+                      <Image
+                        src={product?.image_Url[0]?.url}
+                        alt={product?.name}
+                        width={60}
+                        height={60}
+                        className="rounded-md object-cover"
+                      />
+
+                      <span className="text-sm font-medium">
+                        {product?.name}
+                      </span>
+                    </Link>
+                  ))
+                ) : (
+                  <p className="p-4 text-center text-gray-500">
+                    No products found
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-3 md:gap-5">
@@ -91,30 +133,35 @@ export default function Header() {
 
           <div className="flex items-center gap-3 text-gray-700 text-xl">
             <CgHeart
+              size={24}
               onClick={() => setFavouriteOpen(true)}
               className="cursor-pointer hover:text-red-500 transition"
             />
             <BsCart
+              size={24}
               onClick={() => setCartOpen(true)}
               className="cursor-pointer hover:text-blue-600 transition"
             />
 
-            {isAuthenticated && user && user.avatar ? (
-              <Link href={"/profile"}>
-                <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center">
+            <Link href={isAuthenticated ? "/profile" : "/login"}>
+              <div className="w-7.5 h-7.5 rounded-full overflow-hidden flex items-center justify-center">
+                {isAuthenticated && user && user?.avatar ? (
                   <Image
-                    width={40}
-                    height={40}
-                    src={`http://localhost:8000/uploads/${user.avatar}`}
+                    width={34}
+                    height={34}
+                    src={`http://localhost:8000/uploads/${user?.avatar}`}
                     alt="avatar"
                     className="object-cover"
                     unoptimized // remove this when use cloudinary
                   />
-                </div>
-              </Link>
-            ) : (
-              <CgProfile className="cursor-pointer hover:text-gray-900 transition" />
-            )}
+                ) : (
+                  <CgProfile
+                    size={24}
+                    className="cursor-pointer hover:text-gray-900 transition"
+                  />
+                )}
+              </div>
+            </Link>
           </div>
         </div>
 
@@ -124,8 +171,16 @@ export default function Header() {
             <FiMenu />
           </button>
 
-          <Link href="/">
-            <h1 className="text-lg font-semibold">Multi Vendor</h1>
+          <Link href={"/"}>
+            <Image
+              className="w-20 h-16"
+              src={
+                "https://cdn.dribbble.com/userupload/17039933/file/original-dbbc84c08bd6b4b49fc97827fa5be468.jpg?resize=752x&vertical=center"
+              }
+              width={80}
+              height={80}
+              alt="multi-vendor"
+            />
           </Link>
 
           <BsCart className="text-xl" />
@@ -152,14 +207,48 @@ export default function Header() {
           </button>
         </div>
 
-        <div className="p-4 border-b">
+        <div className="relative p-4 border-b">
           <div className="flex items-center border rounded-lg px-3 py-2 bg-gray-50">
             <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               placeholder="Search products..."
               className="w-full bg-transparent outline-none text-sm"
             />
-            <BiSearch className="text-gray-500 text-lg" />
+            {search ? (
+              <FiX className="cursor-pointer" onClick={() => setSearch("")} />
+            ) : (
+              <BiSearch className="text-gray-500 text-lg" />
+            )}
           </div>
+
+          {search.trim() && (
+            <div className="absolute top-full left-0 md:hidden mt-2 w-full bg-white border rounded-lg shadow-lg max-h-96 overflow-y-auto z-50">
+              {filteredProducts.length ? (
+                filteredProducts.map((product) => (
+                  <Link
+                    key={product?.id}
+                    href={`/products/${encodeURIComponent(product?.name)}`}
+                    className="flex items-center gap-3 p-3 hover:bg-gray-100"
+                  >
+                    <Image
+                      src={product?.image_Url[0]?.url}
+                      alt={product?.name}
+                      width={60}
+                      height={60}
+                      className="rounded-md object-cover"
+                    />
+
+                    <span className="text-sm font-medium">{product?.name}</span>
+                  </Link>
+                ))
+              ) : (
+                <p className="p-4 text-center text-gray-500">
+                  No products found
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         <nav className="flex flex-col p-4 gap-4 text-gray-700">
@@ -182,21 +271,36 @@ export default function Header() {
             Become a Seller
           </button>
 
-          <div className="text-center">
-            <Link
-              className="hover:text-blue-600 hover:underline"
-              href={"/login"}
-            >
-              Login
+          {isAuthenticated ? (
+            <Link onClick={() => setOpen(false)} href={"/profile"}>
+              <div className="mx-auto w-18 h-18 rounded-full overflow-hidden flex items-center mt-3">
+                <Image
+                  width={80}
+                  height={80}
+                  src={`http://localhost:8000/uploads/${user?.avatar}`}
+                  alt="avatar"
+                  className="object-cover"
+                  unoptimized // remove this when use cloudinary
+                />
+              </div>
             </Link>
-            {" / "}
-            <Link
-              className="hover:text-blue-600 hover:underline"
-              href={"/sign-up"}
-            >
-              Signup
-            </Link>
-          </div>
+          ) : (
+            <div className="text-center">
+              <Link
+                className="hover:text-blue-600 hover:underline"
+                href={"/login"}
+              >
+                Login
+              </Link>
+              {" / "}
+              <Link
+                className="hover:text-blue-600 hover:underline"
+                href={"/sign-up"}
+              >
+                Signup
+              </Link>
+            </div>
+          )}
         </div>
       </div>
 

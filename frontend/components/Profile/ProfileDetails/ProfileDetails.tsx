@@ -27,14 +27,14 @@ export default function ProfileDetails() {
 
   return (
     <div className="w-full max-w-4xl">
-      <div className="relative flex flex-col items-center mb-8">
+      <div className="max-w-28 mx-auto relative flex flex-col items-center mb-8">
         <div className="w-28 h-28 rounded-full border-4 border-green-400 p-1 overflow-hidden">
           {avatar || user ? (
             <Image
               src={
-                user
-                  ? `http://localhost:8000/uploads/${user.avatar}`
-                  : URL.createObjectURL(avatar)
+                avatar
+                  ? URL.createObjectURL(avatar)
+                  : `http://localhost:8000/uploads/${user.avatar}`
               }
               alt="avatar"
               width={112}
@@ -48,7 +48,7 @@ export default function ProfileDetails() {
             </div>
           )}
         </div>
-        <label className="z-100 absolute bottom-0 w-7 h-7 cursor-pointer rounded-full flex items-center justify-center gap-2 bg-gray-300 hover:underline">
+        <label className="absolute bottom-0 right-1/6 w-7 h-7 cursor-pointer rounded-full flex items-center justify-center gap-2 bg-gray-300 hover:underline">
           <CameraIcon size={16} />
           <input
             type="file"
@@ -64,10 +64,14 @@ export default function ProfileDetails() {
         className="grid grid-cols-1 md:grid-cols-2 gap-5"
       >
         <div>
-          <label className="text-sm font-medium text-gray-700">Full name</label>
+          <label htmlFor="name" className="text-sm font-medium text-gray-700">
+            Full name
+          </label>
           <div className="relative mt-1">
             <FiUser className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
+              autoComplete="name"
+              id="name"
               type="text"
               value={name}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -79,10 +83,14 @@ export default function ProfileDetails() {
         </div>
 
         <div>
-          <label className="text-sm font-medium text-gray-700">Email</label>
+          <label htmlFor="email" className="text-sm font-medium text-gray-700">
+            Email
+          </label>
           <div className="relative mt-1">
             <FiMail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
+              autoComplete="email"
+              id="email"
               type="email"
               value={email}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -94,12 +102,17 @@ export default function ProfileDetails() {
         </div>
 
         <div>
-          <label className="text-sm font-medium text-gray-700">
+          <label
+            htmlFor="phone-number"
+            className="text-sm font-medium text-gray-700"
+          >
             Phone Number
           </label>
           <div className="relative mt-1">
             <FiPhone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
+              autoComplete="tel"
+              id="phone-number"
               type="tel"
               value={phone}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -111,10 +124,17 @@ export default function ProfileDetails() {
         </div>
 
         <div>
-          <label className="text-sm font-medium text-gray-700">Zip Code</label>
+          <label
+            htmlFor="zip-code"
+            className="text-sm font-medium text-gray-700"
+          >
+            Zip Code
+          </label>
           <div className="relative mt-1">
             <FiMapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
+              autoComplete="postal-code"
+              id="zip-code"
               type="text"
               value={zip}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -125,7 +145,7 @@ export default function ProfileDetails() {
           </div>
         </div>
 
-        <div className="md:col-span-2">
+        {/* <div className="md:col-span-2">
           <label className="text-sm font-medium text-gray-700">
             Address Line 1
           </label>
@@ -151,7 +171,7 @@ export default function ProfileDetails() {
             }
             className="w-full mt-1 px-3 py-2 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500"
           />
-        </div>
+        </div> */}
 
         <div className="md:col-span-2 mt-4">
           <button

@@ -6,13 +6,8 @@ import FeaturesBar from "@/components/Homepage/FeaturesBar";
 import HeroSection from "@/components/Homepage/HeroSection";
 import PopularEvents from "@/components/Events/PopularEvents";
 import SubscribeSection from "@/components/Homepage/SubscribeSection";
-import { useInitApp } from "@/redux/hooks/useInitApp";
 
 export default function Home() {
-  // Initial API loads
-  console.log("Home");
-  useInitApp();
-
   return (
     <div>
       <HeroSection />
