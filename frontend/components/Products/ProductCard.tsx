@@ -1,22 +1,31 @@
 "use client";
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { FiHeart, FiShoppingCart, FiEye } from "react-icons/fi";
-import { FaStar } from "react-icons/fa";
 import Link from "next/link";
 import { AiFillHeart } from "react-icons/ai";
 import ProductModal from "../Layout/ProductModal";
 import useBodyScrollLock from "@/hooks/useBodyScrollLock";
 import { Product } from "@/redux/slices/product";
 import { addToCart } from "@/redux/slices/cart";
-import { useAppDispatch } from "@/redux/hooks/hooks";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
+import { addToWishlist, removeFromWishlist } from "@/redux/slices/wishlist";
 
 export function ProductCard({ product }: { product: Product }) {
   const [open, setOpen] = useState(false);
   const [isFavourite, setIsFavourite] = useState(false);
+  const { wishlist } = useAppSelector((store) => store.wishlist);
   const dispatch = useAppDispatch();
   useBodyScrollLock(open);
+
+  useEffect(() => {
+    const doesExist = wishlist?.find((item) => item?._id == product?._id);
+    if (doesExist) {
+      setIsFavourite(true);
+    } else {
+      setIsFavourite(false);
+    }
+  }, [wishlist]);
 
   return (
     <>
@@ -78,13 +87,19 @@ export function ProductCard({ product }: { product: Product }) {
         <div className="absolute top-3 right-3 flex flex-col items-center gap-3 text-gray-500">
           {isFavourite ? (
             <AiFillHeart
-              onClick={() => setIsFavourite(false)}
+              onClick={() => {
+                // setIsFavourite(false);
+                dispatch(removeFromWishlist(product?._id));
+              }}
               className="text-red-600 cursor-pointer transition"
               title="Remove from favourites"
             />
           ) : (
             <FiHeart
-              onClick={() => setIsFavourite(true)}
+              onClick={() => {
+                // setIsFavourite(true);
+                dispatch(addToWishlist(product));
+              }}
               className="cursor-pointer hover:text-red-500 transition"
               title="Add to favourites"
             />

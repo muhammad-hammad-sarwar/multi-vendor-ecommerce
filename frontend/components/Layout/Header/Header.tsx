@@ -8,12 +8,12 @@ import { navItems } from "@/lib/utils/static";
 import CategoriesDropDown from "./CategoriesDropDown";
 import { ChevronRightIcon } from "lucide-react";
 import clsx from "clsx";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { useAppSelector } from "@/redux/hooks/hooks";
 import Image from "next/image";
 import CartDrawer from "../Cart/CartDrawer";
-import { FavouritesDrawer } from "../Favourites/Drawer";
+import { WishlistDrawer } from "../Favourites/WishlistDrawer";
 import useBodyScrollLock from "@/hooks/useBodyScrollLock";
 
 const activePage: Record<string, number> = {
@@ -29,6 +29,8 @@ export default function Header() {
   const { loading, allProducts } = useAppSelector((state) => state.products);
   const { shop, isSeller } = useAppSelector((state) => state.shop);
   const { cartItems } = useAppSelector((store) => store.cart);
+  const { wishlist } = useAppSelector((store) => store.wishlist);
+
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [cartOpen, setCartOpen] = useState(false);
@@ -152,11 +154,18 @@ export default function Header() {
           </nav>
 
           <div className="flex items-center gap-3 text-gray-700 text-xl">
-            <CgHeart
-              size={24}
+            <div
               onClick={() => setFavouriteOpen(true)}
-              className="cursor-pointer hover:text-red-500 transition"
-            />
+              className="cursor-pointer relative"
+            >
+              <CgHeart
+                size={24}
+                className="cursor-pointer hover:text-red-500 transition"
+              />
+              <div className="absolute -top-1 -right-2 text-white bg-green-600 rounded-full w-5 h-5 text-sm flex items-center justify-center">
+                {wishlist?.length}
+              </div>
+            </div>
             <div
               onClick={() => setCartOpen(true)}
               className="cursor-pointer relative"
@@ -330,7 +339,7 @@ export default function Header() {
       </div>
 
       {cartOpen && <CartDrawer setOpen={setCartOpen} />}
-      <FavouritesDrawer open={favouriteOpen} setOpen={setFavouriteOpen} />
+      <WishlistDrawer open={favouriteOpen} setOpen={setFavouriteOpen} />
     </>
   );
 }

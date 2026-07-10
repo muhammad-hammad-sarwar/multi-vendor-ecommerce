@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { AiFillHeart } from "react-icons/ai";
 import { FiHeart, FiMessageCircle, FiShoppingCart, FiX } from "react-icons/fi";
@@ -7,7 +7,8 @@ import { FaStar } from "react-icons/fa";
 import { Product } from "@/redux/slices/product";
 import { toast } from "react-toastify";
 import { addToCart } from "@/redux/slices/cart";
-import { useAppDispatch } from "@/redux/hooks/hooks";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
+import { addToWishlist, removeFromWishlist } from "@/redux/slices/wishlist";
 
 export default function ProductModal({
   product,
@@ -16,9 +17,17 @@ export default function ProductModal({
   product: Product;
   setOpen: (fvrt: boolean) => void;
 }) {
+  const { wishlist } = useAppSelector((store) => store.wishlist);
   const dispatch = useAppDispatch();
   const [isFavourite, setIsFavourite] = useState(false);
   const [qty, setQty] = useState(1);
+
+  useEffect(() => {
+    const doesExist = wishlist?.find((item) => item?._id == product?._id);
+    if (doesExist) {
+      setIsFavourite(true);
+    }
+  }, [wishlist]);
 
   return (
     <div
@@ -131,13 +140,19 @@ export default function ProductModal({
 
             {isFavourite ? (
               <AiFillHeart
-                onClick={() => setIsFavourite(false)}
+                onClick={() => {
+                  // setIsFavourite(false);
+                  dispatch(removeFromWishlist(product?._id));
+                }}
                 className="text-red-600 cursor-pointer text-xl"
                 title="Remove from favourites"
               />
             ) : (
               <FiHeart
-                onClick={() => setIsFavourite(true)}
+                onClick={() => {
+                  // setIsFavourite(true);
+                  dispatch(addToWishlist(product));
+                }}
                 className="cursor-pointer hover:text-red-500 text-xl"
                 title="Add to favourites"
               />
