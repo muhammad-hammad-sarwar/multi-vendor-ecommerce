@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express";
-import { AppError } from "../../utils/AppError.js";
-import { User } from "../user/user.model.js";
+import { AppError } from "../utils/AppError.js";
+import { User } from "../models/user.model.js";
 import bcrypt from "bcrypt";
-import { sendEmail } from "../../utils/sendEmail.js";
+import { sendEmail } from "../utils/sendEmail.js";
 import jwt from "jsonwebtoken";
-import { deleteFile } from "../../utils/deleteFile.js";
+import { deleteFile } from "../utils/deleteFile.js";
 
 export const signUp = async (
   req: Request,
@@ -132,7 +132,6 @@ export const login = async (
   res: Response,
   next: NextFunction,
 ) => {
-  console.log(process.env?.DB_URL);
   const { email, password } = req.body;
   const user = await User.findOne({ email }).select("+password");
   if (!user) throw new AppError("User not found", 404);
@@ -146,20 +145,22 @@ export const login = async (
 
   // lax means different domains for frontend and backend
   res
-    .cookie("token", token, { httpOnly: true, secure: false, sameSite: "lax" })
+    .cookie("token", token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    })
     .json({ success: true, message: "Welcome back" });
 };
 
 export const loadUser = async (req: Request, res: Response) => {
   const token = req.cookies?.token;
-  console.log("token", token);
   if (!token) throw new AppError("Not authenticated", 401);
 
   const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
     userId: string;
   };
-
-  console.log("Decoded ", decoded);
 
   const user = await User.findById(decoded.userId);
   if (!user) throw new AppError("User not found", 404);
