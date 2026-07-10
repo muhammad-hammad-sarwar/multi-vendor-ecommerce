@@ -4,16 +4,17 @@ import { BiSearch } from "react-icons/bi";
 import { CgHeart, CgProfile } from "react-icons/cg";
 import { BsCart } from "react-icons/bs";
 import { FiMenu, FiX } from "react-icons/fi";
-import { navItems, productData } from "@/lib/utils/static";
+import { navItems } from "@/lib/utils/static";
 import CategoriesDropDown from "./CategoriesDropDown";
 import { ChevronRightIcon } from "lucide-react";
 import clsx from "clsx";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useAppSelector } from "@/redux/hooks/hooks";
 import Image from "next/image";
-import CartDrawer from "../Cart/Drawer";
+import CartDrawer from "../Cart/CartDrawer";
 import { FavouritesDrawer } from "../Favourites/Drawer";
+import useBodyScrollLock from "@/hooks/useBodyScrollLock";
 
 const activePage: Record<string, number> = {
   "/": 1,
@@ -25,17 +26,19 @@ const activePage: Record<string, number> = {
 
 export default function Header() {
   const { user, isAuthenticated } = useAppSelector((state) => state.user);
+  const { loading, allProducts } = useAppSelector((state) => state.products);
+  const { shop, isSeller } = useAppSelector((state) => state.shop);
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [cartOpen, setCartOpen] = useState(false);
   const [favouriteOpen, setFavouriteOpen] = useState(false);
   const pathname = usePathname();
   const active = activePage[pathname];
-  useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "auto";
-  }, [open]);
+  useBodyScrollLock(open);
+  useBodyScrollLock(cartOpen);
+  useBodyScrollLock(favouriteOpen);
 
-  const filteredProducts = productData.filter((product) =>
+  const filteredProducts = allProducts?.filter((product) =>
     product?.name?.toLowerCase()?.includes(search?.toLowerCase()),
   );
 
@@ -75,16 +78,20 @@ export default function Header() {
                 {filteredProducts.length ? (
                   filteredProducts.map((product) => (
                     <Link
-                      key={product?.id}
-                      href={`/products/${product?.name}`}
+                      onClick={() => {
+                        setSearch("");
+                      }}
+                      key={product?._id}
+                      href={`/products/${product?._id}`}
                       className="flex items-center gap-3 p-3 hover:bg-gray-100"
                     >
                       <Image
-                        src={product?.image_Url[0]?.url}
+                        src={`http://localhost:8000/uploads/${product?.images?.[0]}`}
                         alt={product?.name}
                         width={60}
                         height={60}
                         className="rounded-md object-cover"
+                        unoptimized
                       />
 
                       <span className="text-sm font-medium">
@@ -102,9 +109,21 @@ export default function Header() {
           </div>
 
           <div className="flex items-center gap-3 md:gap-5">
-            <button className="hidden sm:flex items-center bg-[#000000] text-white hover:bg-gray-800 text-sm md:text-base font-bold px-4 py-3 rounded-lg transition">
-              Become a Seller <ChevronRightIcon />
-            </button>
+            {isSeller ? (
+              <Link
+                href={`/shop/${shop._id}`}
+                className="hidden sm:flex items-center bg-[#000000] text-white hover:bg-gray-800 text-sm md:text-base font-bold px-4 py-3 rounded-lg transition"
+              >
+                Your Shop <ChevronRightIcon />
+              </Link>
+            ) : (
+              <Link
+                href={"/seller-login"}
+                className="hidden sm:flex items-center bg-[#000000] text-white hover:bg-gray-800 text-sm md:text-base font-bold px-4 py-3 rounded-lg transition"
+              >
+                Become a Seller <ChevronRightIcon />
+              </Link>
+            )}
 
             <button className="md:hidden text-2xl">
               <FiMenu />
@@ -183,13 +202,13 @@ export default function Header() {
             />
           </Link>
 
-          <BsCart className="text-xl" />
+          <BsCart onClick={() => setCartOpen(true)} className="text-xl" />
         </div>
       </header>
 
       {/* Mobile Sidebar */}
       <div
-        className={`fixed inset-0 bg-black/40 z-40 transition ${
+        className={`fixed inset-0 bg-black/40 z-40 ${
           open ? "opacity-100 visible" : "opacity-0 invisible"
         }`}
         onClick={() => setOpen(false)}
@@ -227,16 +246,17 @@ export default function Header() {
               {filteredProducts.length ? (
                 filteredProducts.map((product) => (
                   <Link
-                    key={product?.id}
+                    key={product?._id}
                     href={`/products/${encodeURIComponent(product?.name)}`}
                     className="flex items-center gap-3 p-3 hover:bg-gray-100"
                   >
                     <Image
-                      src={product?.image_Url[0]?.url}
+                      src={`http://localhost:8000/uploads/${product?.images?.[0]}`}
                       alt={product?.name}
                       width={60}
                       height={60}
                       className="rounded-md object-cover"
+                      unoptimized
                     />
 
                     <span className="text-sm font-medium">{product?.name}</span>
@@ -304,7 +324,7 @@ export default function Header() {
         </div>
       </div>
 
-      <CartDrawer open={cartOpen} setOpen={setCartOpen} />
+      {cartOpen && <CartDrawer setOpen={setCartOpen} />}
       <FavouritesDrawer open={favouriteOpen} setOpen={setFavouriteOpen} />
     </>
   );

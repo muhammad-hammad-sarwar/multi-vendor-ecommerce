@@ -1,7 +1,6 @@
 "use client";
-
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Chip, Button, Box } from "@mui/material";
+import { Chip, Button } from "@mui/material";
 
 const rows = [
   {
@@ -97,9 +96,8 @@ export default function Orders() {
   return (
     <div>
       <h2 className="text-2xl font-semibold text-gray-800 mb-6">My Orders</h2>
-      {/* <div className="w-full overflow-auto"> */}
+
       <DataGrid
-        // className="max-w-full h-100"
         rows={rows}
         columns={columns}
         initialState={{
@@ -113,7 +111,6 @@ export default function Orders() {
         checkboxSelection
         disableRowSelectionOnClick
       />
-      {/* </div> */}
     </div>
   );
 }

@@ -1,7 +1,8 @@
 "use client";
 import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
+import { useAppSelector } from "@/redux/hooks/hooks";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FiCamera,
   FiHome,
@@ -12,13 +13,20 @@ import {
 } from "react-icons/fi";
 
 export default function SellerSettings() {
+  const {
+    isSeller,
+    shop,
+    loading: isLoading,
+    error,
+  } = useAppSelector((state) => state.shop);
+
   const [loading, setLoading] = useState(false);
   const [avatar, setAvatar] = useState<File | null>(null);
-  const [shopName, setShopName] = useState("Tech Store");
-  const [address, setAddress] = useState("221B Baker Street");
-  const [phone, setPhone] = useState("+92 300 1234567");
-  const [zipCode, setZipCode] = useState("54000");
-  const [description, setDescription] = useState("Description");
+  const [shopName, setShopName] = useState(shop?.name || "");
+  const [address, setAddress] = useState(shop?.address || "");
+  const [phone, setPhone] = useState(shop?.phoneNumber || "");
+  const [zipCode, setZipCode] = useState(shop?.zipCode || "");
+  const [description, setDescription] = useState(shop?.description || "");
 
   const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -44,6 +52,33 @@ export default function SellerSettings() {
     setLoading(true);
   };
 
+  useEffect(() => {
+    if (!shop) return;
+
+    setShopName(shop.name);
+    setDescription(shop.description);
+    setAddress(shop.address);
+    setPhone(shop.phoneNumber);
+    setZipCode(shop.zipCode);
+  }, [shop]);
+
+  if (isLoading || !shop)
+    return (
+      <div className="flex min-h-[80vh] w-full items-center justify-center">
+        <div className="flex flex-col items-center gap-6">
+          <div className="flex gap-3">
+            <span className="h-4 w-4 rounded-full bg-orange-400 animate-wave [animation-delay:0ms]" />
+            <span className="h-4 w-4 rounded-full bg-orange-500 animate-wave [animation-delay:150ms]" />
+            <span className="h-4 w-4 rounded-full bg-red-500 animate-wave [animation-delay:300ms]" />
+          </div>
+
+          <p className="text-sm font-medium text-gray-500">
+            Loading shop settings...
+          </p>
+        </div>
+      </div>
+    );
+
   return (
     <div className="mx-auto">
       <h1 className="text-blue-600 text-3xl font-bold">Shop Settings</h1>
@@ -55,7 +90,16 @@ export default function SellerSettings() {
       <div className="flex justify-center mt-10">
         <div className="relative">
           <div className="h-40 w-40 rounded-full overflow-hidden border-4 border-blue-100 shadow-lg">
-            {avatar ? (
+            {shop?.avatar ? (
+              <Image
+                src={`http://localhost:8000/uploads/${shop?.avatar}`}
+                alt="Shop Avatar"
+                width={160}
+                height={160}
+                className="h-full w-full object-cover"
+                unoptimized
+              />
+            ) : avatar ? (
               <Image
                 src={URL.createObjectURL(avatar)}
                 alt="Shop Avatar"
@@ -110,15 +154,16 @@ export default function SellerSettings() {
           </label>
 
           <div className="relative mt-1">
-            <FiFileText className="absolute left-3 top-4 text-gray-400" />
+            <FiFileText className="absolute left-3 top-3 text-gray-400" />
 
             <textarea
               required
               id="description"
+              placeholder="Enter Description"
               rows={5}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full rounded-lg border bg-gray-50 pt-2 pl-10 pr-3 focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-lg border bg-gray-50 pt-2 pl-9 pr-3 focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
@@ -170,6 +215,8 @@ export default function SellerSettings() {
 
             <input
               required
+              type="number"
+              inputMode="numeric" // this changes the keyboard on mobile
               id="zipCode"
               value={zipCode}
               onChange={(e) => setZipCode(e.target.value)}

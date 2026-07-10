@@ -18,13 +18,10 @@ export default function LoginPage() {
     e.preventDefault();
     try {
       setLoading(true);
-      setEmail("");
-      setPassword("");
-      await api.post("/auth/login", { email, password });
+      const result = await api.post("/shop/login", { email, password });
       toast.success("Logged In successfully");
-      router.push("/");
+      router.push(`/shop/${result.data?.shopId}`);
     } catch (error) {
-      console.log(error);
       toast.error(`${error}`);
     } finally {
       setLoading(false);
@@ -34,8 +31,8 @@ export default function LoginPage() {
   return (
     <section className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8">
-        <h1 className="text-3xl font-semibold text-blue-600 text-center">
-          Login to your account
+        <h1 className="text-2xl font-semibold text-blue-600 text-center">
+          Login to your seller account
         </h1>
         <p className="text-sm text-gray-500 text-center mt-1">
           Enter your credentials to continue
@@ -132,7 +129,7 @@ export default function LoginPage() {
           <p className="text-sm text-center text-gray-600">
             Don&apos;t have an account?{" "}
             <Link
-              href="/sign-up"
+              href="/seller-sign-up"
               aria-label="Go to sign up page"
               className="text-blue-600 font-medium hover:underline"
             >

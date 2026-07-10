@@ -1,3 +1,16 @@
+import {
+  FiGrid,
+  FiShoppingBag,
+  FiPackage,
+  FiPlusSquare,
+  FiCalendar,
+  FiDollarSign,
+  FiMessageSquare,
+  FiTag,
+  FiRotateCcw,
+  FiSettings,
+} from "react-icons/fi";
+
 // Navigation Items
 export const navItems = [
   {
@@ -459,5 +472,47 @@ export const popularEvents = [
 
     time_left: "2025-01-15T00:00:00Z",
     // time_left: "2026-09-20T00:00:00Z",
+  },
+];
+
+export const sellerDashboardTabs = [
+  { name: "Dashboard", icon: FiGrid, url: "/seller/dashboard" },
+  {
+    name: "All Orders",
+    icon: FiShoppingBag,
+    url: "/seller/orders",
+  },
+  {
+    name: "All Products",
+    icon: FiPackage,
+    url: "/seller/products",
+  },
+  {
+    name: "Create Product",
+    icon: FiPlusSquare,
+    url: "/seller/create-product",
+  },
+  {
+    name: "All Events",
+    icon: FiCalendar,
+    url: "/seller/events",
+  },
+  {
+    name: "Create Event",
+    icon: FiPlusSquare,
+    url: "/seller/create-event",
+  },
+  { name: "Withdraw Money", icon: FiDollarSign, url: "/seller/withdraw" },
+  { name: "Shop Inbox", icon: FiMessageSquare, url: "/seller/inbox" },
+  {
+    name: "Discount Codes",
+    icon: FiTag,
+    url: "/seller/coupon-codes",
+  },
+  { name: "Refunds", icon: FiRotateCcw, url: "/seller/refunds" },
+  {
+    name: "Settings",
+    icon: FiSettings,
+    url: "/seller/settings",
   },
 ];

@@ -4,7 +4,7 @@ import Image from "next/image";
 import { AiFillHeart } from "react-icons/ai";
 import { FiHeart, FiMessageCircle, FiShoppingCart, FiX } from "react-icons/fi";
 import { FaStar } from "react-icons/fa";
-import { Product } from "../Products/ProductCard";
+import { Product } from "@/redux/slices/product";
 
 export default function ProductModal({
   product,
@@ -28,10 +28,11 @@ export default function ProductModal({
         <div className="w-full md:w-1/2 p-6 border-r">
           <div className="w-full h-72 relative rounded-lg overflow-hidden">
             <Image
-              src={product.image_Url[0].url}
+              src={`http://localhost:8000/uploads/${product?.images?.[0]}`}
               alt={product.name}
               fill
               className="object-contain"
+              unoptimized
             />
           </div>
 
@@ -39,17 +40,18 @@ export default function ProductModal({
             <div className="overflow-hidden h-14 w-14 rounded-full">
               <Image
                 className="object-cover object-left w-full h-full"
-                src={product.shop.shop_avatar.url}
+                src={`http://localhost:8000/uploads/${product?.shop?.avatar}`}
                 alt="shop"
                 height={60}
                 width={60}
+                unoptimized
               />
             </div>
 
             <div>
-              <p className="text-sm font-semibold">{product.shop.name}</p>
+              <p className="text-sm font-semibold">{product?.shop?.name}</p>
 
-              <div className="flex items-center gap-1 text-xs text-gray-500">
+              {/* <div className="flex items-center gap-1 text-xs text-gray-500">
                 {[...Array(5)].map((_, i) => (
                   <FaStar
                     key={i}
@@ -60,7 +62,7 @@ export default function ProductModal({
                     }
                   />
                 ))}
-              </div>
+              </div> */}
             </div>
           </div>
 
@@ -68,9 +70,7 @@ export default function ProductModal({
             <FiMessageCircle /> Message Shop
           </button>
 
-          <p className="mt-2 text-xs text-gray-500">
-            {product.total_sell} sold
-          </p>
+          <p className="mt-2 text-xs text-gray-500">{product.sold_out} sold</p>
         </div>
 
         <div className="w-full md:w-1/2 p-6 relative">
@@ -91,12 +91,12 @@ export default function ProductModal({
 
           <div className="mt-4">
             <span className="text-2xl font-bold text-black mr-2">
-              ${product.discount_price || product.price}
+              ${product.discountPrice || product.originalPrice}
             </span>
 
-            {product.discount_price && (
+            {product.discountPrice && (
               <span className="text-red-500 line-through text-sm">
-                ${product.price}
+                ${product.originalPrice}
               </span>
             )}
           </div>

@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import Image from "next/image";
 import {
@@ -14,6 +13,7 @@ import {
 } from "react-icons/fi";
 import { categoriesData } from "@/lib/utils/static";
 import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
+import api from "@/axios/api";
 
 export default function CreateProduct() {
   const [loading, setLoading] = useState(false);
@@ -52,13 +52,18 @@ export default function CreateProduct() {
   const handleImages = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
 
-    setImages(Array.from(e.target.files));
+    const newImages = Array.from(e.target.files);
+    setImages((prev) => [...prev, ...newImages]);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
+    setLoading(true);
 
     const formData = new FormData();
+    if (images) {
+      images.forEach((img) => formData.append("images", img));
+    }
 
     formData.append("name", name);
     formData.append("description", description);
@@ -74,19 +79,16 @@ export default function CreateProduct() {
       formData.append("images", image);
     });
 
-    console.log(formData);
+    await api.post("/products", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
 
-    setLoading(true);
-
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
+    setLoading(false);
   };
 
   return (
     <>
       <h1 className="text-3xl font-bold text-blue-600">Create Product</h1>
-
       <p className="text-gray-500 mt-1">Fill the product details below.</p>
 
       <form onSubmit={handleSubmit} className="space-y-6 mt-8">
@@ -101,7 +103,7 @@ export default function CreateProduct() {
             <FiBox className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
 
             <input
-              required
+              // required
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -121,7 +123,7 @@ export default function CreateProduct() {
             <FiFileText className="absolute left-3 top-4 text-gray-400" />
 
             <textarea
-              required
+              // required
               id="description"
               rows={5}
               value={description}
@@ -142,7 +144,7 @@ export default function CreateProduct() {
             <FiLayers className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
 
             <select
-              required
+              // required
               id="category"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
@@ -206,7 +208,7 @@ export default function CreateProduct() {
               <FiDollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
 
               <input
-                required
+                // required
                 id="originalPrice"
                 type="number"
                 value={originalPrice}
@@ -244,7 +246,7 @@ export default function CreateProduct() {
             <FiPackage className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
 
             <input
-              required
+              // required
               id="stock"
               type="number"
               value={stock}
@@ -263,7 +265,7 @@ export default function CreateProduct() {
 
           <label className="mt-2 flex items-center gap-3 cursor-pointer">
             <input
-              required
+              // required
               hidden
               multiple
               type="file"
@@ -279,14 +281,32 @@ export default function CreateProduct() {
 
           <div className="flex gap-4 mt-5 flex-wrap">
             {images.map((image) => (
-              <Image
+              <div
                 key={image.name}
-                src={URL.createObjectURL(image)}
-                alt={image.name}
-                width={100}
-                height={100}
-                className="rounded-lg object-cover h-24 w-24"
-              />
+                className="relative group overflow-hidden rounded-xl border bg-gray-100"
+              >
+                <Image
+                  src={URL.createObjectURL(image)}
+                  alt={image.name}
+                  width={180}
+                  height={180}
+                  className="h-32 w-full object-cover"
+                />
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setImages(
+                      images.filter(
+                        (_, index) => index !== images.indexOf(image),
+                      ),
+                    )
+                  }
+                  className="cursor-pointer absolute top-2 right-2 bg-white rounded-full p-1 shadow transition"
+                >
+                  <FiX size={15} />
+                </button>
+              </div>
             ))}
           </div>
         </div>
@@ -294,7 +314,7 @@ export default function CreateProduct() {
         <button
           type="submit"
           disabled={loading}
-          className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg w-full py-3"
+          className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg w-full h-10 cursor-pointer"
         >
           {loading ? <ButtonLoader /> : "Create Product"}
         </button>

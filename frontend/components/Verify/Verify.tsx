@@ -8,6 +8,7 @@ export default function Verify() {
   const searchParams = useSearchParams();
   const uid = searchParams.get("uid");
   const token = searchParams.get("token");
+  const sellerToken = searchParams.get("seller_token");
 
   const [status, setStatus] = useState("loading");
   const [email, setEmail] = useState("");
@@ -15,7 +16,11 @@ export default function Verify() {
   useEffect(() => {
     const verify = async () => {
       try {
-        await api.post("/auth/verify", { uid, token });
+        if (token) {
+          await api.post("/auth/verify", { uid, token });
+        } else if (sellerToken) {
+          await api.post("/shop/verify", { uid, seller_token: sellerToken });
+        }
         setStatus("success");
       } catch (err) {
         setStatus("failed");
@@ -26,7 +31,11 @@ export default function Verify() {
   }, []);
 
   const resend = async () => {
-    await api.post("/auth/resend-verification", { email, uid });
+    if (token) {
+      await api.post("/auth/resend-verification", { email, uid });
+    } else if (sellerToken) {
+      await api.post("/shop/resend-verification", { email, uid });
+    }
     setStatus("resent");
   };
 
@@ -70,7 +79,7 @@ export default function Verify() {
             </p>
 
             <Link
-              href="/login"
+              href={token ? "/login" : "seller_login"}
               className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium transition"
             >
               Go to Login

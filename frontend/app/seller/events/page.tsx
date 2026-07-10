@@ -65,7 +65,7 @@ export default function AllEvents() {
     <>
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold">All Events</h1>
+          <h1 className="text-3xl font-bold text-blue-600">All Events</h1>
 
           <p className="text-gray-500 mt-1">Manage all promotional events.</p>
         </div>

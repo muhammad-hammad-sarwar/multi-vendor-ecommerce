@@ -10,7 +10,7 @@ export default function Categories() {
           {categoriesData.map((cat) => (
             <Link
               key={cat.id}
-              href={`/products?category=${cat.title.split(" ").join("-")}`}
+              href={`/products?category=${encodeURIComponent(cat.title)}`}
               className="flex flex-col items-center bg-white text-center p-4 rounded-xl hover:shadow-md hover:-translate-y-1 transition"
             >
               <div className="w-16 h-16 relative mb-3">

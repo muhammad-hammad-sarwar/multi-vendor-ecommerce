@@ -10,8 +10,10 @@ import {
   FiGrid,
 } from "react-icons/fi";
 import { CgProfile } from "react-icons/cg";
+import { useAppSelector } from "@/redux/hooks/hooks";
 
 export default function SellerHeader() {
+  const { shop, isSeller } = useAppSelector((state) => state.shop);
   return (
     <header className="sticky top-0 z-50 h-16 bg-white border-b">
       <div className="mx-auto flex h-full items-center justify-between px-4 md:px-8">
@@ -54,16 +56,24 @@ export default function SellerHeader() {
             </Link>
           </div>
 
-          {/* <Image
-            src="/avatar.jpg"
-            alt="Profile"
-            width={40}
-            height={40}
-            className="rounded-full object-cover border"
-          /> */}
-
-          <Link href={"/shop"}>
-            <CgProfile className="text-2xl text-gray-600 hover:text-blue-600 transition" />
+          <Link href={isSeller ? `/shop/${shop._id}` : "/seller-login"}>
+            <div className="w-7.5 h-7.5 rounded-full overflow-hidden flex items-center justify-center">
+              {isSeller && shop && shop?.avatar ? (
+                <Image
+                  width={34}
+                  height={34}
+                  src={`http://localhost:8000/uploads/${shop?.avatar}`}
+                  alt="avatar"
+                  className="object-cover"
+                  unoptimized // remove this when use cloudinary
+                />
+              ) : (
+                <CgProfile
+                  size={24}
+                  className="cursor-pointer hover:text-gray-900 transition"
+                />
+              )}
+            </div>
           </Link>
         </div>
       </div>

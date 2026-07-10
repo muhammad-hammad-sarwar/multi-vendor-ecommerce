@@ -15,6 +15,7 @@ import {
 } from "react-icons/fi";
 import { categoriesData } from "@/lib/utils/static";
 import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
+import api from "@/axios/api";
 
 export default function CreateEvent() {
   const [loading, setLoading] = useState(false);
@@ -42,14 +43,10 @@ export default function CreateEvent() {
 
   const handleTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key !== "Enter") return;
-
     e.preventDefault();
 
     const value = tagInput.trim();
-
-    if (!value) return;
-
-    if (tags.includes(value)) return;
+    if (!value || tags.includes(value)) return;
 
     setTags([...tags, value]);
     setTagInput("");
@@ -62,7 +59,7 @@ export default function CreateEvent() {
   const handleImages = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
 
-    setImages(Array.from(e.target.files));
+    setImages((prev) => [...prev, ...Array.from(e.target.files)]);
   };
 
   const handleStartDate = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,8 +72,9 @@ export default function CreateEvent() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setLoading(true);
 
     const formData = new FormData();
 
@@ -88,8 +86,8 @@ export default function CreateEvent() {
     formData.append("discountPrice", discountPrice);
     formData.append("stock", stock);
 
-    formData.append("eventStartDate", startDate);
-    formData.append("eventEndDate", endDate);
+    formData.append("startDate", startDate);
+    formData.append("endDate", endDate);
 
     tags.forEach((tag) => {
       formData.append("tags[]", tag);
@@ -99,7 +97,18 @@ export default function CreateEvent() {
       formData.append("images", image);
     });
 
-    setLoading(true);
+    try {
+      console.log("Start Date", formData.get("startDate"));
+      console.log("End Date", formData.get("endDate"));
+
+      await api.post("/events", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -373,7 +382,7 @@ export default function CreateEvent() {
                         ),
                       )
                     }
-                    className="absolute top-2 right-2 bg-white rounded-full p-1 shadow opacity-0 group-hover:opacity-100 transition"
+                    className="cursor-pointer absolute top-2 right-2 bg-white rounded-full p-1 shadow transition"
                   >
                     <FiX size={15} />
                   </button>
@@ -388,7 +397,7 @@ export default function CreateEvent() {
             type="submit"
             disabled={loading}
             aria-label="Create Event"
-            className={`w-full rounded-xl py-3 font-semibold text-white transition-all duration-200
+            className={`w-full rounded-xl h-10 font-semibold text-white transition-all duration-200
               ${
                 loading
                   ? "bg-blue-500 cursor-not-allowed"

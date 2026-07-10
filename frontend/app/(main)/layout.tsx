@@ -16,7 +16,7 @@ export default function HomepageLayout({
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <ReduxAppInit />
+      {/* <ReduxAppInit /> */}
       <main className="flex-1">{children}</main>
       <Footer />
     </div>

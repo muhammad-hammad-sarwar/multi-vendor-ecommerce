@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   FiUser,
   FiPackage,
@@ -37,7 +37,6 @@ export default function ProfilePage() {
   const [active, setActive] = useState("Profile");
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { isAuthenticated, loading } = useAppSelector((state) => state.user);
 
   const handleLogout = async () => {
     try {

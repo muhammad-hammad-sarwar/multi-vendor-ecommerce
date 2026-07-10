@@ -8,65 +8,7 @@ import Link from "next/link";
 import { AiFillHeart } from "react-icons/ai";
 import ProductModal from "../Layout/ProductModal";
 import useBodyScrollLock from "@/hooks/useBodyScrollLock";
-
-export interface Product {
-  id: number;
-  name: string;
-  description: string;
-
-  category?: string;
-
-  image_Url: {
-    public_id: string;
-    url: string;
-  }[];
-
-  shop: {
-    name: string;
-
-    shop_avatar: {
-      public_id: string;
-      url: string;
-    };
-
-    ratings: number;
-
-    /**
-     * Present in only some shop records.
-     */
-    category?: string;
-  };
-
-  /* Missing */
-  price?: number;
-
-  discount_price: number;
-
-  rating: number;
-
-  /**
-   * Present only on some products.
-   */
-  reviews?: {
-    /**
-     * User shape is not available in the provided dataset.
-     * Add fields here when the backend provides them.
-     */
-    user?: {
-      id?: string | number;
-      name?: string;
-      email?: string;
-      avatar?: string;
-    };
-
-    comment: string;
-    rating: number;
-  }[];
-
-  total_sell: number;
-
-  stock: number;
-}
+import { Product } from "@/redux/slices/product";
 
 export function ProductCard({ product }: { product: Product }) {
   const [open, setOpen] = useState(false);
@@ -76,29 +18,29 @@ export function ProductCard({ product }: { product: Product }) {
   return (
     <>
       <div className="relative">
-        <Link href={`/products/${product.name}`}>
+        <Link href={`/products/${product._id}`}>
           <div className="h-88 bg-white border rounded-xl p-4 hover:shadow-md transition flex flex-col gap-3">
             <div className="relative w-full h-40">
               <img
-                src={product.image_Url[0].url}
+                src={`http://localhost:8000/uploads/${product?.images?.[0]}`}
                 alt={product.name}
                 className="w-full h-full object-cover rounded-lg"
               />
             </div>
 
             <div className="flex flex-col gap-1">
-              <p className="text-xs text-blue-600">{product.shop.name}</p>
+              <p className="text-xs text-blue-600">{product?.shop?.name}</p>
 
               <h3 className="text-sm font-semibold text-gray-900 line-clamp-2">
                 {product.name}
               </h3>
 
-              <div className="flex items-center gap-1">
+              {/* <div className="flex items-center gap-1">
                 {[...Array(5)].map((_, i) => (
                   <FaStar
                     key={i}
                     className={`text-xs ${
-                      i < Math.floor(product.rating)
+                      i < Math.floor(product.)
                         ? "text-yellow-400"
                         : "text-gray-300"
                     }`}
@@ -107,23 +49,23 @@ export function ProductCard({ product }: { product: Product }) {
                 <span className="text-xs text-gray-500 ml-1">
                   ({product.rating})
                 </span>
-              </div>
+              </div> */}
 
               <div className="flex items-center gap-2 mt-1">
                 <span className="text-lg font-bold text-gray-900">
-                  ${product.discount_price || product.price}
+                  ${product.discountPrice || product.originalPrice}
                 </span>
 
-                {product.discount_price && (
+                {product.discountPrice && (
                   <span className="text-sm text-red-500 line-through">
-                    ${product.price}
+                    ${product.originalPrice}
                   </span>
                 )}
               </div>
 
               <div className="flex justify-end">
                 <span className="text-xs text-gray-500">
-                  {product.total_sell} sold
+                  {product.sold_out} sold
                 </span>
               </div>
             </div>
