@@ -9,10 +9,13 @@ import { AiFillHeart } from "react-icons/ai";
 import ProductModal from "../Layout/ProductModal";
 import useBodyScrollLock from "@/hooks/useBodyScrollLock";
 import { Product } from "@/redux/slices/product";
+import { addToCart } from "@/redux/slices/cart";
+import { useAppDispatch } from "@/redux/hooks/hooks";
 
 export function ProductCard({ product }: { product: Product }) {
   const [open, setOpen] = useState(false);
   const [isFavourite, setIsFavourite] = useState(false);
+  const dispatch = useAppDispatch();
   useBodyScrollLock(open);
 
   return (
@@ -87,6 +90,7 @@ export function ProductCard({ product }: { product: Product }) {
             />
           )}
           <FiShoppingCart
+            onClick={() => dispatch(addToCart({ ...product }))}
             title="Add to cart"
             className="cursor-pointer hover:text-blue-600 transition"
           />

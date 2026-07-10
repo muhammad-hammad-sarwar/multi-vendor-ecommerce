@@ -28,6 +28,7 @@ export default function Header() {
   const { user, isAuthenticated } = useAppSelector((state) => state.user);
   const { loading, allProducts } = useAppSelector((state) => state.products);
   const { shop, isSeller } = useAppSelector((state) => state.shop);
+  const { cartItems } = useAppSelector((store) => store.cart);
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [cartOpen, setCartOpen] = useState(false);
@@ -156,11 +157,15 @@ export default function Header() {
               onClick={() => setFavouriteOpen(true)}
               className="cursor-pointer hover:text-red-500 transition"
             />
-            <BsCart
-              size={24}
+            <div
               onClick={() => setCartOpen(true)}
-              className="cursor-pointer hover:text-blue-600 transition"
-            />
+              className="cursor-pointer relative"
+            >
+              <BsCart size={24} className="hover:text-blue-600 transition" />
+              <div className="absolute -top-1 -right-2 text-white bg-green-600 rounded-full w-5 h-5 text-sm flex items-center justify-center">
+                {cartItems?.length}
+              </div>
+            </div>
 
             <Link href={isAuthenticated ? "/profile" : "/login"}>
               <div className="w-7.5 h-7.5 rounded-full overflow-hidden flex items-center justify-center">

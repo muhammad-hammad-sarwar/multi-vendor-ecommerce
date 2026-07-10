@@ -1,4 +1,11 @@
 "use client";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
+import {
+  decrementCartItem,
+  incrementCartItem,
+  removeFromCart,
+} from "@/redux/slices/cart";
+import clsx from "clsx";
 import { FiX, FiPlus, FiMinus, FiShoppingCart } from "react-icons/fi";
 
 export default function CartDrawer({
@@ -6,6 +13,13 @@ export default function CartDrawer({
 }: {
   setOpen: (open: boolean) => void;
 }) {
+  const { cartItems } = useAppSelector((store) => store.cart);
+  const dispatch = useAppDispatch();
+
+  const total = cartItems.reduce((sum, item) => {
+    return sum + (item?.discountPrice || item?.originalPrice) * item?.quantity;
+  }, 0);
+
   return (
     <>
       <div
@@ -18,58 +32,65 @@ export default function CartDrawer({
           "fixed right-0 top-0 h-full w-full sm:w-100 bg-white z-50 shadow-lg flex flex-col"
         }
       >
-        {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
           <h2 className="font-semibold text-lg flex items-center gap-2">
-            <FiShoppingCart /> Cart (3)
+            <FiShoppingCart /> Cart ({cartItems?.length})
           </h2>
 
           <button onClick={() => setOpen(false)}>
-            <FiX className="text-xl" />
+            <FiX className="cursor-pointer text-xl" />
           </button>
         </div>
 
-        {/* Items */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {[1, 2, 3].map((item) => (
+          {cartItems?.map((item) => (
             <div
-              key={item}
+              key={item?._id}
               className="flex gap-3 border rounded-lg p-3 relative"
             >
-              {/* Remove */}
-              <button className="absolute top-2 right-2 text-gray-400 hover:text-red-500">
-                <FiX />
+              <button className="cursor-pointer absolute top-2 right-2 text-gray-400 hover:text-red-500">
+                <FiX onClick={() => dispatch(removeFromCart(item?._id))} />
               </button>
 
-              {/* Qty Controls */}
               <div className="flex flex-col items-center justify-between">
-                <button className="bg-red-500 text-white p-1 rounded">
+                <button
+                  onClick={() => dispatch(incrementCartItem(item))}
+                  className="cursor-pointer bg-red-500 text-white p-1 rounded"
+                >
                   <FiPlus />
                 </button>
 
-                <span className="text-sm font-medium">1</span>
+                <span className="text-sm font-medium">{item?.quantity}</span>
 
-                <button className="bg-gray-200 p-1 rounded">
+                <button
+                  onClick={() => dispatch(decrementCartItem(item?._id))}
+                  className="cursor-pointer bg-gray-200 p-1 rounded"
+                >
                   <FiMinus />
                 </button>
               </div>
 
-              {/* Image */}
               <img
-                src="https://via.placeholder.com/80"
+                src={`http://localhost:8000/uploads/${item?.images?.[0]}`}
                 className="w-20 h-20 object-cover rounded"
               />
 
-              {/* Info */}
               <div className="flex flex-col justify-between flex-1">
-                <p className="text-sm font-medium line-clamp-2">
-                  Product Title Goes Here
+                <p className="text-sm font-medium line-clamp-2 capitalize">
+                  {item?.name}
                 </p>
 
                 <div>
-                  <p className="text-sm">$120</p>
+                  <p
+                    className={clsx(
+                      "text-sm",
+                      item?.discountPrice ? "line-through" : "",
+                    )}
+                  >
+                    ${item?.originalPrice}
+                  </p>
                   <p className="text-sm text-red-500 font-semibold">
-                    $120 total
+                    ${item?.discountPrice}
                   </p>
                 </div>
               </div>
@@ -77,10 +98,12 @@ export default function CartDrawer({
           ))}
         </div>
 
-        {/* Checkout */}
         <div className="p-4 border-t">
-          <button className="w-full bg-red-500 text-white py-2 rounded-lg font-medium hover:bg-red-600 transition">
-            Checkout Now
+          <button
+            disabled={total == 0}
+            className="disabled:cursor-not-allowed disabled:text-gray-200 disabled:bg-gray-400 disabled:hover:bg-gray-400 cursor-pointer w-full bg-red-500 text-white py-2 rounded-lg font-medium hover:bg-red-600 transition"
+          >
+            Checkout Now (USD$ {total})
           </button>
         </div>
       </div>

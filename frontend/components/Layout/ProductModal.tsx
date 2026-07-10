@@ -5,6 +5,9 @@ import { AiFillHeart } from "react-icons/ai";
 import { FiHeart, FiMessageCircle, FiShoppingCart, FiX } from "react-icons/fi";
 import { FaStar } from "react-icons/fa";
 import { Product } from "@/redux/slices/product";
+import { toast } from "react-toastify";
+import { addToCart } from "@/redux/slices/cart";
+import { useAppDispatch } from "@/redux/hooks/hooks";
 
 export default function ProductModal({
   product,
@@ -13,6 +16,7 @@ export default function ProductModal({
   product: Product;
   setOpen: (fvrt: boolean) => void;
 }) {
+  const dispatch = useAppDispatch();
   const [isFavourite, setIsFavourite] = useState(false);
   const [qty, setQty] = useState(1);
 
@@ -113,7 +117,12 @@ export default function ProductModal({
               <span className="px-4">{qty}</span>
 
               <button
-                onClick={() => setQty((q) => q + 1)}
+                onClick={() =>
+                  setQty((q) => {
+                    if (q < product?.stock) return q + 1;
+                    return q;
+                  })
+                }
                 className="cursor-pointer px-3 py-2 bg-gray-100"
               >
                 +
@@ -135,7 +144,12 @@ export default function ProductModal({
             )}
           </div>
 
-          <button className="cursor-pointer mt-6 w-full bg-black text-white py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-900 transition">
+          <button
+            onClick={() =>
+              dispatch(addToCart({ _id: product?._id, quantity: qty }))
+            }
+            className="cursor-pointer mt-6 w-full bg-black text-white py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-900 transition"
+          >
             <FiShoppingCart />
             Add to Cart
           </button>

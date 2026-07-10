@@ -1,15 +1,14 @@
 "use client";
-import { useEffect, useState } from "react";
 import { ProductCard } from "../Products/ProductCard";
-import { productData } from "@/lib/utils/static";
 import { Product } from "@/redux/slices/product";
 import { useAppSelector } from "@/redux/hooks/hooks";
 
 export default function BestDeals() {
   const { loading, allProducts } = useAppSelector((state) => state.products);
 
-  allProducts &&
-    allProducts.sort((a, b) => b?.sold_out - a?.sold_out)?.slice(0, 5);
+  const data =
+    allProducts &&
+    [...allProducts]?.sort((a, b) => b?.sold_out - a?.sold_out)?.slice(0, 5);
   if (loading && !allProducts) return <>loading</>;
 
   return (
@@ -24,7 +23,7 @@ export default function BestDeals() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-        {allProducts?.map((product: Product) => (
+        {data?.map((product: Product) => (
           <ProductCard key={product._id} product={product} />
         ))}
       </div>
