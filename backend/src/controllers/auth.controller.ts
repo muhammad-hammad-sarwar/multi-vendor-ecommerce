@@ -31,7 +31,7 @@ export const signUp = async (
     email,
     password: hashedPassword,
     avatar,
-    address,
+    // address,
     verifyTokenHash,
     verifyTokenExpiry,
   });
@@ -143,6 +143,8 @@ export const login = async (
     expiresIn: "7d",
   });
 
+  const { password: pswd, ...safeUser } = user.toObject();
+
   // lax means different domains for frontend and backend
   res
     .cookie("token", token, {
@@ -151,7 +153,7 @@ export const login = async (
       sameSite: "lax",
       expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     })
-    .json({ success: true, message: "Welcome back" });
+    .json({ success: true, message: "Welcome back", user: safeUser });
 };
 
 export const loadUser = async (req: Request, res: Response) => {

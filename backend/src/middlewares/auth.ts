@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { AppError } from "../utils/AppError.js";
 import { Shop } from "../models/shop.model.js";
 import jwt from "jsonwebtoken";
+import { User } from "../models/user.model.js";
 
 export const isSeller = async (
   req: Request,
@@ -16,18 +17,36 @@ export const isSeller = async (
     shopId: string;
   };
 
-  req.user = await Shop.findById(decoded.shopId);
+  if (!decoded?.shopId) throw new AppError("Invalid token", 401);
+
+  const shop = await Shop.findById(decoded.shopId);
+  if (!shop) throw new AppError("Shop does not exist", 404);
+
+  req.user = shop;
 
   next();
 };
 
-export const isAuthenticated = (
+export const isAuthenticated = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
-  if (!req.cookies?.seller_token)
-    throw new AppError("You are not authorized.", 401);
+  if (!req.cookies?.token) throw new AppError("You are not authorized.", 401);
+
+  const decoded = jwt.verify(
+    req.cookies?.token,
+    process.env.JWT_SECRET as string,
+  ) as {
+    userId: string;
+  };
+
+  if (!decoded?.userId) throw new AppError("Invalid token", 401);
+  const user = await User.findById(decoded?.userId);
+
+  if (!user) throw new AppError("User does not exist", 404);
+
+  req.user = user;
 
   next();
 };

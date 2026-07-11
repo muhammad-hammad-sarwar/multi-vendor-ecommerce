@@ -1,6 +1,8 @@
 "use client";
 import api from "@/axios/api";
 import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
+import { addUserWhileLogin } from "@/redux/actions/user";
+import { useAppDispatch } from "@/redux/hooks/hooks";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -13,6 +15,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isVisible, setIsVisible] = useState(false);
+  const dispatch = useAppDispatch();
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -20,8 +23,9 @@ export default function LoginPage() {
       setLoading(true);
       setEmail("");
       setPassword("");
-      await api.post("/auth/login", { email, password });
+      const res = await api.post("/auth/login", { email, password });
       toast.success("Logged In successfully");
+      dispatch(addUserWhileLogin(res.data?.user));
       router.push("/");
     } catch (error) {
       console.log(error);

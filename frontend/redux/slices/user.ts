@@ -6,11 +6,13 @@ export interface IUser {
   email: string;
   avatar: string;
   address?: string;
+  phoneNumber: string;
 }
 
 export interface UserState {
   user: IUser | null;
   loading: boolean;
+  profileLoading: boolean;
   error: string | null;
   isAuthenticated: boolean;
 }
@@ -18,6 +20,7 @@ export interface UserState {
 const initialState: UserState = {
   user: null,
   loading: false,
+  profileLoading: false,
   error: null,
   isAuthenticated: false,
 };
@@ -32,6 +35,12 @@ const userSlice = createSlice({
       state.error = null;
     },
 
+    // When login add user to store
+    addUser(state, action) {
+      state.isAuthenticated = true;
+      state.user = action.payload;
+    },
+
     loadUserSuccess(state, action: PayloadAction<IUser>) {
       state.loading = false;
       state.user = action.payload;
@@ -44,6 +53,34 @@ const userSlice = createSlice({
       state.user = null;
     },
 
+    // For Avatar update
+    updateProfileAvatarStart(state) {
+      state.loading = true;
+    },
+    updateProfileAvatarSuccess(state, action) {
+      state.loading = false;
+      state.user = action.payload;
+    },
+    updateProfileAvatarFailure(state, action) {
+      state.loading = false;
+      state.error = action.payload;
+    },
+
+    // For Name and PhoneNumber
+    updateProfileStart(state) {
+      state.profileLoading = true;
+    },
+    updateProfileSuccess(state, action) {
+      state.profileLoading = false;
+      state.user = action.payload;
+      toast.success("Profile Updated successfully");
+    },
+    updateProfileFailure(state, action) {
+      state.profileLoading = false;
+      state.error = action.payload;
+      toast.error(state.error);
+    },
+
     logout(state) {
       state.isAuthenticated = false;
       state.user = null;
@@ -51,7 +88,18 @@ const userSlice = createSlice({
   },
 });
 
-export const { loadUserStart, loadUserFailed, loadUserSuccess, logout } =
-  userSlice.actions;
+export const {
+  addUser,
+  loadUserStart,
+  loadUserSuccess,
+  loadUserFailed,
+  updateProfileAvatarStart,
+  updateProfileAvatarSuccess,
+  updateProfileAvatarFailure,
+  updateProfileStart,
+  updateProfileSuccess,
+  updateProfileFailure,
+  logout,
+} = userSlice.actions;
 
 export default userSlice.reducer;

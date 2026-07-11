@@ -13,6 +13,6 @@ productRouter.post(
   catchAsync(productController.createProduct),
 );
 
-productRouter.get("", isSeller, catchAsync(productController.getProducts));
+productRouter.get("/", catchAsync(productController.getProducts));
 
 export default productRouter;

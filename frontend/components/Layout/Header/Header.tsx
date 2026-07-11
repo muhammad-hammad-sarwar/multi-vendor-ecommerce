@@ -8,7 +8,7 @@ import { navItems } from "@/lib/utils/static";
 import CategoriesDropDown from "./CategoriesDropDown";
 import { ChevronRightIcon } from "lucide-react";
 import clsx from "clsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useAppSelector } from "@/redux/hooks/hooks";
 import Image from "next/image";
@@ -44,6 +44,8 @@ export default function Header() {
   const filteredProducts = allProducts?.filter((product) =>
     product?.name?.toLowerCase()?.includes(search?.toLowerCase()),
   );
+
+  useEffect(() => {}, [user]);
 
   return (
     <>

@@ -1,20 +1,25 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 
-const getWishlist = () => {
-  if (typeof window === "undefined") return [];
+// const getWishlist = () => {
+//   if (typeof window === "undefined") return [];
 
-  return JSON.parse(localStorage.getItem("wishlist") || "[]");
-};
+//   return JSON.parse(localStorage.getItem("wishlist") || "[]");
+// };
 
 const initialState = {
-  wishlist: getWishlist(),
+  wishlist: [],
 };
 
 const wishlistSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
+    // Initialize from local Storage
+    setWishlist(state, action) {
+      state.wishlist = action.payload;
+    },
+
     addToWishlist(state, action) {
       const item = state.wishlist.find(
         (item) => item._id === action.payload._id,
@@ -39,5 +44,6 @@ const wishlistSlice = createSlice({
   },
 });
 
-export const { addToWishlist, removeFromWishlist } = wishlistSlice.actions;
+export const { addToWishlist, removeFromWishlist, setWishlist } =
+  wishlistSlice.actions;
 export default wishlistSlice.reducer;

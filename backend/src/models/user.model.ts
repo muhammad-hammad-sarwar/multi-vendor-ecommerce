@@ -1,11 +1,21 @@
 import mongoose, { Schema, Document } from "mongoose";
 
+interface IAddress {
+  country: string;
+  city: string;
+  address1: string;
+  address2: string;
+  zipCode: string;
+  addressType: "Home" | "Office" | "Default";
+}
+
 export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
   avatar: string;
-  address?: string;
+  addresses?: IAddress[];
+  phoneNumber: string;
   isVerified?: boolean;
   verifyTokenHash: string;
   verifyTokenExpiry: Date;
@@ -35,23 +45,45 @@ const userSchema = new Schema<IUser>(
       type: String,
       required: true,
     },
-    address: {
+    phoneNumber: {
       type: String,
+      minLength: [15, "Phone Number must be 11 digits"],
+      maxLength: [15, "Phone Number must be 11 digits"],
       default: "",
     },
+    addresses: [
+      {
+        type: {
+          country: { type: String, required: true },
+          city: { type: String, required: true },
+          address1: { type: String, required: true },
+          address2: { type: String, required: true },
+          zipCode: { type: String, required: true },
+          addressType: {
+            type: String,
+            default: "Default",
+            enum: ["Home", "Office", "Default"],
+          },
+        },
+        default: [],
+      },
+    ],
 
     // Verify User after creation
     isVerified: {
       type: Boolean,
       default: false,
+      select: false,
     },
     verifyTokenHash: {
       type: String,
       required: true,
+      select: false,
     },
     verifyTokenExpiry: {
       type: Date,
       required: true,
+      select: false,
     },
   },
   {

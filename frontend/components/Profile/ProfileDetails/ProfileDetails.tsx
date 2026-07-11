@@ -1,29 +1,58 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import { FiUser, FiMail, FiPhone, FiMapPin, FiUpload } from "react-icons/fi";
-import { useAppSelector } from "@/redux/hooks/hooks";
+import {
+  FiUser,
+  FiMail,
+  FiPhone,
+  FiMapPin,
+  FiUpload,
+  FiLock,
+} from "react-icons/fi";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
 import { CameraIcon } from "lucide-react";
+import LoadingDots from "@/components/Common/LoadingDots";
+import {
+  updateUserProfile,
+  updateUserProfileAvatar,
+} from "@/redux/actions/user";
+import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
 
 export default function ProfileDetails() {
-  const { user } = useAppSelector((state) => state.user);
+  const { user, loading, error, profileLoading } = useAppSelector(
+    (state) => state.user,
+  );
   const [name, setName] = useState<string>(user ? user.name : "");
   const [email, setEmail] = useState<string>(user ? user.email : "");
-  const [phone, setPhone] = useState<string>("");
-  const [zip, setZip] = useState<string>("");
-  const [address1, setAddress1] = useState<string>("");
-  const [address2, setAddress2] = useState<string>("");
+  const [phone, setPhone] = useState<string>(user ? user?.phoneNumber : "");
+  const [password, setPassword] = useState("");
   const [avatar, setAvatar] = useState<File | null>(null);
+  const dispatch = useAppDispatch();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setAvatar(file);
+    // setAvatar(file);
+    const formData = new FormData();
+    formData.append("avatar", file);
+    dispatch(updateUserProfileAvatar(formData)).then(() => {
+      setAvatar(file);
+    });
   };
 
   const handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
+    dispatch(updateUserProfile({ name, password, phoneNumber: phone }));
   };
+
+  useEffect(() => {
+    setName(user?.name ?? "");
+    setEmail(user?.email ?? "");
+    setPhone(user?.phoneNumber ?? "");
+  }, [user]);
+
+  if (loading || (!error && !user))
+    return <LoadingDots text="Loading profile data..." />;
 
   return (
     <div className="w-full max-w-4xl">
@@ -72,6 +101,7 @@ export default function ProfileDetails() {
             <input
               autoComplete="name"
               id="name"
+              placeholder="John Doe"
               type="text"
               value={name}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -86,17 +116,19 @@ export default function ProfileDetails() {
           <label htmlFor="email" className="text-sm font-medium text-gray-700">
             Email
           </label>
-          <div className="relative mt-1">
+          <div className="cursor-not-allowed relative mt-1">
             <FiMail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
+              disabled
               autoComplete="email"
               id="email"
               type="email"
+              placeholder="john.doe@example.com"
               value={email}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setEmail(e.target.value)
               }
-              className="w-full pl-10 pr-3 py-2 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-lg border bg-gray-100 py-2 pl-10 pr-3 text-gray-500 opacity-70 cursor-not-allowed focus:outline-none"
             />
           </div>
         </div>
@@ -112,9 +144,13 @@ export default function ProfileDetails() {
             <FiPhone className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               autoComplete="tel"
+              required
               id="phone-number"
               type="tel"
               value={phone}
+              placeholder="+92-300-0000000"
+              minLength={15}
+              maxLength={15}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setPhone(e.target.value)
               }
@@ -125,60 +161,36 @@ export default function ProfileDetails() {
 
         <div>
           <label
-            htmlFor="zip-code"
+            htmlFor="password"
             className="text-sm font-medium text-gray-700"
           >
-            Zip Code
+            Password
           </label>
+
           <div className="relative mt-1">
-            <FiMapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <FiLock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+
             <input
-              autoComplete="postal-code"
-              id="zip-code"
-              type="text"
-              value={zip}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setZip(e.target.value)
-              }
-              className="w-full pl-10 pr-3 py-2 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500"
+              required={true}
+              id="password"
+              name="password"
+              type={"password"}
+              placeholder="Enter Password"
+              autoComplete="current-password"
+              aria-label="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full pl-10 pr-10 py-2 border rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
 
-        {/* <div className="md:col-span-2">
-          <label className="text-sm font-medium text-gray-700">
-            Address Line 1
-          </label>
-          <input
-            type="text"
-            value={address1}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setAddress1(e.target.value)
-            }
-            className="w-full mt-1 px-3 py-2 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        <div className="md:col-span-2">
-          <label className="text-sm font-medium text-gray-700">
-            Address Line 2
-          </label>
-          <input
-            type="text"
-            value={address2}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setAddress2(e.target.value)
-            }
-            className="w-full mt-1 px-3 py-2 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500"
-          />
-        </div> */}
-
         <div className="md:col-span-2 mt-4">
           <button
             type="submit"
-            className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition"
+            className="cursor-pointer w-full md:w-42 bg-blue-600 hover:bg-blue-700 text-white px-6 h-12 rounded-lg font-medium transition"
           >
-            Update Profile
+            {profileLoading ? <ButtonLoader /> : "Update Profile"}
           </button>
         </div>
       </form>
