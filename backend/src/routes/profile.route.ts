@@ -25,4 +25,16 @@ profileRouter.put(
   catchAsync(profileController.updateProfilePassword),
 );
 
+profileRouter.put(
+  "/addresses",
+  isAuthenticated,
+  catchAsync(profileController.updateProfileAddresses),
+);
+
+profileRouter.delete(
+  "/addresses/:id",
+  isAuthenticated,
+  catchAsync(profileController.deleteUserAddress),
+);
+
 export default profileRouter;

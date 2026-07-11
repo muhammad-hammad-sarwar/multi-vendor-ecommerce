@@ -21,8 +21,6 @@ export default function LoginPage() {
     e.preventDefault();
     try {
       setLoading(true);
-      setEmail("");
-      setPassword("");
       const res = await api.post("/auth/login", { email, password });
       toast.success("Logged In successfully");
       dispatch(addUserWhileLogin(res.data?.user));

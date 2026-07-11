@@ -139,6 +139,7 @@ export const login = async (req: Request, res: Response) => {
     expiresIn: "7d",
   });
 
+  const { password: _, ...safeShop } = shop.toObject();
   // lax means different domains for frontend and backend
   res
     .cookie("seller_token", token, {
@@ -147,7 +148,12 @@ export const login = async (req: Request, res: Response) => {
       sameSite: "lax",
       expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     })
-    .json({ success: true, message: "Welcome back", shopId: shop._id });
+    .json({
+      success: true,
+      message: "Welcome back",
+      shopId: shop._id,
+      shop: safeShop,
+    });
 };
 
 export const loadShop = async (req: Request, res: Response) => {

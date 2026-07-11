@@ -34,12 +34,12 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [cartOpen, setCartOpen] = useState(false);
-  const [favouriteOpen, setFavouriteOpen] = useState(false);
+  const [wishlistOpen, setWishlistOpen] = useState(false);
   const pathname = usePathname();
   const active = activePage[pathname];
   useBodyScrollLock(open);
   useBodyScrollLock(cartOpen);
-  useBodyScrollLock(favouriteOpen);
+  useBodyScrollLock(wishlistOpen);
 
   const filteredProducts = allProducts?.filter((product) =>
     product?.name?.toLowerCase()?.includes(search?.toLowerCase()),
@@ -157,7 +157,7 @@ export default function Header() {
 
           <div className="flex items-center gap-3 text-gray-700 text-xl">
             <div
-              onClick={() => setFavouriteOpen(true)}
+              onClick={() => setWishlistOpen(true)}
               className="cursor-pointer relative"
             >
               <CgHeart
@@ -341,7 +341,9 @@ export default function Header() {
       </div>
 
       {cartOpen && <CartDrawer setOpen={setCartOpen} />}
-      <WishlistDrawer open={favouriteOpen} setOpen={setFavouriteOpen} />
+      {wishlistOpen && (
+        <WishlistDrawer open={wishlistOpen} setOpen={setWishlistOpen} />
+      )}
     </>
   );
 }

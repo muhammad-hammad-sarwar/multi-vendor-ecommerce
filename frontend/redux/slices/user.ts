@@ -1,11 +1,21 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 
+interface IAddress {
+  _id: string;
+  country: string;
+  city: string;
+  address1: string;
+  address2: string;
+  zipCode: string;
+  addressType: "Home" | "Office" | "Default";
+}
+
 export interface IUser {
   name: string;
   email: string;
   avatar: string;
-  address?: string;
+  addresses?: IAddress[];
   phoneNumber: string;
 }
 

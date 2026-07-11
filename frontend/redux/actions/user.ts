@@ -79,3 +79,34 @@ export const updateUserProfilePassword =
       dispatch(updateProfileFailure(err?.response?.data?.message || "Failed"));
     }
   };
+
+export const updateUserProfileAddresses =
+  (payload) => async (dispatch: AppDispatch) => {
+    try {
+      dispatch(updateProfileStart());
+      const res = await api.put("/profile/addresses", payload, {
+        withCredentials: true,
+      });
+
+      dispatch(updateProfileSuccess(res.data?.user));
+    } catch (err) {
+      console.dir(err);
+      dispatch(updateProfileFailure(err?.response?.data?.message || "Failed"));
+    }
+  };
+
+export const deleteUserProfileAddress =
+  (payload) => async (dispatch: AppDispatch) => {
+    try {
+      console.log(payload);
+      dispatch(updateProfileStart());
+      const res = await api.delete(`/profile/addresses/${payload}`, {
+        withCredentials: true,
+      });
+
+      dispatch(updateProfileSuccess(res.data?.user));
+    } catch (err) {
+      console.dir(err);
+      dispatch(updateProfileFailure(err?.response?.data?.message || "Failed"));
+    }
+  };

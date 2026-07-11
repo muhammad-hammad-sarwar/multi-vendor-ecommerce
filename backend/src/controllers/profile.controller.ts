@@ -100,3 +100,71 @@ export const updateProfilePassword = async (req: Request, res: Response) => {
     user: req.user,
   });
 };
+
+export const updateProfileAddresses = async (req: Request, res: Response) => {
+  if (!req.user) {
+    throw new AppError("Please login to continue.", 401);
+  }
+
+  const { country, city, address1, address2, zipCode, addressType } = req.body;
+
+  if (!country || !city || !address1 || !address2 || !zipCode || !addressType) {
+    throw new AppError("Please fill all required fields.", 400);
+  }
+
+  const doesExist = req.user.addresses?.find(
+    (address) => address.addressType === addressType,
+  );
+
+  if (doesExist) {
+    throw new AppError(
+      `A ${addressType.toLowerCase()} address already exists.`,
+      400,
+    );
+  }
+
+  req.user.addresses?.push({
+    country,
+    city,
+    address1,
+    address2,
+    zipCode,
+    addressType,
+  });
+
+  await req.user.save();
+
+  return res.status(200).json({
+    success: true,
+    message: "Address added successfully.",
+    user: req.user,
+  });
+};
+
+export const deleteUserAddress = async (req: Request, res: Response) => {
+  if (!req.user) {
+    throw new AppError("Please login to continue.", 401);
+  }
+
+  const { id } = req.params;
+
+  if (!id) {
+    throw new AppError("Address type is required.", 400);
+  }
+
+  const address = req.user?.addresses?.find((add) => add._id == id);
+
+  if (!address) {
+    throw new AppError("Address not found.", 404);
+  }
+
+  req.user.addresses = req.user?.addresses?.filter((add) => add._id != id);
+
+  await req.user.save();
+
+  return res.status(200).json({
+    success: true,
+    message: "Address deleted successfully.",
+    user: req.user,
+  });
+};
