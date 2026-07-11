@@ -2,6 +2,7 @@ import { Router } from "express";
 import * as shopController from "../controllers/shop.controller.js";
 import { upload } from "../middlewares/upload.middleware.js";
 import catchAsync from "../utils/catchAsync.js";
+import { isSeller } from "../middlewares/auth.js";
 
 const shopRouter = Router();
 shopRouter.post(
@@ -19,5 +20,8 @@ shopRouter.post(
 
 shopRouter.get("/", catchAsync(shopController.loadShop));
 shopRouter.post("/logout", catchAsync(shopController.logout));
+
+shopRouter.get("/products", isSeller, shopController.getShopProducts);
+shopRouter.delete("/products/:id", isSeller, shopController.deleteProductById);
 
 export default shopRouter;

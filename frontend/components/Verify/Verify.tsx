@@ -79,7 +79,7 @@ export default function Verify() {
             </p>
 
             <Link
-              href={token ? "/login" : "seller_login"}
+              href={token ? "/login" : "seller-login"}
               className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium transition"
             >
               Go to Login

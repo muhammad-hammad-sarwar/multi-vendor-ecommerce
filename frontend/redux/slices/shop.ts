@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Product } from "./product";
 
 export interface IShop {
   _id: string;
@@ -31,6 +32,10 @@ const shopSlice = createSlice({
   name: "shop",
   initialState,
   reducers: {
+    addShop(state, action) {
+      state.shop = action.payload;
+    },
+
     loadShopStart(state) {
       state.loading = true;
       state.error = null;
@@ -55,6 +60,11 @@ const shopSlice = createSlice({
   },
 });
 
-export const { loadShopFailed, loadShopStart, loadShopSuccess, logout } =
-  shopSlice.actions;
+export const {
+  addShop,
+  loadShopFailed,
+  loadShopStart,
+  loadShopSuccess,
+  logout,
+} = shopSlice.actions;
 export default shopSlice.reducer;

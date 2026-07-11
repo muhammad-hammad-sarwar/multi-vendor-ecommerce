@@ -1,6 +1,8 @@
 "use client";
 import api from "@/axios/api";
 import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
+import { useAppDispatch } from "@/redux/hooks/hooks";
+import { addShop } from "@/redux/slices/shop";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -13,6 +15,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isVisible, setIsVisible] = useState(false);
+  const dispatch = useAppDispatch();
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -20,6 +23,7 @@ export default function LoginPage() {
       setLoading(true);
       const result = await api.post("/shop/login", { email, password });
       toast.success("Logged In successfully");
+      dispatch(addShop(result.data?.shop));
       router.push(`/shop/${result.data?.shopId}`);
     } catch (error) {
       toast.error(`${error}`);

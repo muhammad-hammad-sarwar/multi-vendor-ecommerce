@@ -1,4 +1,5 @@
 "use client";
+import { useAppSelector } from "@/redux/hooks/hooks";
 import { useEffect, useState } from "react";
 import {
   FiPlus,
@@ -14,35 +15,13 @@ import {
 export default function CouponsPage() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  const { products } = useAppSelector((state) => state.products);
   const [couponCode, setCouponCode] = useState("");
   const [discount, setDiscount] = useState("");
   const [selectedProduct, setSelectedProduct] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
 
-  const products = [
-    "Nike Air Max",
-    "Gaming Mouse",
-    "MacBook Pro",
-    "Mechanical Keyboard",
-  ];
-
-  const coupons = [
-    {
-      id: 1,
-      code: "SUMMER20",
-      product: "Nike Air Max",
-      discount: 20,
-      expiry: "2026-08-12",
-    },
-    {
-      id: 2,
-      code: "SAVE10",
-      product: "Gaming Mouse",
-      discount: 10,
-      expiry: "2026-09-01",
-    },
-  ];
+  const coupons = [];
 
   const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
@@ -217,8 +196,8 @@ export default function CouponsPage() {
                     <option value="">Select Product</option>
 
                     {products.map((product) => (
-                      <option key={product} value={product}>
-                        {product}
+                      <option key={product?._id} value={product?._id}>
+                        {product?.name}
                       </option>
                     ))}
                   </select>

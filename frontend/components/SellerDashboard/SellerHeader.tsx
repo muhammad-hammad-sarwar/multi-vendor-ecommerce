@@ -31,7 +31,7 @@ export default function SellerHeader() {
 
         <div className="flex items-center gap-3">
           <div className="hidden lg:flex items-center gap-6">
-            <Link href="/seller">
+            <Link href="/seller/dashboard">
               <FiGrid className="text-2xl text-gray-600 hover:text-blue-600 transition" />
             </Link>
 
@@ -47,11 +47,11 @@ export default function SellerHeader() {
               <FiCalendar className="text-2xl text-gray-600 hover:text-blue-600 transition" />
             </Link>
 
-            <Link href="/seller/coupons">
+            <Link href="/seller/coupon-codes">
               <FiTag className="text-2xl text-gray-600 hover:text-blue-600 transition" />
             </Link>
 
-            <Link href="/seller/messages">
+            <Link href="/seller/inbox">
               <FiMessageCircle className="text-2xl text-gray-600 hover:text-blue-600 transition" />
             </Link>
           </div>

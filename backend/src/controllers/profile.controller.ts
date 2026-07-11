@@ -25,9 +25,7 @@ export const updateProfileAvatar = async (req: Request, res: Response) => {
 export const updateProfile = async (req: Request, res: Response) => {
   const { name, phoneNumber, password } = req.body;
 
-  if (!req.user) {
-    throw new AppError("Please login to continue", 401);
-  }
+  if (!req.user) throw new AppError("Please login to continue", 401);
 
   if (name === req.user.name && phoneNumber === req.user.phoneNumber) {
     throw new AppError("No changes were made to your profile.", 400);

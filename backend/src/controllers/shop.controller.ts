@@ -6,6 +6,7 @@ import { sendEmail } from "../utils/sendEmail.js";
 import jwt from "jsonwebtoken";
 import { deleteFile } from "../utils/deleteFile.js";
 import { shopSchema } from "../schemas/shop.schema.js";
+import { Product } from "../models/product.model.js";
 
 export const signUp = async (
   req: Request,
@@ -176,4 +177,30 @@ export const logout = async (req: Request, res: Response) => {
   res.clearCookie("seller_token");
 
   res.json({ success: true, message: "Logged out successfully" });
+};
+
+export const getShopProducts = async (req: Request, res: Response) => {
+  if (!req.user) throw new AppError("Please login to continue.", 401);
+  return res.json({
+    success: true,
+    products: await Product.find({ shop: req.user?._id }),
+  });
+};
+
+export const deleteProductById = async (req: Request, res: Response) => {
+  if (!req.user) throw new AppError("Please login to continue.", 401);
+  const { id } = req.params;
+  if (!id) throw new AppError("Product id is required", 400);
+  const product = await Product.findById(id);
+  if (!product) throw new AppError("Product does not exist", 400);
+
+  if (product.shop.toString() != req?.user?._id.toString())
+    throw new AppError("You are Not Authorized to delete the product", 401);
+
+  await Product.deleteOne({ _id: id });
+
+  return res.json({
+    success: true,
+    message: `Product with id ${id} deleted successfully`,
+  });
 };

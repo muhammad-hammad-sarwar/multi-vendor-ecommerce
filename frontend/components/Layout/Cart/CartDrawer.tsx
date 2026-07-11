@@ -6,6 +6,7 @@ import {
   removeFromCart,
 } from "@/redux/slices/cart";
 import clsx from "clsx";
+import Link from "next/link";
 import { FiX, FiPlus, FiMinus, FiShoppingCart } from "react-icons/fi";
 
 export default function CartDrawer({
@@ -14,6 +15,8 @@ export default function CartDrawer({
   setOpen: (open: boolean) => void;
 }) {
   const { cartItems } = useAppSelector((store) => store.cart);
+  const { isAuthenticated } = useAppSelector((store) => store.user);
+
   const dispatch = useAppDispatch();
 
   const total = cartItems.reduce((sum, item) => {
@@ -105,12 +108,14 @@ export default function CartDrawer({
         </div>
 
         <div className="p-4 border-t">
-          <button
-            disabled={total == 0}
-            className="disabled:cursor-not-allowed disabled:text-gray-200 disabled:bg-gray-400 disabled:hover:bg-gray-400 cursor-pointer w-full bg-red-500 text-white py-2 rounded-lg font-medium hover:bg-red-600 transition"
-          >
-            Checkout Now (USD$ {total})
-          </button>
+          <Link href={isAuthenticated ? "/checkout" : "/login"}>
+            <button
+              disabled={total == 0}
+              className="disabled:cursor-not-allowed disabled:text-gray-200 disabled:bg-gray-400 disabled:hover:bg-gray-400 cursor-pointer w-full bg-red-500 text-white py-2 rounded-lg font-medium hover:bg-red-600 transition"
+            >
+              Checkout Now (USD$ {total})
+            </button>
+          </Link>
         </div>
       </div>
     </>

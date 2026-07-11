@@ -8,6 +8,7 @@ import authRouter from "./routes/auth.route.js";
 import productRouter from "./routes/product.route.js";
 import eventRouter from "./routes/event.route.js";
 import profileRouter from "./routes/profile.route.js";
+import couponRouter from "./routes/coupon.route.js";
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use("/shop", shopRouter);
 app.use("/products", productRouter);
 app.use("/events", eventRouter);
 app.use("/profile", profileRouter);
+app.use("/coupon", couponRouter);
 
 // Error Handling
 app.use(errorMiddleware);

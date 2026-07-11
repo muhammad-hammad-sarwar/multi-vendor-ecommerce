@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 
-interface IAddress {
+export interface IAddress {
   _id: string;
   country: string;
   city: string;

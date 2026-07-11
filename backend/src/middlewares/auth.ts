@@ -22,6 +22,9 @@ export const isSeller = async (
   const shop = await Shop.findById(decoded.shopId);
   if (!shop) throw new AppError("Shop does not exist", 404);
 
+  if (!shop.isVerified)
+    throw new AppError("Please verify your email to continue", 401);
+
   req.user = shop;
 
   next();
@@ -45,6 +48,9 @@ export const isAuthenticated = async (
   const user = await User.findById(decoded?.userId);
 
   if (!user) throw new AppError("User does not exist", 404);
+
+  if (!user.isVerified)
+    throw new AppError("Please verify your email to continue", 401);
 
   req.user = user;
 

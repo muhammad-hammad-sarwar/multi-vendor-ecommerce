@@ -18,7 +18,7 @@ export async function proxy(request: NextRequest) {
     );
   }
 
-  if (!token && pathname.startsWith("/profile")) {
+  if (!token && (pathname == "/checkout" || pathname.startsWith("/profile"))) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
@@ -46,5 +46,7 @@ export const config = {
 
     "/seller-login",
     "/seller-sign-up",
+
+    "/checkout",
   ],
 };

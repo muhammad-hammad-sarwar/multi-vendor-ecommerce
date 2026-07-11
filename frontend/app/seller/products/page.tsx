@@ -1,7 +1,9 @@
 "use client";
+import LoadingDots from "@/components/Common/LoadingDots";
 import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
 import useBodyScrollLock from "@/hooks/useBodyScrollLock";
-import { useAppSelector } from "@/redux/hooks/hooks";
+import { deleteSellerProduct } from "@/redux/actions/product";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Link from "next/link";
 import { useState } from "react";
@@ -10,7 +12,10 @@ import { FiEye, FiTrash2 } from "react-icons/fi";
 export default function AllProducts() {
   const [loading, setLoading] = useState(false);
   const [productToDelete, setProductToDelete] = useState<number | null>(null);
-  const {} = useAppSelector((state) => state.shop);
+  const { shopLoading, error, products } = useAppSelector(
+    (state) => state.products,
+  );
+  const dispatch = useAppDispatch();
   useBodyScrollLock(productToDelete);
 
   const columns: GridColDef[] = [
@@ -70,7 +75,7 @@ export default function AllProducts() {
       minWidth: 100,
       renderCell: ({ row }) => (
         <button
-          onClick={() => setProductToDelete(row?.productId)}
+          onClick={() => dispatch(deleteSellerProduct(row?.productId))}
           className="cursor-pointer text-red-600 hover:text-red-800 transition"
           title="Delete Product"
         >
@@ -80,7 +85,20 @@ export default function AllProducts() {
     },
   ];
 
-  const rows = [{}];
+  const rows =
+    (products &&
+      products?.map((p) => ({
+        id: p._id, // DataGrid requires an `id` field
+        productId: p._id,
+        name: p.name,
+        quantity: p.stock - p.sold_out,
+        stock: p.stock,
+        sold: p.sold_out,
+      }))) ??
+    [];
+
+  if (shopLoading || (!error && !products))
+    return <LoadingDots text="Loading your products..." />;
 
   return (
     <>
@@ -88,7 +106,7 @@ export default function AllProducts() {
       <p className="mt-2 mb-8 text-gray-500">Manage your all products.</p>
 
       <DataGrid
-        // rows={rows}
+        rows={rows}
         columns={columns}
         initialState={{
           pagination: {

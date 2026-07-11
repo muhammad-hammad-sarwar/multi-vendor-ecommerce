@@ -1,5 +1,6 @@
 import SellerHeader from "@/components/SellerDashboard/SellerHeader";
 import SellerSidebar from "@/components/SellerDashboard/SellerSidebar";
+import SellerInit from "@/redux/SellerInit";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -24,6 +25,7 @@ export default function SellerLayout({
           </div>
         </main>
       </section>
+      <SellerInit />
     </>
   );
 }
