@@ -55,7 +55,8 @@ export const getProducts = async (req: Request, res: Response) => {
 
 export const getShopProducts = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const products = await Product.find({ shop: id });
+  if (!id) throw new AppError("Shop id is required", 400);
 
+  const products = await Product.find({ shop: id });
   return res.json({ success: true, products });
 };

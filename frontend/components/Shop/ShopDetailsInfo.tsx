@@ -1,10 +1,12 @@
 "use client";
+import { useAppSelector } from "@/redux/hooks/hooks";
 import Link from "next/link";
 import { useState } from "react";
 import { FiCalendar, FiGrid, FiPackage, FiStar } from "react-icons/fi";
+import { ProductCard } from "../Products/ProductCard";
 type Tab = "products" | "events" | "reviews";
 
-export default function ShopDetailsInfo({ isOwner }) {
+export default function ShopDetailsInfo({ products, isOwner }) {
   const [activeTab, setActiveTab] = useState<Tab>("products");
   return (
     <main className="flex-1">
@@ -55,7 +57,13 @@ export default function ShopDetailsInfo({ isOwner }) {
         )}
       </div>
 
-      {activeTab === "products" && (
+      {activeTab === "products" && products?.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {products?.map((p) => (
+            <ProductCard key={p?._id} product={p} />
+          ))}
+        </div>
+      ) : (
         <div className="rounded-2xl border bg-white py-16 text-center shadow-sm">
           <FiPackage className="mx-auto text-gray-300" size={50} />
           <h2 className="mt-5 text-xl font-semibold">No Products Yet</h2>

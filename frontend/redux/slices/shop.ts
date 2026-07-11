@@ -15,10 +15,17 @@ export interface IShop {
 }
 
 interface ShopState {
+  // logged-in
   shop: null | IShop;
   loading: boolean;
   error: null | string;
   isSeller: boolean;
+  products: Product[] | null;
+
+  // current shop is for get by id
+  currentShop: null | IShop;
+  infoLoading: boolean;
+  currentShopProducts: Product[] | null;
 }
 
 const initialState: ShopState = {
@@ -26,6 +33,11 @@ const initialState: ShopState = {
   loading: false,
   error: null,
   isSeller: false,
+  products: null,
+
+  currentShop: null,
+  infoLoading: false,
+  currentShopProducts: null,
 };
 
 const shopSlice = createSlice({
@@ -53,6 +65,36 @@ const shopSlice = createSlice({
       state.shop = null;
     },
 
+    // For All shop sellers info
+    loadShopInfoStart(state) {
+      state.infoLoading = true;
+    },
+
+    loadShopInfoSuccess(state, action) {
+      state.infoLoading = false;
+      state.currentShop = action.payload;
+    },
+
+    loadShopInfoFailure(state, action) {
+      state.infoLoading = false;
+      state.error = action.payload;
+    },
+
+    // current shop info products
+    loadShopProductstart(state) {
+      state.infoLoading = true;
+    },
+
+    loadShopProductsSuccess(state, action) {
+      state.infoLoading = false;
+      state.currentShopProducts = action.payload;
+    },
+
+    loadShopProductsFailure(state, action) {
+      state.infoLoading = false;
+      state.error = action.payload;
+    },
+
     logout(state) {
       state.isSeller = false;
       state.shop = null;
@@ -65,6 +107,14 @@ export const {
   loadShopFailed,
   loadShopStart,
   loadShopSuccess,
+
+  // current shop
+  loadShopInfoStart,
+  loadShopInfoSuccess,
+  loadShopInfoFailure,
+  loadShopProductstart,
+  loadShopProductsSuccess,
+  loadShopProductsFailure,
   logout,
 } = shopSlice.actions;
 export default shopSlice.reducer;

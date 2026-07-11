@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
 import { addToWishlist, removeFromWishlist } from "@/redux/slices/wishlist";
 import { addToCart } from "@/redux/slices/cart";
 import { AiFillHeart } from "react-icons/ai";
+import Link from "next/link";
 
 export default function ProductDetailsPage() {
   const params = useParams();
@@ -108,13 +109,17 @@ export default function ProductDetailsPage() {
           </div>
 
           <div className="flex items-center gap-4 border p-3 rounded-lg">
-            <img
-              src={`http://localhost:8000/uploads/${product?.shop?.avatar}`}
-              className="w-12 h-12 rounded-full"
-            />
+            <Link href={`/shop/preview/${product?.shop?._id}`}>
+              <img
+                src={`http://localhost:8000/uploads/${product?.shop?.avatar}`}
+                className="w-12 h-12 rounded-full"
+              />
+            </Link>
 
             <div className="flex flex-col">
-              <span className="font-medium">{product.shop.name}</span>
+              <Link href={`/shop/preview/${product?.shop?._id}`}>
+                <span className="font-medium">{product.shop.name}</span>
+              </Link>
               <span className="text-sm text-gray-500">
                 {/* {product?.shop?.ratings || 0} rating */}
               </span>

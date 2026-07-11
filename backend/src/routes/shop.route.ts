@@ -21,6 +21,10 @@ shopRouter.post(
 shopRouter.get("/", catchAsync(shopController.loadShop));
 shopRouter.post("/logout", catchAsync(shopController.logout));
 
+// Get shop info by id
+shopRouter.get("/info/:id", catchAsync(shopController.getShopInfo));
+
+// For logged in sellers - get shop products
 shopRouter.get("/products", isSeller, shopController.getShopProducts);
 shopRouter.delete("/products/:id", isSeller, shopController.deleteProductById);
 

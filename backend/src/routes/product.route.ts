@@ -14,6 +14,7 @@ productRouter.post(
 );
 
 productRouter.get("/", catchAsync(productController.getProducts));
+// Get products by shop id
 productRouter.get("/shop/:id", catchAsync(productController.getShopProducts));
 
 export default productRouter;
