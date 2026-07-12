@@ -1,6 +1,6 @@
 import clsx from "clsx";
 interface Props {
-  currentStep: 1 | 2 | 3;
+  currentStep: number;
 }
 
 const steps = ["Shipping", "Payment", "Success"];

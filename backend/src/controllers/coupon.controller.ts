@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { AppError } from "../utils/AppError.js";
 import { createCouponSchema } from "../schemas/coupon.schema.js";
 import { Coupon } from "../models/coupon.model.js";
-import { Product } from "../models/product.model.js";
+import { IProduct, Product } from "../models/product.model.js";
 
 export const createCoupon = async (req: Request, res: Response) => {
   if (!req.user) throw new AppError("Please login to continue", 401);
@@ -38,5 +38,67 @@ export const createCoupon = async (req: Request, res: Response) => {
     success: true,
     message: "Coupon created successfully.",
     coupon,
+  });
+};
+
+export const applyCoupon = async (req: Request, res: Response) => {
+  if (!req.user) throw new AppError("Please login to continue.", 401);
+
+  const { couponCode, cart } = req.body; // cart = Product[]
+  if (!couponCode || !Array.isArray(cart) || cart?.length == 0)
+    throw new AppError("Cart and Coupon code are required", 400);
+
+  const findCoupon = await Coupon.findOne({ name: couponCode });
+  if (!findCoupon) throw new AppError("Coupon Code does not Exist", 400);
+
+  if (new Date(findCoupon?.expiryDate) < new Date())
+    throw new AppError("Coupon has expired.", 400);
+
+  console.log("find coupon product id", findCoupon);
+  const product = await Product.findById(findCoupon?.product);
+
+  if (!product) throw new AppError("Product no longer exists.", 404);
+
+  const eligibleProduct = cart?.find(
+    (p: IProduct) => p?._id?.toString() == product?._id?.toString(),
+  );
+
+  if (!eligibleProduct)
+    throw new AppError(
+      "Coupon is not applicable to any product in your cart.",
+      400,
+    );
+
+  const availableStock = product.stock - product.sold_out;
+  if (eligibleProduct?.quantity > availableStock)
+    throw new AppError(
+      `Only ${availableStock} item(s) of ${product.name} are available.`,
+      400,
+    );
+
+  const totalPrice =
+    (product?.discountPrice || product?.originalPrice) *
+    eligibleProduct?.quantity;
+
+  if (totalPrice < findCoupon?.minimumPurchaseAmount)
+    throw new AppError(
+      `Coupon's minimum purchase amount is USD$ ${findCoupon?.minimumPurchaseAmount}`,
+      400,
+    );
+
+  let discount = (findCoupon?.discountPercentage / 100) * totalPrice;
+  if (
+    findCoupon?.maximumDiscountAmount &&
+    discount > findCoupon.maximumDiscountAmount
+  ) {
+    discount = findCoupon.maximumDiscountAmount;
+  }
+
+  return res.json({
+    success: true,
+    discount,
+    appliedProduct: product?._id,
+    couponCode: findCoupon?.name,
+    message: "Coupon applied successfully.",
   });
 };

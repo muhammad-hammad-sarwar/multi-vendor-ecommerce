@@ -6,8 +6,19 @@ import { IAddress } from "@/redux/slices/user";
 import { toast } from "react-toastify";
 
 const countries = Country.getAllCountries();
-export default function ShippingForm({ setStep }) {
+export default function ShippingForm({
+  totalPrice,
+  subTotalPrice,
+  setStep,
+  shippingCost,
+}: {
+  totalPrice: number;
+  subTotalPrice: number;
+  setStep: (n: number) => void;
+  shippingCost: number;
+}) {
   const { user } = useAppSelector((state) => state.user);
+  const { totalDiscount } = useAppSelector((state) => state.coupon);
   const [fullName, setFullName] = useState(user ? user.name : "");
   const [email, setEmail] = useState(user ? user.email : "");
   const [phone, setPhone] = useState("");
@@ -216,7 +227,7 @@ export default function ShippingForm({ setStep }) {
           if (
             !email ||
             !phone ||
-            fullName ||
+            !fullName ||
             !country ||
             !city ||
             !zipCode ||
@@ -227,6 +238,20 @@ export default function ShippingForm({ setStep }) {
             return;
           }
 
+          const shippingInfo = { address1, address2, zipCode, country, city };
+          const orderData = {
+            email,
+            shippingCost,
+            phone,
+            fullName,
+            totalPrice,
+            subTotalPrice,
+            shippingInfo,
+            discount: totalDiscount,
+            user,
+          };
+
+          localStorage.setItem("orderData", JSON.stringify(orderData));
           setStep(2);
         }}
         className="cursor-pointer mt-8 h-12 px-8 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"

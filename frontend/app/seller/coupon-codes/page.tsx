@@ -20,6 +20,8 @@ export default function CouponsPage() {
   const [discount, setDiscount] = useState("");
   const [selectedProduct, setSelectedProduct] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
+  const [minPurchase, setMinPurchase] = useState("");
+  const [maxDiscount, setMaxDiscount] = useState("");
 
   const coupons = [];
 
@@ -176,8 +178,51 @@ export default function CouponsPage() {
                 </div>
               </div>
 
-              {/* Product */}
+              {/* Min Purchase Amount */}
+              <div>
+                <label htmlFor="minPurchase" className="font-medium">
+                  Minimum Purchase Amount{" "}
+                  <span className="text-red-500">*</span>
+                </label>
 
+                <div className="relative mt-1">
+                  <FiPercent className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+
+                  <input
+                    required
+                    id="minPurchase"
+                    type="number"
+                    min={1}
+                    value={minPurchase}
+                    onChange={(e) => setMinPurchase(e.target.value)}
+                    className="w-full rounded-lg border bg-gray-50 py-2 pl-10"
+                  />
+                </div>
+              </div>
+
+              {/* Max Discount */}
+              <div>
+                <label htmlFor="maxDiscount" className="font-medium">
+                  Maximum Discount Amount{" "}
+                  <span className="text-red-500">*</span>
+                </label>
+
+                <div className="relative mt-1">
+                  <FiPercent className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+
+                  <input
+                    required
+                    id="maxDiscount"
+                    min={1}
+                    type="number"
+                    value={maxDiscount}
+                    onChange={(e) => setMaxDiscount(e.target.value)}
+                    className="w-full rounded-lg border bg-gray-50 py-2 pl-10"
+                  />
+                </div>
+              </div>
+
+              {/* Product */}
               <div>
                 <label htmlFor="product" className="font-medium">
                   Select Product <span className="text-red-500">*</span>

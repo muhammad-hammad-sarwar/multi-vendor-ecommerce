@@ -19,7 +19,7 @@ export const isSeller = async (
 
   if (!decoded?.shopId) throw new AppError("Invalid token", 401);
 
-  const shop = await Shop.findById(decoded.shopId);
+  const shop = await Shop.findById(decoded.shopId).select("+isVerified");
   if (!shop) throw new AppError("Shop does not exist", 404);
 
   if (!shop.isVerified)
@@ -45,7 +45,7 @@ export const isAuthenticated = async (
   };
 
   if (!decoded?.userId) throw new AppError("Invalid token", 401);
-  const user = await User.findById(decoded?.userId);
+  const user = await User.findById(decoded?.userId).select("+isVerified");
 
   if (!user) throw new AppError("User does not exist", 404);
 

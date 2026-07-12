@@ -14,6 +14,9 @@ export interface IProduct extends Document {
   images: string[];
   createdAt: Date;
   updatedAt: Date;
+
+  // For receiving cart from applying coupon
+  quantity?: number;
 }
 
 const productSchema = new Schema<IProduct>(

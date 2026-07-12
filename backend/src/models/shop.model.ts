@@ -59,14 +59,17 @@ const shopSchema = new Schema<IShop>(
     isVerified: {
       type: Boolean,
       default: false,
+      select: false,
     },
     verifyTokenHash: {
       type: String,
       required: true,
+      select: false,
     },
     verifyTokenExpiry: {
       type: Date,
       required: true,
+      select: false,
     },
   },
   { timestamps: true },
