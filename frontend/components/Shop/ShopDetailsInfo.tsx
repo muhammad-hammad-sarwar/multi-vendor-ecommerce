@@ -64,13 +64,15 @@ export default function ShopDetailsInfo({ products, isOwner }) {
           ))}
         </div>
       ) : (
-        <div className="rounded-2xl border bg-white py-16 text-center shadow-sm">
-          <FiPackage className="mx-auto text-gray-300" size={50} />
-          <h2 className="mt-5 text-xl font-semibold">No Products Yet</h2>
-          <p className="mt-2 text-gray-500">
-            This shop hasn't listed any products yet.
-          </p>
-        </div>
+        activeTab == "products" && (
+          <div className="rounded-2xl border bg-white py-16 text-center shadow-sm">
+            <FiPackage className="mx-auto text-gray-300" size={50} />
+            <h2 className="mt-5 text-xl font-semibold">No Products Yet</h2>
+            <p className="mt-2 text-gray-500">
+              This shop hasn't listed any products yet.
+            </p>
+          </div>
+        )
       )}
 
       {activeTab === "events" && (

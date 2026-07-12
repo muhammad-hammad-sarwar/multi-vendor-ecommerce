@@ -15,10 +15,9 @@ import {
 } from "react-icons/fi";
 import ButtonLoader from "../Layout/ButtonLoader/ButtonLoader";
 
-export default function ShopSidebarInfo({ isOwner, shop }) {
+export default function ShopSidebarInfo({ isOwner, shop, totalProducts }) {
   const [logoutLoading, setLogoutLoading] = useState(false);
   const router = useRouter();
-  // const { currentShop: shop } = useAppSelector((state) => state.shop);
 
   const handleLogout = async () => {
     setLogoutLoading(true);
@@ -68,7 +67,7 @@ export default function ShopSidebarInfo({ isOwner, shop }) {
           <div className="mt-2 flex gap-2 text-gray-600">
             <FiPackage className="mt-1" />
 
-            {/* <p>{shop}</p> */}
+            <p>{totalProducts}</p>
           </div>
         </div>
 

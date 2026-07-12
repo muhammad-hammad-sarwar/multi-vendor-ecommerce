@@ -19,7 +19,11 @@ export default function ShopPage() {
   return (
     <section className="bg-gray-100 min-h-screen px-10 py-10">
       <div className="mx-auto flex max-w-7xl gap-8">
-        <ShopSidebarInfo shop={shop} isOwner={true} />
+        <ShopSidebarInfo
+          totalProducts={products?.length}
+          shop={shop}
+          isOwner={true}
+        />
         <ShopDetailsInfo products={products} isOwner={true} />
       </div>
     </section>
