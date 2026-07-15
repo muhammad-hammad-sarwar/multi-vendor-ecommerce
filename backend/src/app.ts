@@ -9,6 +9,8 @@ import productRouter from "./routes/product.route.js";
 import eventRouter from "./routes/event.route.js";
 import profileRouter from "./routes/profile.route.js";
 import couponRouter from "./routes/coupon.route.js";
+import paymentRouter from "./routes/payment.route.js";
+import orderRouter from "./routes/order.route.js";
 
 const app = express();
 
@@ -27,6 +29,8 @@ app.use("/products", productRouter);
 app.use("/events", eventRouter);
 app.use("/profile", profileRouter);
 app.use("/coupon", couponRouter);
+app.use("/payment", paymentRouter);
+app.use("/orders", orderRouter);
 
 // Error Handling
 app.use(errorMiddleware);

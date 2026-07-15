@@ -20,6 +20,10 @@ const cartSlice = createSlice({
       state.cartItems = action.payload;
     },
 
+    clearCart(state) {
+      state.cartItems = [];
+    },
+
     addToCart(state, action) {
       const { quantity = 1 } = action.payload;
 
@@ -96,5 +100,6 @@ export const {
   incrementCartItem,
   decrementCartItem,
   setCartItems,
+  clearCart,
 } = cartSlice.actions;
 export default cartSlice.reducer;

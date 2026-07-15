@@ -4,7 +4,7 @@ import { CheckCircle2 } from "lucide-react";
 
 export default function OrderSuccessPage() {
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4">
+    <div className="flex items-center justify-center px-4">
       <div className="bg-white max-w-lg w-full rounded-2xl shadow-lg border p-10 text-center">
         <div className="relative flex justify-center mb-8">
           <div className="absolute h-24 w-24 rounded-full bg-green-200 animate-ping opacity-30" />
@@ -29,7 +29,7 @@ export default function OrderSuccessPage() {
 
         <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href="/profile/orders"
+            href="/orders"
             className="px-6 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition font-medium"
           >
             View My Orders

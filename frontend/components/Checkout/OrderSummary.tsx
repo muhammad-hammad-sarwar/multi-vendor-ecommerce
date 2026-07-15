@@ -1,6 +1,6 @@
 import { checkCouponCodeValidity } from "@/redux/actions/coupon";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ButtonLoader from "../Layout/ButtonLoader/ButtonLoader";
 import { toast } from "react-toastify";
 
@@ -16,7 +16,13 @@ export default function OrderSummary({
   const { cartItems } = useAppSelector((state) => state.cart);
   const { loading, totalDiscount } = useAppSelector((state) => state.coupon);
   const [couponCode, setCouponValue] = useState("");
+  const [orderData, setOrderData] = useState(null);
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    const orderData = JSON.parse(localStorage.getItem("orderData") || "{}");
+    setOrderData(orderData);
+  }, []);
 
   const applyCoupon = (e) => {
     e.preventDefault();

@@ -16,7 +16,11 @@ export interface IProduct extends Document {
   updatedAt: Date;
 
   // For receiving cart from applying coupon
-  quantity?: number;
+  // quantity?: number;
+}
+
+export interface CartProduct extends IProduct {
+  quantity: number;
 }
 
 const productSchema = new Schema<IProduct>(
