@@ -26,6 +26,9 @@ shopRouter.get("/info/:id", catchAsync(shopController.getShopInfo));
 
 // For logged in sellers - get shop products
 shopRouter.get("/products", isSeller, shopController.getShopProducts);
+shopRouter.get("/events", isSeller, shopController.getShopEvents);
+
 shopRouter.delete("/products/:id", isSeller, shopController.deleteProductById);
+shopRouter.delete("/events/:id", isSeller, shopController.deleteEventById);
 
 export default shopRouter;

@@ -4,6 +4,7 @@ import { loadShop, loadUserProfile } from "../actions/user";
 import { loadAllProducts } from "../actions/product";
 import { setWishlist } from "../slices/wishlist";
 import { setCartItems } from "../slices/cart";
+import { loadAllEvents } from "../actions/event";
 
 export const useInitApp = () => {
   const dispatch = useAppDispatch();
@@ -16,6 +17,7 @@ export const useInitApp = () => {
     dispatch(setCartItems(cart));
 
     dispatch(loadAllProducts());
+    dispatch(loadAllEvents());
     dispatch(loadUserProfile());
     dispatch(loadShop());
   }, [dispatch]);

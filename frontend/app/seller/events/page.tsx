@@ -1,65 +1,105 @@
 "use client";
+import LoadingDots from "@/components/Common/LoadingDots";
 import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
 import useBodyScrollLock from "@/hooks/useBodyScrollLock";
-import Image from "next/image";
+import { deleteSellerEvent } from "@/redux/actions/event";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { FiCalendar, FiEye, FiTrash2, FiPercent } from "react-icons/fi";
-
-const events = [
-  {
-    id: 1,
-    image: "https://picsum.photos/200?11",
-    name: "Summer Sale",
-    product: "Nike Air Max",
-    discount: 20,
-    startDate: "2026-07-15",
-    endDate: "2026-07-18",
-    status: "Active" as EventStatus,
-  },
-  {
-    id: 2,
-    image: "https://picsum.photos/200?12",
-    name: "Flash Sale",
-    product: "Gaming Mouse",
-    discount: 15,
-    startDate: "2026-08-05",
-    endDate: "2026-08-07",
-    status: "Upcoming" as EventStatus,
-  },
-  {
-    id: 3,
-    image: "https://picsum.photos/200?13",
-    name: "Winter Discount",
-    product: "Keyboard",
-    discount: 35,
-    startDate: "2026-05-01",
-    endDate: "2026-05-03",
-    status: "Expired" as EventStatus,
-  },
-];
+import { useState } from "react";
+import { FiEye, FiTrash2 } from "react-icons/fi";
+import { toast } from "react-toastify";
 
 type EventStatus = "Active" | "Upcoming" | "Expired";
 export default function AllEvents() {
-  const [loading, setLoading] = useState(false);
   const [eventToDelete, setEventToDelete] = useState<number | null>(null);
+  const { deleteLoading, events, shopLoading, error } = useAppSelector(
+    (state) => state.events,
+  );
   useBodyScrollLock(eventToDelete);
+  const dispatch = useAppDispatch();
 
-  const getStatusColor = (status: EventStatus) => {
-    switch (status) {
-      case "Active":
-        return "bg-green-100 text-green-700";
+  const columns: GridColDef[] = [
+    {
+      field: "productId",
+      headerName: "Product ID",
+      flex: 1,
+      minWidth: 150,
+    },
+    {
+      field: "name",
+      headerName: "Name",
+      flex: 1,
+      minWidth: 150,
+    },
+    {
+      field: "quantity",
+      headerName: "Item Quantity",
+      flex: 1,
+      minWidth: 150,
+    },
+    {
+      field: "stock",
+      headerName: "Stock",
+      flex: 1,
+      minWidth: 120,
+    },
+    {
+      field: "sold_out",
+      headerName: "Sold Out",
+      sortable: false,
+      filterable: false,
+      minWidth: 150,
+    },
 
-      case "Upcoming":
-        return "bg-blue-100 text-blue-700";
+    {
+      field: "view",
+      headerName: "View",
+      sortable: false,
+      filterable: false,
+      minWidth: 100,
+      renderCell: ({ row }) => (
+        <Link
+          href={`/products/${row?.productId}`}
+          className="text-gray-600 hover:text-black transition"
+          title="View Product"
+        >
+          <FiEye size={18} />
+        </Link>
+      ),
+    },
+    {
+      field: "delete",
+      headerName: "Delete",
+      sortable: false,
+      filterable: false,
+      minWidth: 100,
+      renderCell: ({ row }) => (
+        <button
+          onClick={() => setEventToDelete(row?.productId)}
+          className="cursor-pointer text-red-600 hover:text-red-800 transition"
+          title="Delete Product"
+        >
+          <FiTrash2 size={18} />
+        </button>
+      ),
+    },
+  ];
 
-      case "Expired":
-        return "bg-gray-200 text-gray-700";
+  const rows =
+    (events &&
+      events?.map((p) => ({
+        id: p._id, // DataGrid requires an `id` field
+        productId: p._id,
+        name: p.name,
+        quantity: p.stock - p.sold_out,
+        stock: p.stock,
+        sold: p.sold_out,
+      }))) ??
+    [];
 
-      default:
-        return "";
-    }
-  };
+  if (shopLoading || (!error && !events))
+    return <LoadingDots text="Loading your events..." />;
 
   return (
     <>
@@ -71,113 +111,20 @@ export default function AllEvents() {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
-        <table className="w-full">
-          <thead className="bg-gray-100">
-            <tr className="text-left">
-              <th className="p-4">Event</th>
-              <th className="p-4">Product</th>
-              <th className="p-4">Discount</th>
-              <th className="p-4">Duration</th>
-              <th className="p-4">Status</th>
-              <th className="p-4 text-center">Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {events.map((event) => (
-              <tr
-                key={event.id}
-                className="border-t hover:bg-gray-50 transition"
-              >
-                {/* Event */}
-
-                <td className="p-4">
-                  <div className="flex items-center gap-4">
-                    <Image
-                      src={event.image}
-                      alt={event.name}
-                      width={55}
-                      height={55}
-                      className="rounded-lg object-cover"
-                    />
-
-                    <div>
-                      <p className="font-semibold">{event.name}</p>
-
-                      <p className="flex items-center gap-1 text-sm text-gray-500">
-                        <FiCalendar size={13} />
-                        Promotional Event
-                      </p>
-                    </div>
-                  </div>
-                </td>
-
-                {/* Product */}
-
-                <td className="p-4 font-medium">{event.product}</td>
-
-                {/* Discount */}
-
-                <td className="p-4">
-                  <div className="inline-flex items-center gap-1 rounded-full bg-orange-100 px-3 py-1 text-orange-700 text-sm">
-                    <FiPercent size={13} />
-                    {event.discount}%
-                  </div>
-                </td>
-
-                {/* Duration */}
-
-                <td className="p-4">
-                  <div className="text-sm">
-                    <p>{event.startDate}</p>
-
-                    <p className="text-gray-500">{event.endDate}</p>
-                  </div>
-                </td>
-
-                {/* Status */}
-
-                <td className="p-4">
-                  <span
-                    className={`rounded-full px-3 py-1 text-sm ${getStatusColor(
-                      event.status,
-                    )}`}
-                  >
-                    {event.status}
-                  </span>
-                </td>
-
-                {/* Actions */}
-
-                <td className="p-4">
-                  <div className="flex justify-center gap-5">
-                    <Link
-                      href={`/events/${event.id}`}
-                      className="text-gray-600 hover:text-black transition"
-                    >
-                      <FiEye size={18} />
-                    </Link>
-
-                    <button
-                      onClick={() => setEventToDelete(event.id)}
-                      className="cursor-pointer text-red-600 hover:text-red-800 transition"
-                    >
-                      <FiTrash2 size={18} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {events.length === 0 && (
-          <div className="py-16 text-center text-gray-500">
-            No events found.
-          </div>
-        )}
-      </div>
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        initialState={{
+          pagination: {
+            paginationModel: {
+              pageSize: 5,
+            },
+          },
+        }}
+        pageSizeOptions={[5]}
+        checkboxSelection
+        disableRowSelectionOnClick
+      />
 
       {eventToDelete !== null && (
         <div
@@ -218,23 +165,18 @@ export default function AllEvents() {
 
               <button
                 type="button"
-                disabled={loading}
+                disabled={deleteLoading}
                 onClick={async () => {
                   try {
-                    setLoading(true);
-                    console.log(eventToDelete);
-                    setTimeout(() => {
-                      setLoading(false);
-                      setEventToDelete(null);
-                    }, 1500);
+                    dispatch(deleteSellerEvent(eventToDelete));
+                    setEventToDelete(null);
                   } catch (error) {
-                    console.log(error);
-                    setLoading(false);
+                    toast.error(error?.response?.data?.message);
                   }
                 }}
                 className="cursor-pointer rounded-lg bg-red-600 px-6 py-2 font-medium text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-70"
               >
-                {loading ? <ButtonLoader /> : "Delete Event"}
+                {deleteLoading ? <ButtonLoader /> : "Delete Event"}
               </button>
             </div>
           </div>

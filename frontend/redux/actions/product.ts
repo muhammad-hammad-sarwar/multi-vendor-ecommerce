@@ -36,7 +36,7 @@ export const loadSellerProducts = () => async (dispatch: AppDispatch) => {
 export const deleteSellerProduct = (id) => async (dispatch: AppDispatch) => {
   try {
     dispatch(deleteSellerProductStart());
-    const res = await api.get(`/shop/products/${id}`);
+    const res = await api.delete(`/shop/products/${id}`);
     dispatch(deleteSellerProductSuccess(res.data.products as Product[]));
   } catch (error) {
     dispatch(deleteSellerProductFailure(error?.response?.data?.message));

@@ -13,4 +13,7 @@ eventRouter.post(
   catchAsync(eventController.createEvent),
 );
 
+// Get All Events
+eventRouter.get("/", catchAsync(eventController.getEvents));
+
 export default eventRouter;

@@ -7,6 +7,7 @@ import jwt from "jsonwebtoken";
 import { deleteFile } from "../utils/deleteFile.js";
 import { shopSchema } from "../schemas/shop.schema.js";
 import { Product } from "../models/product.model.js";
+import { Event } from "../models/event.model.js";
 
 export const signUp = async (
   req: Request,
@@ -187,6 +188,16 @@ export const getShopProducts = async (req: Request, res: Response) => {
   });
 };
 
+export const getShopEvents = async (req: Request, res: Response) => {
+  if (!req.user) throw new AppError("Please login to continue.", 401);
+  const events = await Event.find({ shop: req.user?._id });
+  console.log(events);
+  return res.json({
+    success: true,
+    events,
+  });
+};
+
 export const deleteProductById = async (req: Request, res: Response) => {
   if (!req.user) throw new AppError("Please login to continue.", 401);
   const { id } = req.params;
@@ -198,10 +209,33 @@ export const deleteProductById = async (req: Request, res: Response) => {
     throw new AppError("You are Not Authorized to delete the product", 401);
 
   await Product.deleteOne({ _id: id });
+  const products = await Product.find({ shop: req.user._id });
 
   return res.json({
     success: true,
     message: `Product with id ${id} deleted successfully`,
+    products,
+  });
+};
+
+export const deleteEventById = async (req: Request, res: Response) => {
+  if (!req.user) throw new AppError("Please login to continue.", 401);
+  const { id } = req.params;
+  if (!id) throw new AppError("Event id is required", 400);
+  const event = await Event.findById(id);
+  if (!event) throw new AppError("Event does not exist", 400);
+
+  if (event.shop.toString() != req?.user?._id.toString())
+    throw new AppError("You are Not Authorized to delete the Event", 401);
+
+  await Event.deleteOne({ _id: id });
+
+  const events = await Event.find({ shop: req.user._id });
+
+  return res.json({
+    success: true,
+    message: `Event with id ${id} deleted successfully`,
+    events,
   });
 };
 

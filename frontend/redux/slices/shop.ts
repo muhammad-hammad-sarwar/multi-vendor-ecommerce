@@ -21,6 +21,7 @@ interface ShopState {
   error: null | string;
   isSeller: boolean;
   products: Product[] | null;
+  events: null;
 
   // current shop is for get by id
   currentShop: null | IShop;
@@ -34,6 +35,7 @@ const initialState: ShopState = {
   error: null,
   isSeller: false,
   products: null,
+  events: null,
 
   currentShop: null,
   infoLoading: false,

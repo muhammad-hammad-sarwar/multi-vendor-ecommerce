@@ -8,13 +8,14 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Link from "next/link";
 import { useState } from "react";
 import { FiEye, FiTrash2 } from "react-icons/fi";
+import { toast } from "react-toastify";
 
 export default function AllProducts() {
-  const [loading, setLoading] = useState(false);
   const [productToDelete, setProductToDelete] = useState<number | null>(null);
-  const { shopLoading, error, products } = useAppSelector(
+  const { deleteLoading, shopLoading, error, products } = useAppSelector(
     (state) => state.products,
   );
+
   const dispatch = useAppDispatch();
   useBodyScrollLock(productToDelete);
 
@@ -75,7 +76,7 @@ export default function AllProducts() {
       minWidth: 100,
       renderCell: ({ row }) => (
         <button
-          onClick={() => dispatch(deleteSellerProduct(row?.productId))}
+          onClick={() => setProductToDelete(row?.productId)}
           className="cursor-pointer text-red-600 hover:text-red-800 transition"
           title="Delete Product"
         >
@@ -159,23 +160,18 @@ export default function AllProducts() {
 
               <button
                 type="button"
-                disabled={loading}
+                disabled={deleteLoading}
                 onClick={async () => {
                   try {
-                    setLoading(true);
-                    setTimeout(() => {
-                      setLoading(false);
-                      setProductToDelete(null);
-                    }, 1500);
+                    dispatch(deleteSellerProduct(productToDelete));
+                    setProductToDelete(null);
                   } catch (error) {
-                    console.log(error);
-
-                    setLoading(false);
+                    toast.error(error?.response?.data?.message);
                   }
                 }}
                 className="cursor-pointer rounded-lg bg-red-600 px-6 py-2 font-medium text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-70"
               >
-                {loading ? <ButtonLoader /> : "Delete Product"}
+                {deleteLoading ? <ButtonLoader /> : "Delete Product"}
               </button>
             </div>
           </div>

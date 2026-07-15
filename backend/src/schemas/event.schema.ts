@@ -7,10 +7,7 @@ export const createEventSchema = z.object({
     .min(3, "Product name must be at least 3 characters")
     .max(100),
 
-  description: z
-    .string()
-    .trim()
-    .min(10, "Description must be at least 10 characters"),
+  description: z.string().trim(),
 
   category: z.string().trim().min(1, "Category is required"),
 
@@ -27,6 +24,10 @@ export const createEventSchema = z.object({
 
   discountPrice: z.coerce.number().positive().optional(),
   stock: z.coerce.number().int().min(0, "Stock cannot be negative"),
-  startDate: z.date(),
-  endDate: z.date(),
+  startDate: z.string().refine((value) => !isNaN(Date.parse(value)), {
+    message: "Invalid start date",
+  }),
+  endDate: z.string().refine((value) => !isNaN(Date.parse(value)), {
+    message: "Invalid end date",
+  }),
 });

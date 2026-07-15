@@ -16,6 +16,8 @@ import {
 import { categoriesData } from "@/lib/utils/static";
 import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
 import api from "@/axios/api";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 export default function CreateEvent() {
   const [loading, setLoading] = useState(false);
@@ -31,6 +33,7 @@ export default function CreateEvent() {
   const [endDate, setEndDate] = useState("");
   const [images, setImages] = useState<File[]>([]);
   const today = new Date().toISOString().split("T")[0];
+  const router = useRouter();
 
   const getMinEndDate = (start: string) => {
     if (!start) return "";
@@ -74,10 +77,14 @@ export default function CreateEvent() {
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (originalPrice <= discountPrice) {
+      toast.error("Discount Price must be lesser than original price");
+      return;
+    }
+
     setLoading(true);
-
     const formData = new FormData();
-
     formData.append("name", name);
     formData.append("description", description);
     formData.append("category", category);
@@ -104,8 +111,11 @@ export default function CreateEvent() {
       await api.post("/events", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+
+      toast.success("Event created successfully");
+      router.push("/seller/events");
     } catch (error) {
-      console.log(error);
+      toast.error(error?.response?.data?.message);
     } finally {
       setLoading(false);
     }

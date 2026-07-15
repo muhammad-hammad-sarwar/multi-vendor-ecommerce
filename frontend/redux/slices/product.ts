@@ -21,6 +21,7 @@ interface ProductState {
   allProducts: null | Product[];
   loading: boolean;
   shopLoading: boolean;
+  deleteLoading: boolean;
   error: null | string;
   products: null | Product[];
 }
@@ -29,6 +30,7 @@ const initialState: ProductState = {
   allProducts: null,
   loading: false,
   shopLoading: false,
+  deleteLoading: false,
   error: null,
   products: null,
 };
@@ -62,14 +64,14 @@ const productSlice = createSlice({
     },
 
     deleteSellerProductStart(state) {
-      state.shopLoading = true;
+      state.deleteLoading = true;
     },
     deleteSellerProductSuccess(state, action) {
-      state.shopLoading = false;
+      state.deleteLoading = false;
       state.products = action.payload;
     },
     deleteSellerProductFailure(state, action) {
-      state.shopLoading = false;
+      state.deleteLoading = false;
       state.error = action.payload;
     },
   },
