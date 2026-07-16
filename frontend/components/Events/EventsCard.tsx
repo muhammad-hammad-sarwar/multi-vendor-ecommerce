@@ -1,34 +1,27 @@
 "use client";
 import useCountDown from "@/hooks/useCountDown";
+import { IEvent } from "@/redux/slices/events";
 import Image from "next/image";
-export interface Event {
-  id: number;
-  title: string;
-  description: string;
-  image: string;
-  price: number;
-  discount_price?: number | null;
-  sold: number;
-  time_left: string;
-}
+import Link from "next/link";
 
-export default function EventCard({ event }: { event: Event }) {
-  const { timeLeft } = useCountDown(event.time_left);
+export default function EventCard({ event }: { event: IEvent }) {
+  const { timeLeft } = useCountDown(`${event?.endDate}`);
   return (
     <div className="w-full border rounded-xl flex flex-col md:flex-row overflow-hidden hover:shadow-md transition bg-white">
       <div className="w-full md:w-[320px] h-55 relative shrink-0">
         <Image
-          src={event.image}
-          alt={event.title}
+          src={`http://localhost:8000/uploads/${event?.images[0]}`}
+          alt={event?.name}
           fill
           className="object-cover"
           sizes="(max-width: 768px) 100vw, 320px"
+          unoptimized
         />
       </div>
 
       <div className="flex-1 p-5 flex flex-col justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">{event.title}</h3>
+          <h3 className="text-lg font-semibold text-gray-900">{event?.name}</h3>
 
           <p className="text-sm text-gray-500 mt-2 line-clamp-3">
             {event.description}
@@ -37,17 +30,19 @@ export default function EventCard({ event }: { event: Event }) {
           <div className="flex items-center justify-between mt-4">
             <div className="flex items-center gap-2">
               <span className="text-xl font-bold text-gray-900">
-                ${event.discount_price || event.price}
+                ${event?.discountPrice || event?.originalPrice}
               </span>
 
-              {event.discount_price && (
+              {event?.discountPrice && (
                 <span className="text-sm text-red-500 line-through">
-                  ${event.price}
+                  ${event?.originalPrice}
                 </span>
               )}
             </div>
 
-            <span className="text-xs text-emerald-600">{event.sold} sold</span>
+            <span className="text-xs text-emerald-600">
+              {event?.sold_out} sold
+            </span>
           </div>
 
           <div className="mt-4 text-sm font-medium text-red-600">
@@ -56,15 +51,11 @@ export default function EventCard({ event }: { event: Event }) {
               : `Ends in: ${timeLeft.days}d ${timeLeft.hours}h ${timeLeft.minutes}m ${timeLeft.seconds}s`}
           </div>
 
-          <div className="flex items-center gap-5 mt-5">
-            <button className="cursor-pointer bg-black text-white px-5 py-2 rounded-lg hover:bg-gray-900 transition">
-              Buy Now
-            </button>
-
-            <button className="cursor-pointer text-blue-600 hover:underline text-sm">
+          <Link href={`/products/${event?._id}?isEvent=true`}>
+            <button className="mt-2 cursor-pointer w-36 h-10 rounded-md bg-black text-white font-bold text-sm">
               See Details
             </button>
-          </div>
+          </Link>
         </div>
       </div>
     </div>

@@ -15,6 +15,9 @@ export interface Product {
   images: string[];
   createdAt: Date;
   updatedAt: Date;
+
+  // For Event adjusting in product and event by id
+  endDate?: string;
 }
 
 interface ProductState {

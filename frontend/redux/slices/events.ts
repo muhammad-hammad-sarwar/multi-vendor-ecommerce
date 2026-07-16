@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IShop } from "./shop";
 
-export interface Event {
+export interface IEvent {
   _id: string;
   name: string;
   description: string;
@@ -12,18 +12,20 @@ export interface Event {
   stock: number;
   sold_out: number;
   shop: IShop;
+  startDate: Date;
+  endDate: Date;
   images: string[];
   createdAt: Date;
   updatedAt: Date;
 }
 
 interface EventState {
-  allEvents: null | Event[];
+  allEvents: null | IEvent[];
   loading: boolean;
   error: null | string;
   // For logged in shop
   shopLoading: boolean;
-  events: null | Event[];
+  events: null | IEvent[];
   deleteLoading: boolean;
 }
 
@@ -43,9 +45,10 @@ const eventSlice = createSlice({
     getAllEventsStart(state) {
       state.loading = true;
     },
-    getAllEventsSuccess(state, action: PayloadAction<Event[]>) {
+    getAllEventsSuccess(state, action: PayloadAction<IEvent[]>) {
       state.loading = false;
       state.allEvents = action.payload;
+      console.log("All Events", state.allEvents);
     },
     getAllEventsFailure(state, action) {
       state.loading = false;

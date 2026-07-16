@@ -44,6 +44,9 @@ export const createEvent = async (req: Request, res: Response) => {
 };
 
 export const getEvents = async (req: Request, res: Response) => {
-  const events = await Event.find({});
+  const events = await Event.find({
+    endDate: { $gt: new Date() },
+  }).populate("shop", "name avatar");
+
   return res.json({ success: true, events });
 };

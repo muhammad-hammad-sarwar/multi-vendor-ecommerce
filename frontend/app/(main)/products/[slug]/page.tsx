@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { FiHeart, FiShoppingCart } from "react-icons/fi";
 import { ProductCard } from "@/components/Products/ProductCard";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
@@ -8,20 +8,36 @@ import { addToWishlist, removeFromWishlist } from "@/redux/slices/wishlist";
 import { addToCart } from "@/redux/slices/cart";
 import { AiFillHeart } from "react-icons/ai";
 import Link from "next/link";
+import useCountDown from "@/hooks/useCountDown";
 
 export default function ProductDetailsPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
+  const isEvent = searchParams.get("isEvent");
+  console.log(isEvent);
   const { loading, allProducts } = useAppSelector((state) => state.products);
   const { wishlist } = useAppSelector((store) => store.wishlist);
-  const product = allProducts?.find((item) => item._id === params.slug);
+  const {
+    allEvents,
+    loading: eventLoading,
+    error: EventError,
+  } = useAppSelector((state) => state.events);
+  const product = isEvent
+    ? allEvents?.find((item) => item._id === params.slug)
+    : allProducts?.find((item) => item._id === params.slug);
   const [tab, setTab] = useState("details");
   const [activeImage, setActiveImage] = useState(product?.images?.[0]);
   const [isFavourite, setIsFavourite] = useState(false);
   const dispatch = useAppDispatch();
+  const { timeLeft } = useCountDown(`${(isEvent && product?.endDate) || ""}`);
 
-  const related = allProducts?.filter(
-    (p) => p.category === product?._id && p._id !== product._id,
-  );
+  const related = isEvent
+    ? allEvents?.filter(
+        (p) => p.category === product?.category && p._id !== product._id,
+      )
+    : allProducts?.filter(
+        (p) => p.category === product?.category && p._id !== product._id,
+      );
 
   useEffect(() => {
     if (product) {
@@ -39,7 +55,11 @@ export default function ProductDetailsPage() {
   }, [params, allProducts, wishlist]);
 
   if (loading || !allProducts) return <>loading</>;
-  if (!product && !loading) return <>No Product found</>;
+  // Product here is being treated as an event and a product as well
+  if (!isEvent && !product && !loading) return <>No Product found</>;
+  if (isEvent && !product && !eventLoading) return <>No Event found</>;
+  if (isEvent && (eventLoading || (!EventError && !allEvents)))
+    return <>loading</>;
 
   return (
     <section className="w-11/12 mx-auto py-10">
@@ -108,6 +128,14 @@ export default function ProductDetailsPage() {
             )}
           </div>
 
+          {isEvent && (
+            <div className="mt-4 text-sm font-medium text-red-600">
+              {timeLeft.days == 0
+                ? "Sale Ended!"
+                : `Ends in: ${timeLeft.days}d ${timeLeft.hours}h ${timeLeft.minutes}m ${timeLeft.seconds}s`}
+            </div>
+          )}
+
           <div className="flex items-center gap-4 border p-3 rounded-lg">
             <Link href={`/shop/preview/${product?.shop?._id}`}>
               <img
@@ -118,7 +146,7 @@ export default function ProductDetailsPage() {
 
             <div className="flex flex-col">
               <Link href={`/shop/preview/${product?.shop?._id}`}>
-                <span className="font-medium">{product.shop.name}</span>
+                <span className="font-medium">{product.shop?.name}</span>
               </Link>
               <span className="text-sm text-gray-500">
                 {/* {product?.shop?.ratings || 0} rating */}
@@ -159,9 +187,9 @@ export default function ProductDetailsPage() {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {related?.length == 0 ? (
-            <div>No Related Products</div>
+            <div>No Related {isEvent ? "Events" : "Products"}</div>
           ) : (
-            related.map((p) => <ProductCard product={p} />)
+            related.map((p) => <ProductCard key={p?._id} product={p} />)
           )}
         </div>
       </div>

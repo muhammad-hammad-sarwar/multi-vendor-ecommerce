@@ -3,13 +3,13 @@ import {
   deleteSellerEventFailure,
   deleteSellerEventStart,
   deleteSellerEventSuccess,
-  Event,
   getAllEventsFailure,
   getAllEventsStart,
   getAllEventsSuccess,
   getSellerEventsFailure,
   getSellerEventsStart,
   getSellerEventsSuccess,
+  IEvent,
 } from "../slices/events";
 import { AppDispatch } from "../store";
 
@@ -37,7 +37,7 @@ export const loadAllEvents = () => async (dispatch: AppDispatch) => {
   try {
     dispatch(getAllEventsStart());
     const res = await api.get("/events");
-    dispatch(getAllEventsSuccess(res.data.products as Event[]));
+    dispatch(getAllEventsSuccess(res.data.events as IEvent[]));
   } catch (error) {
     dispatch(getAllEventsFailure(error?.response?.data?.message));
   }

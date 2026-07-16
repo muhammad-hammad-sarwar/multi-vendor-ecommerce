@@ -230,7 +230,10 @@ export const deleteEventById = async (req: Request, res: Response) => {
 
   await Event.deleteOne({ _id: id });
 
-  const events = await Event.find({ shop: req.user._id });
+  const events = await Event.find({
+    shop: req.user._id,
+    endDate: { $gt: new Date() },
+  });
 
   return res.json({
     success: true,
