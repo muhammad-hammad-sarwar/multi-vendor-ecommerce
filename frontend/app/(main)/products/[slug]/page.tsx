@@ -9,12 +9,12 @@ import { addToCart } from "@/redux/slices/cart";
 import { AiFillHeart } from "react-icons/ai";
 import Link from "next/link";
 import useCountDown from "@/hooks/useCountDown";
+import Rating from "@/components/Common/Ratings";
 
 export default function ProductDetailsPage() {
   const params = useParams();
   const searchParams = useSearchParams();
   const isEvent = searchParams.get("isEvent");
-  console.log(isEvent);
   const { loading, allProducts } = useAppSelector((state) => state.products);
   const { wishlist } = useAppSelector((store) => store.wishlist);
   const {
@@ -25,7 +25,7 @@ export default function ProductDetailsPage() {
   const product = isEvent
     ? allEvents?.find((item) => item._id === params.slug)
     : allProducts?.find((item) => item._id === params.slug);
-  const [tab, setTab] = useState("details");
+  const [tab, setTab] = useState("Details");
   const [activeImage, setActiveImage] = useState(product?.images?.[0]);
   const [isFavourite, setIsFavourite] = useState(false);
   const dispatch = useAppDispatch();
@@ -60,6 +60,38 @@ export default function ProductDetailsPage() {
   if (isEvent && !product && !eventLoading) return <>No Event found</>;
   if (isEvent && (eventLoading || (!EventError && !allEvents)))
     return <>loading</>;
+
+  const totalProducts = isEvent
+    ? allEvents?.reduce(
+        (acc, cur) => (cur?.shop?._id === product?.shop?._id ? acc + 1 : acc),
+        0,
+      )
+    : allProducts?.reduce(
+        (acc, cur) => (cur?.shop?._id === product?.shop?._id ? acc + 1 : acc),
+        0,
+      );
+
+  const getShopStats = () => {
+    const allShopProducts = isEvent
+      ? allEvents.filter((p) => p.shop?._id === product?.shop?._id)
+      : allProducts.filter((p) => p.shop?._id === product?.shop?._id);
+
+    let totalReviews = 0;
+    let totalRating = 0;
+
+    allShopProducts.forEach((product) => {
+      product.reviews?.forEach((review) => {
+        totalReviews++;
+        totalRating += review.rating;
+      });
+    });
+
+    return {
+      totalReviews,
+      averageRating: totalReviews ? totalRating / totalReviews : 0,
+    };
+  };
+  const { totalReviews, averageRating } = getShopStats();
 
   return (
     <section className="w-11/12 mx-auto py-10">
@@ -162,7 +194,7 @@ export default function ProductDetailsPage() {
 
       <div className="mt-10">
         <div className="flex gap-6 border-b">
-          {["details", "reviews", "seller"].map((t) => (
+          {["Details", "Reviews", "Seller"].map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -176,9 +208,108 @@ export default function ProductDetailsPage() {
         </div>
 
         <div className="mt-4 text-sm text-gray-600">
-          {tab === "details" && <p>{product?.description}</p>}
-          {tab === "reviews" && <p>Customer reviews coming soon...</p>}
-          {tab === "seller" && <p>Seller information here...</p>}
+          {tab === "Details" && <p>{product?.description}</p>}
+          {tab === "Reviews" && (
+            <div className="mt-2">
+              <h2 className="text-lg font-semibold mb-2">Customer Reviews</h2>
+
+              <div className="space-y-4">
+                {product?.reviews?.length == 0 ? (
+                  <h2>No Product Reviews</h2>
+                ) : (
+                  product?.reviews?.map((review) => (
+                    <div
+                      key={review?._id}
+                      className="flex items-start justify-between gap-4 rounded-lg border p-4"
+                    >
+                      <div className="flex items-start gap-3">
+                        <img
+                          src={`http://localhost:8000/uploads/${review?.user?.avatar}`}
+                          alt={review?.user?.name}
+                          className="w-12 h-12 rounded-full object-cover border"
+                        />
+
+                        <div>
+                          <h3 className="font-semibold text-gray-900">
+                            {review?.user?.name}
+                          </h3>
+
+                          <p className="text-sm text-gray-600 mt-1">
+                            {review?.comment}
+                          </p>
+                        </div>
+                      </div>
+
+                      <Rating rating={review?.rating} />
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+          {tab === "Seller" && (
+            <div className="rounded-xl border border-gray-200 bg-white p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <img
+                    src={`http://localhost:8000/uploads/${product?.shop.avatar}`}
+                    alt={product?.shop.name}
+                    className="h-16 w-16 rounded-full object-cover border"
+                  />
+
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-900">
+                      {product?.shop.name}
+                    </h2>
+
+                    <p className="text-sm text-gray-500">Verified Seller</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-x-10 gap-y-5 text-right">
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-gray-500">
+                      Joined On
+                    </p>
+                    <p className="font-semibold text-gray-900">
+                      {new Date(product?.shop?.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-gray-500">
+                      Products
+                    </p>
+                    <p className="font-semibold text-gray-900">
+                      {totalProducts}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-gray-500">
+                      Reviews
+                    </p>
+                    <p className="font-semibold text-gray-900">
+                      {totalReviews}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-gray-500">
+                      Rating
+                    </p>
+
+                    <div className="flex items-center justify-end gap-2">
+                      {/* <Rating rating={reviewsAndRatings[1]} /> */}
+                      <span className="font-semibold text-gray-900">
+                        {averageRating}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

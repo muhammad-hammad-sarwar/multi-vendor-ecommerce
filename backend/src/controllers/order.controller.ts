@@ -74,9 +74,15 @@ export const getSellerOrders = async (req: Request, res: Response) => {
 };
 
 export const updateStatus = async (req: Request, res: Response) => {
+  const shop = req.user;
+  if (!shop) throw new AppError("Please login to continue", 401);
+
   const { orderId, status } = req.params;
   if (!orderId || !status)
     throw new AppError("Order Id and status are required", 400);
+
+  if (orderId.toString() != shop._id.toString())
+    throw new AppError("You are not authorized to change status", 401);
 
   if (status != "Delivered" && status != "On the way")
     throw new AppError("Status is not valid", 400);

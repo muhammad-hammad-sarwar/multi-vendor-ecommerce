@@ -10,6 +10,7 @@ import { Product } from "@/redux/slices/product";
 import { addToCart } from "@/redux/slices/cart";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
 import { addToWishlist, removeFromWishlist } from "@/redux/slices/wishlist";
+import Rating from "../Common/Ratings";
 
 export function ProductCard({ product }: { product: Product }) {
   const [open, setOpen] = useState(false);
@@ -75,9 +76,11 @@ export function ProductCard({ product }: { product: Product }) {
                 )}
               </div>
 
+              <Rating rating={product?.ratings} />
+
               <div className="flex justify-end">
-                <span className="text-xs text-gray-500">
-                  {product.sold_out} sold
+                <span className="text-sm text-green-600">
+                  ({product.sold_out} sold)
                 </span>
               </div>
             </div>

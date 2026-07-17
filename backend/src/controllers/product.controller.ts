@@ -50,7 +50,9 @@ export const createProduct = async (req: Request, res: Response) => {
 
 export const getProducts = async (req: Request, res: Response) => {
   return res.json({
-    products: await Product.find().populate("shop", "name avatar"),
+    products: await Product.find()
+      .populate("shop", "name avatar createdAt")
+      .populate("reviews.user", "avatar name"),
   });
 };
 
@@ -58,7 +60,10 @@ export const getShopProducts = async (req: Request, res: Response) => {
   const { id } = req.params;
   if (!id) throw new AppError("Shop id is required", 400);
 
-  const products = await Product.find({ shop: id });
+  const products = await Product.find({ shop: id }).populate(
+    "reviews.user",
+    "avatar name",
+  );
   return res.json({ success: true, products });
 };
 
