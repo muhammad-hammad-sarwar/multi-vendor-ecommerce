@@ -47,10 +47,68 @@ export const createOrder = async (req: Request, res: Response) => {
       totalPrice,
       paymentInfo,
       user,
+      shop: shopId,
     });
   }
 
   res
     .status(201)
     .json({ success: true, message: "Orderes create successfully" });
+};
+
+export const getSellerOrders = async (req: Request, res: Response) => {
+  const shop = req.user;
+  if (!shop) throw new AppError("Please login to continue", 400);
+
+  const orders = await Order.find({
+    "cart.shop._id": shop._id.toString(),
+  }).sort({
+    createdAt: -1,
+  });
+
+  return res.json({
+    success: true,
+    message: "Orders fetched successfully",
+    orders,
+  });
+};
+
+export const updateStatus = async (req: Request, res: Response) => {
+  const { orderId, status } = req.params;
+  if (!orderId || !status)
+    throw new AppError("Order Id and status are required", 400);
+
+  if (status != "Delivered" && status != "On the way")
+    throw new AppError("Status is not valid", 400);
+
+  const order = await Order.findById(orderId);
+  if (!order) throw new AppError("Order does not exist", 400);
+
+  if (order.status == status)
+    throw new AppError(`Status is already ${status}`, 400);
+
+  if (status == "Delivered") {
+    order.deliveredAt = new Date();
+    if (order.paymentInfo) order.paymentInfo.status = "succedded";
+  }
+
+  order.status = status;
+  await order.save();
+
+  return res.json({ success: true, message: "Status Updated successfully" });
+};
+
+export const getUserOrders = async (req: Request, res: Response) => {
+  const user = req.user;
+  if (!user) throw new AppError("Please login to continue", 400);
+
+  const orders = await Order.find({ "user._id": user._id }).sort({
+    createdAt: -1,
+  });
+
+  return res.json({
+    success: true,
+    message: "Orders fetched successfully",
+    orders,
+  });
 };

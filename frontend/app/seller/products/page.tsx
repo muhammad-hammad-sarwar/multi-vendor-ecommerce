@@ -61,7 +61,7 @@ export default function AllProducts() {
       renderCell: ({ row }) => (
         <Link
           href={`/products/${row?.productId}`}
-          className="text-gray-600 hover:text-black transition"
+          className="block pt-3 text-gray-600 hover:text-black transition"
           title="View Product"
         >
           <FiEye size={18} />

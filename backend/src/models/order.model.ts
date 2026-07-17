@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 
 const orderSchema = new Schema(
   {
@@ -10,7 +10,7 @@ const orderSchema = new Schema(
       // Status of order itself
       type: String,
       default: "Processing",
-      enum: ["Processing", "Delivered", "Shipped"], // Also add requried fields
+      enum: ["Processing", "Delivered", "On the way"], // Also add requried fields
     },
     paymentInfo: {
       id: { type: String },
@@ -19,6 +19,7 @@ const orderSchema = new Schema(
     },
     paidAt: { type: Date, default: Date.now() },
     deliveredAt: { type: Date },
+    shop: { type: String },
   },
   { timestamps: true },
 );

@@ -25,7 +25,7 @@ export default function RootLayout({
     <html lang="en" className={`${poppins.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <AppProvider>
-          <ToastContainer theme="colored" />
+          <ToastContainer position="bottom-center" theme="colored" />
           {children}
           <ReduxAppInit />
         </AppProvider>

@@ -9,6 +9,13 @@ export interface IProduct extends Document {
   originalPrice: number;
   discountPrice?: number;
   stock: number;
+  ratings: number;
+  reviews: {
+    user: Types.ObjectId;
+    createdAt?: Date;
+    rating: number;
+    comment: string;
+  }[];
   sold_out: number;
   shop: Types.ObjectId;
   images: string[];
@@ -56,6 +63,31 @@ const productSchema = new Schema<IProduct>(
       default: 0,
       min: 0,
     },
+    ratings: { type: Number },
+    reviews: [
+      {
+        user: {
+          type: Schema.Types.ObjectId,
+          ref: "User",
+          required: true,
+        },
+        rating: {
+          type: Number,
+          required: true,
+          min: 1,
+          max: 5,
+        },
+        comment: {
+          type: String,
+          required: true,
+          trim: true,
+        },
+        createdAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
     stock: {
       type: Number,
       required: true,

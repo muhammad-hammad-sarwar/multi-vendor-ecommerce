@@ -61,8 +61,8 @@ export default function AllEvents() {
       renderCell: ({ row }) => (
         <Link
           href={`/products/${row?.productId}`}
-          className="text-gray-600 hover:text-black transition"
-          title="View Product"
+          className="block pt-3 text-gray-600 hover:text-black transition"
+          title="View Event"
         >
           <FiEye size={18} />
         </Link>
@@ -78,7 +78,7 @@ export default function AllEvents() {
         <button
           onClick={() => setEventToDelete(row?.productId)}
           className="cursor-pointer text-red-600 hover:text-red-800 transition"
-          title="Delete Product"
+          title="Delete Event"
         >
           <FiTrash2 size={18} />
         </button>

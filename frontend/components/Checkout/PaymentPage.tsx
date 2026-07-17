@@ -12,6 +12,25 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 export default function PaymentPage({ fullName: name, amount, setStep }) {
+  const paymentMethods = [
+    {
+      id: "Stripe",
+      title: "Credit / Debit Card",
+      description: "Pay securely with Stripe",
+    },
+    {
+      id: "COD",
+      title: "Cash on Delivery",
+      description: "Pay when your order arrives",
+    },
+    {
+      id: "Bank",
+      title: "Bank Transfer",
+      description: "Transfer payment manually",
+    },
+  ];
+
+  const [paymentType, setPaymentType] = useState("");
   const [fullName, setFullName] = useState(name ?? "");
   const { cartItems } = useAppSelector((state) => state.cart);
   const stripe = useStripe();
@@ -82,55 +101,148 @@ export default function PaymentPage({ fullName: name, amount, setStep }) {
     }
   };
 
+  const handleCashOnDelivery = async () => {
+    await api
+      .post("/orders", {
+        cart: cartItems,
+        user: orderData?.user,
+        shippingInfo: orderData?.shippingInfo,
+        totalPrice: orderData?.totalPrice,
+        paymentInfo: {
+          type: "CashOnDelivery",
+        },
+      })
+      .then(() => {
+        toast.success("Order placed successfully");
+        setStep(3);
+        dispatch(clearCart());
+        localStorage.removeItem("cartItems");
+        localStorage.removeItem("orderData");
+      });
+  };
+
   return (
-    <form
-      onSubmit={stripePaymentHandler}
-      className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white rounded-xl shadow-sm border p-8"
-    >
-      <div>
-        <label htmlFor="fullName" className="text-sm font-medium text-gray-700">
-          Full name
-        </label>
+    <div className="space-y-4">
+      {paymentMethods.map((method) => (
+        <div
+          key={method.id}
+          className="overflow-hidden rounded-xl border bg-white"
+        >
+          <button
+            type="button"
+            onClick={() => setPaymentType(method.id)}
+            className={`flex w-full items-center justify-between px-5 py-4 text-left transition
+          ${
+            paymentType === method.id
+              ? "bg-blue-50 border-blue-500"
+              : "hover:bg-gray-50"
+          }`}
+          >
+            <div>
+              <h3 className="font-semibold">{method.title}</h3>
+              <p className="text-sm text-gray-500">{method.description}</p>
+            </div>
 
-        <input
-          required
-          id="fullName"
-          placeholder={name ?? "John Doe"}
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-          className="w-full px-3 py-2 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500"
-          aria-label="Full name"
-        />
-      </div>
-      <div>
-        <label className="text-sm font-medium text-gray-700">Card Number</label>
+            <div
+              className={`h-5 w-5 rounded-full border-2 flex items-center justify-center
+            ${
+              paymentType === method.id ? "border-blue-600" : "border-gray-300"
+            }`}
+            >
+              {paymentType === method.id && (
+                <div className="h-2.5 w-2.5 rounded-full bg-blue-600" />
+              )}
+            </div>
+          </button>
 
-        <div className="w-full px-3 py-2 border rounded-lg bg-gray-50 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
-          <CardNumberElement options={elementOptions} />
+          {/* Content */}
+          {paymentType === method.id && (
+            <div className="border-t p-6">
+              {method.id === "Stripe" && (
+                <form
+                  onSubmit={stripePaymentHandler}
+                  className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                >
+                  <div>
+                    <label className="text-sm font-medium">Full Name</label>
+
+                    <input
+                      required
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="mt-1 w-full rounded-lg border px-3 py-2"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium">Card Number</label>
+
+                    <div className="mt-1 rounded-lg border px-3 py-2">
+                      <CardNumberElement options={elementOptions} />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium">Expiry Date</label>
+
+                    <div className="mt-1 rounded-lg border px-3 py-2">
+                      <CardExpiryElement options={elementOptions} />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium">CVC</label>
+
+                    <div className="mt-1 rounded-lg border px-3 py-2">
+                      <CardCvcElement options={elementOptions} />
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="cursor-pointer mt-4 h-11 rounded-lg bg-green-600 px-6 text-white"
+                  >
+                    Pay ${amount}
+                  </button>
+                </form>
+              )}
+
+              {method.id === "COD" && (
+                <div className="space-y-4">
+                  <p className="text-gray-600">
+                    You will pay when your order is delivered.
+                  </p>
+
+                  <button
+                    onClick={handleCashOnDelivery}
+                    className="cursor-pointer rounded-lg bg-green-600 px-6 py-3 text-white"
+                  >
+                    Place Order
+                  </button>
+                </div>
+              )}
+
+              {method.id === "Bank" && (
+                <div className="space-y-3">
+                  <p className="text-gray-600">
+                    Transfer the payment to the following account.
+                  </p>
+
+                  <div className="rounded-lg bg-gray-100 p-4">
+                    <p>Bank: ABC Bank</p>
+                    <p>Account: 123456789</p>
+                    <p>IBAN: PK00ABCD123456789</p>
+                  </div>
+
+                  <button className="rounded-lg bg-green-600 px-6 py-3 text-white">
+                    Continue
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
-      </div>
-
-      <div>
-        <label className="text-sm font-medium text-gray-700">Expiry Date</label>
-
-        <div className="w-full px-3 py-2 border rounded-lg bg-gray-50 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
-          <CardExpiryElement options={elementOptions} />
-        </div>
-      </div>
-
-      <div>
-        <label className="text-sm font-medium text-gray-700">CVC</label>
-
-        <div className="w-full px-3 py-2 border rounded-lg bg-gray-50 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500">
-          <CardCvcElement options={elementOptions} />
-        </div>
-      </div>
-      <button
-        type="submit"
-        className="focus:border focus:border-gray-200 max-w-40 h-10 rounded-sm cursor-pointer bg-green-600 text-white font-bold text-lg"
-      >
-        Submit
-      </button>
-    </form>
+      ))}
+    </div>
   );
 }

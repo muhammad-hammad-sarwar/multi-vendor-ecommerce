@@ -3,6 +3,7 @@ import { createProductSchema } from "../schemas/product.schema.js";
 import { Product } from "../models/product.model.js";
 import { AppError } from "../utils/AppError.js";
 import { deleteFile } from "../utils/deleteFile.js";
+import { Order } from "../models/order.model.js";
 
 export const createProduct = async (req: Request, res: Response) => {
   const files = req.files as Express.Multer.File[];
@@ -59,4 +60,45 @@ export const getShopProducts = async (req: Request, res: Response) => {
 
   const products = await Product.find({ shop: id });
   return res.json({ success: true, products });
+};
+
+export const createReview = async (req: Request, res: Response) => {
+  const user = req.user;
+  if (!user) throw new AppError("Please login to continue", 400);
+  const { productId, rating, comment, orderId } = req.body;
+
+  if (!productId || !rating || !comment || isNaN(Number(rating)))
+    throw new AppError("Product id, rating and comment are required", 400);
+
+  const product = await Product.findOne({ _id: productId });
+
+  if (!product) throw new AppError("Product does not exists", 400);
+
+  const review = { rating: Number(rating), comment, user: user._id };
+  const doesExist = product?.reviews?.find(
+    (r) => r?.user.toString() == user._id.toString(),
+  );
+  if (doesExist) throw new AppError("Review already exists", 400);
+
+  product?.reviews.push(review);
+  product.ratings =
+    product.reviews.reduce((sum, review) => sum + review.rating, 0) /
+    product.reviews.length;
+
+  await product.save();
+
+  // now save isReviewed in order
+  await Order.updateOne(
+    {
+      _id: orderId,
+      "cart._id": productId,
+    },
+    {
+      $set: {
+        "cart.$.isReviewed": true,
+      },
+    },
+  );
+
+  res.json({ success: true, message: "Review added successfully" });
 };
