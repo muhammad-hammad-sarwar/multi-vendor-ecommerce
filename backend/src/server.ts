@@ -38,7 +38,7 @@ app.use(
 );
 
 app.get("/", (req: Request, res: Response) => {
-  res.json({ success: true, message: "Hello from backend" });
+  res.json({ success: true, message: `${process.env?.DB_URL}` });
 });
 
 app.use("/uploads", express.static("uploads"));

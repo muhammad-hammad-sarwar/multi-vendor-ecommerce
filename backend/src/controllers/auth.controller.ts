@@ -133,6 +133,7 @@ export const login = async (
   next: NextFunction,
 ) => {
   const { email, password } = req.body;
+  if (!process.env?.DB_URL) throw new AppError("Please Add DB URL", 400);
   const user = await User.findOne({ email }).select("+password");
   if (!user) throw new AppError("User not found", 404);
 
