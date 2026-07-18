@@ -1,35 +1,50 @@
 "use client";
 import api from "@/axios/api";
 import LoadingDots from "@/components/Common/LoadingDots";
+import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
 import { getAllOrders } from "@/redux/actions/order";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { useState } from "react";
 import { toast } from "react-toastify";
 
 export default function OrderDetails() {
   const params = useParams();
-  const dispatch = useAppDispatch();
+  const [orderloading, setOrderLoading] = useState(false);
   const [status, setStatus] = useState("On the way");
-  const router = useRouter();
   const { orders, loading, error } = useAppSelector((state) => state.order);
   const { shop, loading: shopLoading } = useAppSelector((state) => state.shop);
-
-  useEffect(() => {
-    dispatch(getAllOrders(true));
-  }, []);
+  const dispatch = useAppDispatch();
 
   const handleUpdateStatus = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!status) toast.error("Please Update the Status");
+    setOrderLoading(true);
     try {
       await api.patch(`/orders/seller/${data?._id}/${status}`).then(() => {
         toast.success("Status updated successfully");
-        router.push("/seller/orders");
+        dispatch(getAllOrders(true));
       });
     } catch (error) {
       toast.error(error?.response?.data?.message);
+    } finally {
+      setOrderLoading(false);
+    }
+  };
+
+  const handleRefundStatus = async () => {
+    setOrderLoading(true);
+    try {
+      await api.patch(`/orders/seller/refund/${data?._id}`).then(() => {
+        toast.success("Status updated successfully");
+        dispatch(getAllOrders(true));
+      });
+    } catch (error) {
+      console.dir("Error from refund status", error);
+      toast.error(error?.response?.data?.message);
+    } finally {
+      setOrderLoading(false);
     }
   };
 
@@ -130,31 +145,43 @@ export default function OrderDetails() {
         </div>
       </div>
 
-      <form
-        onSubmit={handleUpdateStatus}
-        className="flex flex-col justify-center gap-3 mt-6"
-      >
-        <label htmlFor="status" className="1font-bold text-xl text-gray-700">
-          Order Status
-        </label>
-
-        <select
-          id="status"
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          className="max-w-40 rounded-lg border border-gray-300 px-4 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+      {data?.status == "Processing" && (
+        <form
+          onSubmit={handleUpdateStatus}
+          className="flex flex-col justify-center gap-3 mt-6"
         >
-          <option value="On the way">On the way</option>
-          <option value="Delivered">Delivered</option>
-        </select>
+          <label htmlFor="status" className="1font-bold text-xl text-gray-700">
+            Order Status
+          </label>
 
+          <select
+            id="status"
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            className="max-w-40 rounded-lg border border-gray-300 px-4 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+          >
+            <option value="On the way">On the way</option>
+            <option value="Delivered">Delivered</option>
+          </select>
+
+          <button
+            type="submit"
+            className="cursor-pointer w-30 flex items-center justify-center h-10 rounded-md bg-pink-100 font-bold text-pink-600"
+          >
+            {orderloading ? <ButtonLoader /> : "Update Status"}
+          </button>
+        </form>
+      )}
+
+      {data?.status == "Refund Processing" && (
         <button
+          onClick={handleRefundStatus}
           type="submit"
-          className="cursor-pointer w-30 flex items-center justify-center h-10 rounded-md bg-pink-100 font-bold text-pink-600"
+          className="mt-4 cursor-pointer w-44 flex items-center justify-center h-12 rounded-md bg-pink-100 font-bold text-pink-600"
         >
-          Update Status
+          {orderloading ? <ButtonLoader /> : "Grant Refund Success"}
         </button>
-      </form>
+      )}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import mongoose, { Schema, Types } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const orderSchema = new Schema(
   {
@@ -10,7 +10,13 @@ const orderSchema = new Schema(
       // Status of order itself
       type: String,
       default: "Processing",
-      enum: ["Processing", "Delivered", "On the way"], // Also add requried fields
+      enum: [
+        "Processing",
+        "Delivered",
+        "On the way",
+        "Refund Processing",
+        "Refund Success",
+      ], // Also add requried fields
     },
     paymentInfo: {
       id: { type: String },

@@ -1,15 +1,12 @@
 "use client";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { useEffect } from "react";
-import { getAllOrders } from "@/redux/actions/order";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
+import { useAppSelector } from "@/redux/hooks/hooks";
 import LoadingDots from "@/components/Common/LoadingDots";
 import { Chip } from "@mui/material";
 import Link from "next/link";
 import { FiEye } from "react-icons/fi";
 
 export default function AllOrders() {
-  const dispatch = useAppDispatch();
   const { orders, loading, error } = useAppSelector((state) => state.order);
   const ordersColumns: GridColDef[] = [
     {
@@ -77,10 +74,6 @@ export default function AllOrders() {
         quantity: o?.cart?.length,
       }))
     : [];
-
-  useEffect(() => {
-    dispatch(getAllOrders(true));
-  }, []);
 
   if (loading || (!error && !orders))
     return <LoadingDots text="Loading orders..." />;

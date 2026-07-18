@@ -81,14 +81,14 @@ export const updateStatus = async (req: Request, res: Response) => {
   if (!orderId || !status)
     throw new AppError("Order Id and status are required", 400);
 
-  if (orderId.toString() != shop._id.toString())
-    throw new AppError("You are not authorized to change status", 401);
-
   if (status != "Delivered" && status != "On the way")
     throw new AppError("Status is not valid", 400);
 
   const order = await Order.findById(orderId);
   if (!order) throw new AppError("Order does not exist", 400);
+
+  if (order.shop && order.shop.toString() != shop._id.toString())
+    throw new AppError("You are not authorized to change status", 401);
 
   if (order.status == status)
     throw new AppError(`Status is already ${status}`, 400);
@@ -117,4 +117,57 @@ export const getUserOrders = async (req: Request, res: Response) => {
     message: "Orders fetched successfully",
     orders,
   });
+};
+
+export const processRefund = async (req: Request, res: Response) => {
+  const user = req.user;
+  if (!user) throw new AppError("Please login to continue", 401);
+
+  const { orderId } = req.params;
+  if (!orderId) throw new AppError("Order Id is required", 400);
+
+  const order = await Order.findById(orderId);
+  if (!order) throw new AppError("Order does not exist", 400);
+
+  if (order.user?._id.toString() != user._id.toString())
+    throw new AppError("You are not authorized to change status", 401);
+
+  if (order.status != "Delivered")
+    throw new AppError("Refund Processing will start after Delivery", 400);
+
+  order.status = "Refund Processing";
+  await order.save();
+
+  res.json({ success: true, message: "Refund Processing start Successfully" });
+};
+
+export const grantRefund = async (req: Request, res: Response) => {
+  const shop = req.user;
+  if (!shop) throw new AppError("Please login to continue", 401);
+  console.log("1");
+
+  const { orderId } = req.params;
+  if (!orderId) throw new AppError("Order Id is required", 400);
+
+  if (orderId.toString() != shop._id.toString())
+    throw new AppError("You are not authorized to change status", 401);
+  console.log("2");
+
+  const order = await Order.findById(orderId);
+  if (!order) throw new AppError("Order does not exist", 400);
+
+  console.log("2.1");
+
+  if (order.status != "Refund Processing")
+    throw new AppError(
+      "Please Refund Processing should start first then grant",
+      400,
+    );
+  console.log("3");
+
+  order.status = "Refund Success";
+  await order.save();
+  console.log("4");
+
+  return res.json({ success: true, message: "Refund Granted successfully" });
 };

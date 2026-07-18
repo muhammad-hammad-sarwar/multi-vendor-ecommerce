@@ -1,96 +1,91 @@
 "use client";
-
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Chip, Button } from "@mui/material";
-
-const rows = [
-  {
-    id: 1,
-    orderId: "#ORD-1001",
-    carrier: "DHL",
-    trackingNumber: "DHL123456",
-    status: "In Transit",
-    deliveryDate: "28 Jun 2026",
-  },
-  {
-    id: 2,
-    orderId: "#ORD-1002",
-    carrier: "FedEx",
-    trackingNumber: "FDX987654",
-    status: "Out for Delivery",
-    deliveryDate: "26 Jun 2026",
-  },
-  {
-    id: 3,
-    orderId: "#ORD-1003",
-    carrier: "UPS",
-    trackingNumber: "UPS456789",
-    status: "Delivered",
-    deliveryDate: "24 Jun 2026",
-  },
-];
-
-const columns: GridColDef[] = [
-  {
-    field: "orderId",
-    headerName: "Order ID",
-    flex: 1,
-    minWidth: 150,
-  },
-  {
-    field: "carrier",
-    headerName: "Carrier",
-    flex: 1,
-    minWidth: 130,
-  },
-  {
-    field: "trackingNumber",
-    headerName: "Tracking No",
-    flex: 1,
-    minWidth: 180,
-  },
-  {
-    field: "status",
-    headerName: "Current Status",
-    flex: 1,
-    minWidth: 180,
-    renderCell: (params) => {
-      const colorMap: Record<string, "success" | "warning" | "info"> = {
-        Delivered: "success",
-        "Out for Delivery": "warning",
-        "In Transit": "info",
-      };
-
-      return (
-        <Chip
-          label={params.value}
-          color={colorMap[params.value]}
-          size="small"
-        />
-      );
-    },
-  },
-  {
-    field: "deliveryDate",
-    headerName: "Expected Delivery",
-    flex: 1,
-    minWidth: 180,
-  },
-  {
-    field: "actions",
-    headerName: "Actions",
-    sortable: false,
-    filterable: false,
-    minWidth: 150,
-    renderCell: () => (
-      <Button variant="outlined" size="small">
-        Track
-      </Button>
-    ),
-  },
-];
+import { Chip } from "@mui/material";
+import Link from "next/link";
+import { MdOutlineTrackChanges } from "react-icons/md";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
+import LoadingDots from "@/components/Common/LoadingDots";
+import { getAllOrders } from "@/redux/actions/order";
+import { useEffect } from "react";
 
 export default function TrackOrders() {
+  const { orders, loading, error } = useAppSelector((state) => state.order);
+  const dispatch = useAppDispatch();
+
+  const ordersColumns: GridColDef[] = [
+    {
+      field: "orderId",
+      headerName: "Order ID",
+      flex: 1,
+      minWidth: 150,
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      flex: 1,
+      minWidth: 150,
+      renderCell: (params) => {
+        const status = params.value;
+
+        const colorMap: Record<
+          string,
+          "success" | "warning" | "error" | "info"
+        > = {
+          Delivered: "success",
+          Processing: "warning",
+          Shipped: "info",
+          Cancelled: "error",
+        };
+
+        return <Chip label={status} color={colorMap[status]} size="small" />;
+      },
+    },
+    {
+      field: "quantity",
+      headerName: "Item Quantity",
+      flex: 1,
+      minWidth: 150,
+    },
+    {
+      field: "total",
+      headerName: "Total",
+      flex: 1,
+      minWidth: 120,
+    },
+    {
+      field: "view",
+      headerName: "View",
+      sortable: false,
+      filterable: false,
+      minWidth: 100,
+      renderCell: ({ row }) => (
+        <Link
+          href={`/profile/orders/track/${row?.orderId}`}
+          className="block pt-3 text-gray-600 hover:text-black transition"
+          title="View Order Details"
+        >
+          <MdOutlineTrackChanges />
+        </Link>
+      ),
+    },
+  ];
+  const rows = orders
+    ? orders?.map((o) => ({
+        id: o?._id,
+        orderId: o?._id,
+        total: o?.totalPrice,
+        status: o?.status,
+        quantity: o?.cart?.length,
+      }))
+    : [];
+
+  useEffect(() => {
+    dispatch(getAllOrders());
+  }, []);
+
+  if (loading || (!error && !orders))
+    return <LoadingDots text="Loading orders..." />;
+
   return (
     <div>
       <h2 className="text-2xl font-semibold text-gray-800 mb-6">
@@ -99,7 +94,7 @@ export default function TrackOrders() {
 
       <DataGrid
         rows={rows}
-        columns={columns}
+        columns={ordersColumns}
         pageSizeOptions={[5, 10]}
         disableRowSelectionOnClick
       />

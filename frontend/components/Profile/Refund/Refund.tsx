@@ -1,40 +1,17 @@
 "use client";
-
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Chip, Button } from "@mui/material";
+import { Chip } from "@mui/material";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
+import Link from "next/link";
+import { FiEye } from "react-icons/fi";
+import { getAllOrders } from "@/redux/actions/order";
+import { useEffect } from "react";
+import LoadingDots from "@/components/Common/LoadingDots";
 
 export default function Refunds() {
-  const rows = [
-    {
-      id: 1,
-      refundId: "#REF-1001",
-      orderId: "#ORD-1001",
-      status: "Approved",
-      amount: "$120.00",
-    },
-    {
-      id: 2,
-      refundId: "#REF-1002",
-      orderId: "#ORD-1005",
-      status: "Pending",
-      amount: "$75.00",
-    },
-    {
-      id: 3,
-      refundId: "#REF-1003",
-      orderId: "#ORD-1010",
-      status: "Rejected",
-      amount: "$45.00",
-    },
-  ];
-
-  const columns: GridColDef[] = [
-    {
-      field: "refundId",
-      headerName: "Refund ID",
-      flex: 1,
-      minWidth: 150,
-    },
+  const dispatch = useAppDispatch();
+  const { orders, loading, error } = useAppSelector((state) => state.order);
+  const ordersColumns: GridColDef[] = [
     {
       field: "orderId",
       headerName: "Order ID",
@@ -47,40 +24,69 @@ export default function Refunds() {
       flex: 1,
       minWidth: 150,
       renderCell: (params) => {
-        const colorMap: Record<string, "success" | "warning" | "error"> = {
-          Approved: "success",
-          Pending: "warning",
-          Rejected: "error",
+        const status = params.value;
+
+        const colorMap: Record<
+          string,
+          "success" | "warning" | "error" | "info"
+        > = {
+          Delivered: "success",
+          Processing: "warning",
+          Shipped: "info",
+          Cancelled: "error",
         };
 
-        return (
-          <Chip
-            label={params.value}
-            color={colorMap[params.value]}
-            size="small"
-          />
-        );
+        return <Chip label={status} color={colorMap[status]} size="small" />;
       },
     },
     {
-      field: "amount",
-      headerName: "Refund Amount",
+      field: "quantity",
+      headerName: "Item Quantity",
       flex: 1,
       minWidth: 150,
     },
     {
-      field: "actions",
-      headerName: "Actions",
+      field: "total",
+      headerName: "Total",
+      flex: 1,
+      minWidth: 120,
+    },
+    {
+      field: "view",
+      headerName: "View",
       sortable: false,
       filterable: false,
-      minWidth: 140,
-      renderCell: () => (
-        <Button variant="outlined" size="small">
-          View
-        </Button>
+      minWidth: 100,
+      renderCell: ({ row }) => (
+        <Link
+          href={`/profile/orders/${row?.orderId}`}
+          className="block pt-3 text-gray-600 hover:text-black transition"
+          title="View Order Details"
+        >
+          <FiEye size={18} />
+        </Link>
       ),
     },
   ];
+
+  const rows = (orders ?? [])
+    .filter(
+      (o) => o.status === "Refund Processing" || o.status === "Refund Success",
+    )
+    .map((o) => ({
+      id: o._id,
+      orderId: o._id,
+      total: o.totalPrice,
+      status: o.status,
+      quantity: o.cart.length,
+    }));
+
+  useEffect(() => {
+    dispatch(getAllOrders());
+  }, []);
+
+  if (loading || (!error && !orders))
+    return <LoadingDots text="Loading Refund Orders..." />;
 
   return (
     <div>
@@ -90,7 +96,7 @@ export default function Refunds() {
 
       <DataGrid
         rows={rows}
-        columns={columns}
+        columns={ordersColumns}
         pageSizeOptions={[5, 10]}
         disableRowSelectionOnClick
       />

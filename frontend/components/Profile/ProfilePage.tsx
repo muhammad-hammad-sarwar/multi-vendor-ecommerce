@@ -20,7 +20,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import api from "@/axios/api";
 import { logout } from "@/redux/slices/user";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
+import { useAppDispatch } from "@/redux/hooks/hooks";
 
 const tabs = [
   { name: "Profile", icon: FiUser },

@@ -27,6 +27,16 @@ export default function OrderDetailsPage() {
     (o) => o?.user?._id == user?._id && o?._id == params?.slug,
   );
 
+  const handleRefund = async () => {
+    try {
+      await api.patch(`/orders/refund/${params.slug}`);
+      toast.success("Order Refund placed successfully");
+      dispatch(getAllOrders());
+    } catch (error) {
+      toast.error("Order refund failed");
+    }
+  };
+
   if ((loading && userLoading) || (!error && !data))
     return <LoadingDots text="Loading Order Details..." />;
 
@@ -205,6 +215,15 @@ export default function OrderDetailsPage() {
         <div>
           <h2 className="text-lg font-semibold mb-3">Payment Info</h2>
           <p>Status: {data?.paymentInfo?.status || "Not Paid"}</p>
+
+          {data?.status == "Delivered" && (
+            <button
+              onClick={handleRefund}
+              className="cursor-pointer mt-4 w-40 h-10 bg-pink-100 text-pink-600 text-lg font-bold rounded-md"
+            >
+              Get a Refund
+            </button>
+          )}
         </div>
       </div>
 

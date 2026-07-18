@@ -18,6 +18,18 @@ orderRouter.patch(
   catchAsync(orderController.updateStatus),
 );
 
+orderRouter.patch(
+  "/refund/:orderId",
+  isAuthenticated,
+  catchAsync(orderController.processRefund),
+);
+
+orderRouter.patch(
+  "/seller/refund/:orderId",
+  isSeller,
+  catchAsync(orderController.grantRefund),
+);
+
 orderRouter.get(
   "/user",
   isAuthenticated,
