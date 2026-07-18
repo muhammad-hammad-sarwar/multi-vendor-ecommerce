@@ -57,7 +57,9 @@ app.use(errorMiddleware);
 (async () => {
   await connectDB();
 
-  app.listen(8000, () => {
-    console.log("Server Running at 8000");
-  });
+  if (process.env.NODE_ENV === "Dev") {
+    app.listen(8000, () => {
+      console.log("Server Running at 8000");
+    });
+  }
 })();
