@@ -31,7 +31,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://multi-vendor-ecommerce-fe.vercel.app/",
+      "https://multi-vendor-ecommerce-fe.vercel.app",
     ],
     credentials: true,
   }),
@@ -54,12 +54,15 @@ app.use("/orders", orderRouter);
 // Error Handling
 app.use(errorMiddleware);
 
-(async () => {
-  await connectDB();
-
-  if (process.env.NODE_ENV === "Dev") {
+if (process.env.NODE_ENV === "development") {
+  connectDB().then(() => {
     app.listen(8000, () => {
       console.log("Server Running at 8000");
     });
-  }
-})();
+  });
+} else {
+  connectDB();
+}
+
+// For vercel
+export default app;
