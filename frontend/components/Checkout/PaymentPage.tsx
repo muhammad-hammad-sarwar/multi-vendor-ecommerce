@@ -65,7 +65,7 @@ export default function PaymentPage({ fullName: name, amount, setStep }) {
     e.preventDefault();
     const {
       data: { client_secret },
-    } = await api.post("/payment/process", { amount });
+    } = await api.post("/payment/process", { amount: Math.floor(amount) });
 
     if (!stripe || !elements) return;
 

@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import { AppError } from "../utils/AppError.js";
 import { Order } from "../models/order.model.js";
-import { CartProduct, Product } from "../models/product.model.js";
+import { Product } from "../models/product.model.js";
+import { Event as EventModel } from "../models/event.model.js";
 
 export const createOrder = async (req: Request, res: Response) => {
   const { cart, shippingInfo, totalPrice, paymentInfo } = req.body;
@@ -26,19 +27,47 @@ export const createOrder = async (req: Request, res: Response) => {
 
   //   Place order in each shop
   for (const [shopId, data] of shopMap) {
-    // Total price per
-    const totalPrice = data?.reduce(
-      (sum: number, item: CartProduct) =>
-        sum + (item?.discountPrice || item?.originalPrice) * item?.quantity,
-      0,
-    );
+    let totalPrice = 0;
+    const validatedCart = [];
+
+    for (const item of data) {
+      const product = item.isEvent
+        ? await EventModel.findById(item._id)
+        : await Product.findById(item._id);
+
+      if (!product) {
+        throw new AppError(`${item.name} no longer exists`, 400);
+      }
+
+      const availableStock = product.stock - product.sold_out;
+      if (item.quantity > availableStock) {
+        throw new AppError(
+          `${product.name} only has ${availableStock} left in stock`,
+          400,
+        );
+      }
+
+      const price = product.discountPrice ?? product.originalPrice;
+      totalPrice += price * item.quantity;
+
+      validatedCart.push({
+        ...item,
+        discountPrice: product.discountPrice,
+        originalPrice: product.originalPrice,
+      });
+    }
 
     // Update the sold out pieces of products
-    for (const item of data) {
-      await Product.updateOne(
-        { _id: item?._id },
-        { $inc: { sold_out: item?.quantity } },
-      );
+    for (const item of validatedCart) {
+      item.isEvent
+        ? await EventModel.updateOne(
+            { _id: item?._id },
+            { $inc: { sold_out: item?.quantity } },
+          )
+        : await Product.updateOne(
+            { _id: item?._id },
+            { $inc: { sold_out: item?.quantity } },
+          );
     }
 
     await Order.create({
@@ -144,30 +173,42 @@ export const processRefund = async (req: Request, res: Response) => {
 export const grantRefund = async (req: Request, res: Response) => {
   const shop = req.user;
   if (!shop) throw new AppError("Please login to continue", 401);
-  console.log("1");
 
   const { orderId } = req.params;
   if (!orderId) throw new AppError("Order Id is required", 400);
 
-  if (orderId.toString() != shop._id.toString())
-    throw new AppError("You are not authorized to change status", 401);
-  console.log("2");
-
   const order = await Order.findById(orderId);
   if (!order) throw new AppError("Order does not exist", 400);
 
-  console.log("2.1");
+  if (order.shop && order.shop.toString() != shop._id.toString())
+    throw new AppError("You are not authorized to change status", 401);
 
   if (order.status != "Refund Processing")
     throw new AppError(
       "Please Refund Processing should start first then grant",
       400,
     );
-  console.log("3");
+
+  const shopMap = new Map();
+  for (const item of order.cart) {
+    const shopId = item?.shop?._id;
+    if (!shopMap.has(shopId)) {
+      shopMap.set(shopId, []);
+    }
+
+    shopMap.get(shopId).push(item);
+  }
+  for (const [_, data] of shopMap) {
+    for (const item of data) {
+      await Product.updateOne(
+        { _id: item?._id },
+        { $inc: { sold_out: -item?.quantity } },
+      );
+    }
+  }
 
   order.status = "Refund Success";
   await order.save();
-  console.log("4");
 
   return res.json({ success: true, message: "Refund Granted successfully" });
 };

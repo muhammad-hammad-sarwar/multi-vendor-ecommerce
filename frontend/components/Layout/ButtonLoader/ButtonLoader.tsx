@@ -1,9 +1,21 @@
-export default function ButtonLoader() {
+import clsx from "clsx";
+
+export default function ButtonLoader({ bg = "bg-white" }: { bg?: string }) {
   return (
     <div className="flex items-center justify-center gap-1">
-      <span className="h-2 w-2 rounded-full bg-white animate-bounce [animation-delay:-0.3s]" />
-      <span className="h-2 w-2 rounded-full bg-white animate-bounce [animation-delay:-0.15s]" />
-      <span className="h-2 w-2 rounded-full bg-white animate-bounce" />
+      <span
+        className={clsx(
+          "h-2 w-2 rounded-full animate-bounce [animation-delay:-0.3s]",
+          bg,
+        )}
+      />
+      <span
+        className={clsx(
+          "h-2 w-2 rounded-full animate-bounce [animation-delay:-0.15s]",
+          bg,
+        )}
+      />
+      <span className={clsx("h-2 w-2 rounded-full animate-bounce", bg)} />
     </div>
   );
 }

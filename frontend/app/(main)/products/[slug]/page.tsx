@@ -134,7 +134,9 @@ export default function ProductDetailsPage() {
 
           <div className="flex items-center gap-4">
             <button
-              onClick={() => dispatch(addToCart(product))}
+              onClick={() =>
+                dispatch(addToCart({ ...product, isEvent: isEvent === "true" }))
+              }
               className="cursor-pointer bg-black text-white px-6 py-2 rounded-lg flex items-center gap-2"
             >
               <FiShoppingCart /> Add to Cart
@@ -152,7 +154,11 @@ export default function ProductDetailsPage() {
               </button>
             ) : (
               <button
-                onClick={() => dispatch(addToWishlist(product))}
+                onClick={() =>
+                  dispatch(
+                    addToWishlist({ ...product, isEvent: isEvent === "true" }),
+                  )
+                }
                 className="cursor-pointer border p-2 rounded-lg"
               >
                 <FiHeart title="Add to favourites" />

@@ -28,7 +28,9 @@ export default function AllOrders() {
           "success" | "warning" | "error" | "info"
         > = {
           Delivered: "success",
+          "Refund Success": "success",
           Processing: "warning",
+          "Refund Processing": "warning",
           Shipped: "info",
           Cancelled: "error",
         };

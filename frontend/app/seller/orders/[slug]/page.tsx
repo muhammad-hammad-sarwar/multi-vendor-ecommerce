@@ -41,7 +41,7 @@ export default function OrderDetails() {
         dispatch(getAllOrders(true));
       });
     } catch (error) {
-      console.dir("Error from refund status", error);
+      console.log("Error from refund status", error);
       toast.error(error?.response?.data?.message);
     } finally {
       setOrderLoading(false);
@@ -179,7 +179,11 @@ export default function OrderDetails() {
           type="submit"
           className="mt-4 cursor-pointer w-44 flex items-center justify-center h-12 rounded-md bg-pink-100 font-bold text-pink-600"
         >
-          {orderloading ? <ButtonLoader /> : "Grant Refund Success"}
+          {orderloading ? (
+            <ButtonLoader bg="bg-pink-700" />
+          ) : (
+            "Grant Refund Success"
+          )}
         </button>
       )}
     </div>

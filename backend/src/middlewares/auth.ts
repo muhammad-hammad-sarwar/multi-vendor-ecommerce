@@ -9,6 +9,7 @@ export const isSeller = async (
   res: Response,
   next: NextFunction,
 ) => {
+  console.log("EVen hitting it or not?");
   const token = req.cookies?.seller_token;
   if (!token) throw new AppError("You are not authorized.", 401);
 
