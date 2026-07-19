@@ -2,7 +2,7 @@ import { useAppSelector } from "@/redux/hooks/hooks";
 import EventCard from "./EventsCard";
 
 export default function PopularEvents() {
-  const { allEvents, loading } = useAppSelector((state) => state.events);
+  const { allEvents, loading, error } = useAppSelector((state) => state.events);
   return (
     <section className="w-11/12 mx-auto py-10">
       <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-6">
@@ -10,10 +10,10 @@ export default function PopularEvents() {
       </h2>
 
       <div className="flex flex-col gap-6 rounded-lg">
-        {loading ? (
+        {loading || (!error && !allEvents) ? (
           <div className="flex flex-col items-center justify-center gap-3 text-gray-500">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
-            <p className="text-sm">Loading events...</p>
+            <p className="text-sm">Loading Popular Events...</p>
           </div>
         ) : allEvents?.length == 0 ? (
           <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-gray-300 bg-gray-50">

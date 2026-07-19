@@ -1,6 +1,7 @@
 "use client";
 import api from "@/axios/api";
 import LoadingDots from "@/components/Common/LoadingDots";
+import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
 import useBodyScrollLock from "@/hooks/useBodyScrollLock";
 import { getAllOrders } from "@/redux/actions/order";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
@@ -17,6 +18,7 @@ export default function OrderDetailsPage() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(5);
+  const [ReviewLoading, setReviewLoading] = useState(false);
   useBodyScrollLock(selectedItem);
 
   useEffect(() => {
@@ -166,24 +168,27 @@ export default function OrderDetailsPage() {
 
               <button
                 onClick={async (e) => {
+                  setReviewLoading(true);
                   await api
                     .post("/products/review", {
                       comment,
                       rating,
                       productId: selectedItem?._id,
                       orderId: params.slug,
+                      isEvent: selectedItem.isEvent,
                     })
                     .then(() => {
                       toast.success("Review updated successfully");
                       dispatch(getAllOrders());
                     })
-                    .catch((err) => toast.error(err?.response?.data?.message));
+                    .catch((err) => toast.error(err?.response?.data?.message))
+                    .finally(() => setReviewLoading(false));
 
                   setSelectedItem(null);
                 }}
                 className="cursor-pointer rounded-md bg-black px-5 py-2 text-white hover:bg-gray-800"
               >
-                Submit Review
+                {ReviewLoading ? <ButtonLoader /> : "Submit Review"}
               </button>
             </div>
           </div>

@@ -168,7 +168,7 @@ export default function OrderDetails() {
             type="submit"
             className="cursor-pointer w-30 flex items-center justify-center h-10 rounded-md bg-pink-100 font-bold text-pink-600"
           >
-            {orderloading ? <ButtonLoader /> : "Update Status"}
+            {orderloading ? <ButtonLoader bg="bg-pink-700" /> : "Update Status"}
           </button>
         </form>
       )}

@@ -1,4 +1,13 @@
-export default function OrderSummaryPayments({ orderData }) {
+import { useEffect, useState } from "react";
+
+export default function OrderSummaryPayments() {
+  const [orderData, setOrderData] = useState(null);
+
+  useEffect(() => {
+    const orderData = JSON.parse(localStorage.getItem("orderData") || "{}");
+    setOrderData(orderData);
+  }, []);
+
   return (
     <div className="rounded-xl border bg-white p-6 shadow-sm sticky top-6">
       <h2 className="text-xl font-semibold mb-6">Order Summary</h2>

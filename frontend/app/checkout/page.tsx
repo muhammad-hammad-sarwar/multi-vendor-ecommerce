@@ -103,7 +103,7 @@ export default function CheckoutPage() {
                   totalPrice={totalPrice}
                 />
               )}
-              {step == 2 && <OrderSummaryPayments orderData={orderData} />}
+              {step == 2 && <OrderSummaryPayments />}
             </div>
             {step == 3 && <OrderSuccessPage />}
           </div>

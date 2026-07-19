@@ -12,6 +12,15 @@ export interface IEvent extends Document {
   sold_out: number;
   shop: Types.ObjectId;
   startDate: Date;
+
+  ratings: number;
+  reviews: {
+    user: Types.ObjectId;
+    createdAt?: Date;
+    rating: number;
+    comment: string;
+  }[];
+
   endDate: Date;
   images: string[];
   createdAt: Date;
@@ -56,6 +65,31 @@ const eventSchema = new Schema<IEvent>(
       required: true,
       min: 0,
     },
+    ratings: { type: Number },
+    reviews: [
+      {
+        user: {
+          type: Schema.Types.ObjectId,
+          ref: "user",
+          required: true,
+        },
+        rating: {
+          type: Number,
+          required: true,
+          min: 1,
+          max: 5,
+        },
+        comment: {
+          type: String,
+          required: true,
+          trim: true,
+        },
+        createdAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
     sold_out: {
       type: Number,
       default: 0,

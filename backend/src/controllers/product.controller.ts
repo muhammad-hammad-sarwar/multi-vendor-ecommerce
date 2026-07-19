@@ -4,6 +4,7 @@ import { Product } from "../models/product.model.js";
 import { AppError } from "../utils/AppError.js";
 import { deleteFile } from "../utils/deleteFile.js";
 import { Order } from "../models/order.model.js";
+import { Event } from "../models/event.model.js";
 
 export const createProduct = async (req: Request, res: Response) => {
   const files = req.files as Express.Multer.File[];
@@ -70,12 +71,14 @@ export const getShopProducts = async (req: Request, res: Response) => {
 export const createReview = async (req: Request, res: Response) => {
   const user = req.user;
   if (!user) throw new AppError("Please login to continue", 400);
-  const { productId, rating, comment, orderId } = req.body;
+  const { productId, rating, comment, orderId, isEvent } = req.body;
 
   if (!productId || !rating || !comment || isNaN(Number(rating)))
     throw new AppError("Product id, rating and comment are required", 400);
 
-  const product = await Product.findOne({ _id: productId });
+  const product = isEvent
+    ? await Event.findOne({ _id: productId })
+    : await Product.findOne({ _id: productId });
 
   if (!product) throw new AppError("Product does not exists", 400);
 
