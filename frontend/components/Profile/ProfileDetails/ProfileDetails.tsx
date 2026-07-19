@@ -80,6 +80,7 @@ export default function ProfileDetails() {
         <label className="absolute bottom-0 right-1/6 w-7 h-7 cursor-pointer rounded-full flex items-center justify-center gap-2 bg-gray-300 hover:underline">
           <CameraIcon size={16} />
           <input
+            hidden
             type="file"
             accept=".jpg,.jpeg,.png"
             className="hidden"

@@ -184,14 +184,19 @@ export const getShopProducts = async (req: Request, res: Response) => {
   if (!req.user) throw new AppError("Please login to continue.", 401);
   return res.json({
     success: true,
-    products: await Product.find({ shop: req.user?._id }),
+    products: await Product.find({ shop: req.user?._id }).populate(
+      "reviews.user",
+      "avatar name",
+    ),
   });
 };
 
 export const getShopEvents = async (req: Request, res: Response) => {
   if (!req.user) throw new AppError("Please login to continue.", 401);
-  const events = await Event.find({ shop: req.user?._id });
-  console.log(events);
+  const events = await Event.find({ shop: req.user?._id }).populate(
+    "reviews.user",
+    "avatar name",
+  );
   return res.json({
     success: true,
     events,
@@ -249,4 +254,43 @@ export const getShopInfo = async (req: Request, res: Response) => {
 
   const shop = await Shop.findById(id);
   return res.json({ success: true, shop });
+};
+
+export const updateProfile = async (req: Request, res: Response) => {
+  const { name, password, phoneNumber, zipCode, address, description } =
+    req.body;
+
+  if (!req.user) throw new AppError("Please login to continue", 401);
+
+  const shop = await Shop.findById(req.user._id).select("+password");
+
+  if (!shop) throw new AppError("Shop not found.", 404);
+
+  if (
+    name === shop.name &&
+    phoneNumber === shop.phoneNumber &&
+    zipCode === shop.zipCode &&
+    address === shop.address &&
+    description === shop.description
+  )
+    throw new AppError("No changes were made to your profile.", 400);
+
+  const isPasswordCorrect = await bcrypt.compare(password, shop.password);
+
+  if (!isPasswordCorrect)
+    throw new AppError("Current password is incorrect.", 401);
+
+  shop.name = name;
+  shop.phoneNumber = phoneNumber;
+  shop.zipCode = zipCode;
+  shop.address = address;
+  shop.description = description;
+
+  await shop.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Profile updated successfully.",
+    shop: await Shop.findById(shop._id),
+  });
 };

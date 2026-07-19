@@ -13,6 +13,7 @@ eventRouter.post(
   catchAsync(eventController.createEvent),
 );
 
+eventRouter.get("/shop/:id", catchAsync(eventController.getShopEvents));
 // Get All Events
 eventRouter.get("/", catchAsync(eventController.getEvents));
 

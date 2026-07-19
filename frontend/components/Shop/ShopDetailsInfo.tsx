@@ -1,12 +1,20 @@
 "use client";
 import { useAppSelector } from "@/redux/hooks/hooks";
+import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { useState } from "react";
 import { FiCalendar, FiGrid, FiPackage, FiStar } from "react-icons/fi";
 import { ProductCard } from "../Products/ProductCard";
+import Rating from "../Common/Ratings";
+import EventCard from "../Events/EventsCard";
 type Tab = "products" | "events" | "reviews";
 
-export default function ShopDetailsInfo({ products, isOwner }) {
+export default function ShopDetailsInfo({
+  products,
+  isOwner,
+  reviews,
+  events,
+}) {
   const [activeTab, setActiveTab] = useState<Tab>("products");
   return (
     <main className="flex-1">
@@ -75,27 +83,69 @@ export default function ShopDetailsInfo({ products, isOwner }) {
         )
       )}
 
-      {activeTab === "events" && (
-        <div className="rounded-2xl border bg-white py-16 text-center shadow-sm">
-          <FiCalendar className="mx-auto text-gray-300" size={50} />
-          <h2 className="mt-5 text-xl font-semibold">No Events Yet</h2>
-          <p className="mt-2 text-gray-500">
-            There are no active promotional events at the moment.
-          </p>
-        </div>
-      )}
+      {activeTab === "events" &&
+        (events.length === 0 ? (
+          <div className="rounded-2xl border bg-white py-16 text-center shadow-sm">
+            <FiCalendar className="mx-auto text-gray-300" size={50} />
+            <h2 className="mt-5 text-xl font-semibold">No Events Yet</h2>
+            <p className="mt-2 text-gray-500">
+              There are no active promotional events at the moment.
+            </p>
+          </div>
+        ) : (
+          events.map((e) => <EventCard event={e} />)
+        ))}
 
       {activeTab === "reviews" && (
         <section className="space-y-6">
-          <div className="rounded-2xl border bg-white py-16 text-center shadow-sm">
-            <FiStar className="mx-auto text-gray-300" size={50} />
+          {reviews?.length === 0 ? (
+            <div className="rounded-2xl border bg-white py-16 text-center shadow-sm">
+              <FiStar className="mx-auto text-gray-300" size={50} />
 
-            <h2 className="mt-5 text-xl font-semibold">No Reviews Yet</h2>
+              <h2 className="mt-5 text-xl font-semibold">No Reviews Yet</h2>
 
-            <p className="mt-2 text-gray-500">
-              Your shop hasn't received any reviews yet.
-            </p>
-          </div>
+              <p className="mt-2 text-gray-500">
+                Your shop hasn't received any reviews yet.
+              </p>
+            </div>
+          ) : (
+            <>
+              {reviews.map((review) => {
+                console.log(review);
+                return (
+                  <div
+                    key={review?._id}
+                    className="flex items-start justify-between gap-4 rounded-lg border p-4"
+                  >
+                    <div className="flex items-start gap-3">
+                      <img
+                        src={`http://localhost:8000/uploads/${review?.user?.avatar}`}
+                        alt={review?.user?.name}
+                        className="w-12 h-12 rounded-full object-cover border"
+                      />
+
+                      <div>
+                        <h3 className="font-semibold text-gray-900">
+                          {review?.user?.name}
+                        </h3>
+
+                        <p className="text-sm text-gray-600 mt-1">
+                          {review?.comment}
+                        </p>
+                      </div>
+                      <p>
+                        {formatDistanceToNow(new Date(review?.createdAt), {
+                          addSuffix: true,
+                        })}
+                      </p>
+                    </div>
+
+                    <Rating rating={review?.rating} />
+                  </div>
+                );
+              })}
+            </>
+          )}
         </section>
       )}
     </main>

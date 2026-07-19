@@ -56,7 +56,7 @@ export default function SellerHeader() {
             </Link>
           </div>
 
-          <Link href={isSeller ? `/shop/${shop._id}` : "/seller-login"}>
+          <Link href={isSeller ? `/shop/${shop?._id}` : "/seller-login"}>
             <div className="w-7.5 h-7.5 rounded-full overflow-hidden flex items-center justify-center">
               {isSeller && shop && shop?.avatar ? (
                 <Image

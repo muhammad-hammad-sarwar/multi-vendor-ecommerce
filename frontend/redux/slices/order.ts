@@ -10,7 +10,7 @@ interface CartItem extends Product {
 export interface Order {
   _id: string;
   status: string;
-  totalPrice: string;
+  totalPrice: number;
   cart: CartItem[];
   shop: string;
   user: IUser;

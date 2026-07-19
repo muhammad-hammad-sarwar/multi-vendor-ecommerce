@@ -14,10 +14,38 @@ import {
   FiStar,
 } from "react-icons/fi";
 import ButtonLoader from "../Layout/ButtonLoader/ButtonLoader";
+import Link from "next/link";
 
-export default function ShopSidebarInfo({ isOwner, shop, totalProducts }) {
+export default function ShopSidebarInfo({
+  isOwner,
+  shop,
+  totalProducts,
+  averageRating,
+}) {
   const [logoutLoading, setLogoutLoading] = useState(false);
+  const { products } = useAppSelector((store) => store.products);
   const router = useRouter();
+
+  // const getShopRatings = () => {
+  //   let totalRating = 0;
+  //   let totalReviews = 0;
+  //   const reviews = [];
+
+  //   products?.forEach((product) => {
+  //     product.reviews?.forEach((review) => {
+  //       reviews.push(review);
+  //       totalRating += review.rating;
+  //       totalReviews++;
+  //     });
+  //   });
+
+  //   return {
+  //     averageRating: totalReviews ? totalRating / totalReviews : 0,
+  //     reviews,
+  //   };
+  // };
+
+  // const { averageRating, reviews } = getShopRatings();
 
   const handleLogout = async () => {
     setLogoutLoading(true);
@@ -77,7 +105,7 @@ export default function ShopSidebarInfo({ isOwner, shop, totalProducts }) {
           <div className="mt-2 flex gap-2 text-gray-600">
             <FiStar className="mt-1 text-yellow-500" />
 
-            {/* <p>{shop.} / 5</p> */}
+            <p>{averageRating} / 5</p>
           </div>
         </div>
 
@@ -94,10 +122,12 @@ export default function ShopSidebarInfo({ isOwner, shop, totalProducts }) {
 
       {isOwner && (
         <div className="mt-10 space-y-3">
-          <button className="cursor-pointer flex w-full items-center justify-center gap-2 rounded-lg bg-black h-12 font-medium text-white transition hover:opacity-90">
-            <FiEdit2 />
-            Edit Shop
-          </button>
+          <Link className="block" href={"/seller/settings"}>
+            <button className="cursor-pointer flex w-full items-center justify-center gap-2 rounded-lg bg-black h-12 font-medium text-white transition hover:opacity-90">
+              <FiEdit2 />
+              Edit Shop
+            </button>
+          </Link>
 
           <button
             onClick={handleLogout}

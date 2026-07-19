@@ -3,6 +3,7 @@ import * as shopController from "../controllers/shop.controller.js";
 import { upload } from "../middlewares/upload.middleware.js";
 import catchAsync from "../utils/catchAsync.js";
 import { isSeller } from "../middlewares/auth.js";
+import { updateProfileAvatar } from "../controllers/profile.controller.js";
 
 const shopRouter = Router();
 shopRouter.post(
@@ -20,6 +21,15 @@ shopRouter.post(
 
 shopRouter.get("/", catchAsync(shopController.loadShop));
 shopRouter.post("/logout", catchAsync(shopController.logout));
+
+shopRouter.put(
+  "/avatar",
+  isSeller,
+  upload.single("avatar"),
+  catchAsync(updateProfileAvatar),
+);
+
+shopRouter.put("/profile", isSeller, catchAsync(shopController.updateProfile));
 
 // Get shop info by id
 shopRouter.get("/info/:id", catchAsync(shopController.getShopInfo));

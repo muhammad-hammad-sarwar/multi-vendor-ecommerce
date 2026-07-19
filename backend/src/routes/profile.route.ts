@@ -2,7 +2,7 @@ import { Router } from "express";
 import * as profileController from "../controllers/profile.controller.js";
 import { upload } from "../middlewares/upload.middleware.js";
 import catchAsync from "../utils/catchAsync.js";
-import { isAuthenticated } from "../middlewares/auth.js";
+import { isAuthenticated, isSeller } from "../middlewares/auth.js";
 
 const profileRouter = Router();
 

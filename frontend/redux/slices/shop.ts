@@ -1,5 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Product } from "./product";
+import { toast } from "react-toastify";
+import { IEvent } from "./events";
 
 export interface IShop {
   _id: string;
@@ -23,10 +25,13 @@ interface ShopState {
   products: Product[] | null;
   events: null;
 
+  profileUpdateLoading: boolean;
+
   // current shop is for get by id
   currentShop: null | IShop;
   infoLoading: boolean;
   currentShopProducts: Product[] | null;
+  currentShopEvents: IEvent[] | null;
 }
 
 const initialState: ShopState = {
@@ -37,9 +42,12 @@ const initialState: ShopState = {
   products: null,
   events: null,
 
+  profileUpdateLoading: false,
+
   currentShop: null,
   infoLoading: false,
   currentShopProducts: null,
+  currentShopEvents: null,
 };
 
 const shopSlice = createSlice({
@@ -97,6 +105,49 @@ const shopSlice = createSlice({
       state.error = action.payload;
     },
 
+    // current shop info events
+    loadShopEventStart(state) {
+      state.infoLoading = true;
+    },
+
+    loadShopEventSuccess(state, action) {
+      state.infoLoading = false;
+      state.currentShopEvents = action.payload;
+    },
+
+    loadShopEventFailure(state, action) {
+      state.infoLoading = false;
+      state.error = action.payload;
+    },
+
+    // For Avatar update
+    updateShopAvatarStart(state) {
+      state.loading = true;
+    },
+    updateShopAvatarSuccess(state, action) {
+      state.loading = false;
+      state.shop = action.payload;
+    },
+    updateShopAvatarFailure(state, action) {
+      state.loading = false;
+      state.error = action.payload;
+    },
+
+    // For Name and PhoneNumber
+    updateShopProfileStart(state) {
+      state.profileUpdateLoading = true;
+    },
+    updateShopProfileSuccess(state, action) {
+      state.profileUpdateLoading = false;
+      state.shop = action.payload;
+      toast.success("Profile Updated successfully");
+    },
+    updateShopProfileFailure(state, action) {
+      state.profileUpdateLoading = false;
+      state.error = action.payload;
+      toast.error(state.error);
+    },
+
     logout(state) {
       state.isSeller = false;
       state.shop = null;
@@ -114,9 +165,25 @@ export const {
   loadShopInfoStart,
   loadShopInfoSuccess,
   loadShopInfoFailure,
+
+  // current shop - preview events
+
+  loadShopEventStart,
+  loadShopEventSuccess,
+  loadShopEventFailure,
+
   loadShopProductstart,
   loadShopProductsSuccess,
   loadShopProductsFailure,
+
+  updateShopAvatarStart,
+  updateShopAvatarSuccess,
+  updateShopAvatarFailure,
+
+  updateShopProfileStart,
+  updateShopProfileSuccess,
+  updateShopProfileFailure,
+
   logout,
 } = shopSlice.actions;
 export default shopSlice.reducer;

@@ -1,6 +1,12 @@
 "use client";
+import LoadingDots from "@/components/Common/LoadingDots";
 import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
-import { useAppSelector } from "@/redux/hooks/hooks";
+import {
+  updateShopAvatar,
+  updateShopProfile,
+} from "@/redux/actions/shop.action";
+import { updateUserProfileAvatar } from "@/redux/actions/user";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import {
@@ -10,46 +16,49 @@ import {
   FiPhone,
   FiFileText,
   FiUser,
+  FiLock,
 } from "react-icons/fi";
 
 export default function SellerSettings() {
   const {
-    isSeller,
     shop,
-    loading: isLoading,
+    loading: shopLoading,
+    profileUpdateLoading,
     error,
   } = useAppSelector((state) => state.shop);
-
-  const [loading, setLoading] = useState(false);
   const [avatar, setAvatar] = useState<File | null>(null);
-  const [shopName, setShopName] = useState(shop?.name || "");
-  const [address, setAddress] = useState(shop?.address || "");
-  const [phone, setPhone] = useState(shop?.phoneNumber || "");
-  const [zipCode, setZipCode] = useState(shop?.zipCode || "");
+  const [shopName, setShopName] = useState(shop?.name ?? "");
+  const [address, setAddress] = useState(shop?.address ?? "");
+  const [phone, setPhone] = useState(shop?.phoneNumber ?? "");
+  const [zipCode, setZipCode] = useState(shop?.zipCode ?? "");
   const [description, setDescription] = useState(shop?.description || "");
+  const [password, setPassword] = useState("");
+  const dispatch = useAppDispatch();
 
-  const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setAvatar(file);
+    const formData = new FormData();
+    formData.append("avatar", file);
+
+    dispatch(updateShopAvatar(formData)).then(() => {
+      setAvatar(file);
+    });
   };
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData();
-
-    if (avatar) {
-      formData.append("avatar", avatar);
-    }
-
-    formData.append("shopName", shopName);
-    formData.append("description", description);
-    formData.append("address", address);
-    formData.append("phone", phone);
-    formData.append("zipCode", zipCode);
-
-    console.log([...formData.entries()]);
-    setLoading(true);
+    dispatch(
+      updateShopProfile({
+        name: shopName,
+        password,
+        phoneNumber: phone,
+        zipCode,
+        address,
+        description,
+      }),
+    );
   };
 
   useEffect(() => {
@@ -62,22 +71,8 @@ export default function SellerSettings() {
     setZipCode(shop.zipCode);
   }, [shop]);
 
-  if (isLoading || !shop)
-    return (
-      <div className="flex min-h-[80vh] w-full items-center justify-center">
-        <div className="flex flex-col items-center gap-6">
-          <div className="flex gap-3">
-            <span className="h-4 w-4 rounded-full bg-orange-400 animate-wave [animation-delay:0ms]" />
-            <span className="h-4 w-4 rounded-full bg-orange-500 animate-wave [animation-delay:150ms]" />
-            <span className="h-4 w-4 rounded-full bg-red-500 animate-wave [animation-delay:300ms]" />
-          </div>
-
-          <p className="text-sm font-medium text-gray-500">
-            Loading shop settings...
-          </p>
-        </div>
-      </div>
-    );
+  if (shopLoading || (!error && !shop))
+    return <LoadingDots text="Loading shop info" />;
 
   return (
     <div className="mx-auto">
@@ -90,26 +85,21 @@ export default function SellerSettings() {
       <div className="flex justify-center mt-10">
         <div className="relative">
           <div className="h-40 w-40 rounded-full overflow-hidden border-4 border-blue-100 shadow-lg">
-            {shop?.avatar ? (
+            {avatar || shop?.avatar ? (
               <Image
-                src={`http://localhost:8000/uploads/${shop?.avatar}`}
+                src={
+                  avatar
+                    ? URL.createObjectURL(avatar)
+                    : `http://localhost:8000/uploads/${shop?.avatar}`
+                }
                 alt="Shop Avatar"
                 width={160}
                 height={160}
                 className="h-full w-full object-cover"
                 unoptimized
               />
-            ) : avatar ? (
-              <Image
-                src={URL.createObjectURL(avatar)}
-                alt="Shop Avatar"
-                width={160}
-                height={160}
-                className="h-full w-full object-cover"
-              />
             ) : (
               <div className="flex h-full w-full items-center justify-center bg-gray-100">
-                {/* Show User Image */}
                 <FiUser size={70} className="text-gray-400" />
               </div>
             )}
@@ -121,7 +111,7 @@ export default function SellerSettings() {
               hidden
               type="file"
               accept=".jpg,.jpeg,.png"
-              onChange={handleImage}
+              onChange={handleImageChange}
             />
           </label>
         </div>
@@ -225,18 +215,44 @@ export default function SellerSettings() {
           </div>
         </div>
 
+        <div>
+          <label
+            htmlFor="password"
+            className="text-sm font-medium text-gray-700"
+          >
+            Password
+          </label>
+
+          <div className="relative mt-1">
+            <FiLock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+
+            <input
+              required={true}
+              id="password"
+              name="password"
+              type={"password"}
+              placeholder="Enter Password for Updaing Shop details"
+              autoComplete="current-password"
+              aria-label="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full pl-10 pr-10 py-2 border rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        </div>
+
         <div className="pt-4 flex justify-end">
           <button
             type="submit"
-            disabled={loading}
+            disabled={profileUpdateLoading}
             className={`cursor-pointer min-w-44 rounded-lg border-2 border-blue-600 px-6 h-12 font-medium transition-all duration-200
                 ${
-                  loading
+                  profileUpdateLoading
                     ? "cursor-not-allowed bg-blue-600 text-white"
                     : "bg-white text-blue-600 hover:bg-blue-600 hover:text-white"
                 }`}
           >
-            {loading ? <ButtonLoader /> : "Update Shop"}
+            {profileUpdateLoading ? <ButtonLoader /> : "Update Shop"}
           </button>
         </div>
       </form>

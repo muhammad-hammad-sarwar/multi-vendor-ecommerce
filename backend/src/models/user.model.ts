@@ -48,8 +48,8 @@ const userSchema = new Schema<IUser>(
     },
     phoneNumber: {
       type: String,
-      minLength: [15, "Phone Number must be 11 digits"],
-      maxLength: [15, "Phone Number must be 11 digits"],
+      // minLength: [15, "Phone Number must be 11 digits"],
+      // maxLength: [15, "Phone Number must be 11 digits"],
       default: "",
     },
     addresses: [

@@ -95,7 +95,7 @@ export const updateProfilePassword = async (req: Request, res: Response) => {
   return res.status(200).json({
     success: true,
     message: "Password updated successfully.",
-    user: req.user,
+    user: await User.findById(user._id),
   });
 };
 

@@ -50,10 +50,12 @@ export const createProduct = async (req: Request, res: Response) => {
 };
 
 export const getProducts = async (req: Request, res: Response) => {
+  const products = await Product.find()
+    .populate("shop", "name avatar createdAt")
+    .populate("reviews.user", "avatar name");
+
   return res.json({
-    products: await Product.find()
-      .populate("shop", "name avatar createdAt")
-      .populate("reviews.user", "avatar name"),
+    products,
   });
 };
 
