@@ -106,9 +106,10 @@ export const applyCoupon = async (req: Request, res: Response) => {
       400,
     );
 
-  let discount = (findCoupon?.discountPercentage / 100) * totalPrice;
+  let discount = (findCoupon.discountPercentage * totalPrice) / 100;
+
   if (
-    findCoupon?.maximumDiscountAmount &&
+    findCoupon.maximumDiscountAmount &&
     discount > findCoupon.maximumDiscountAmount
   ) {
     discount = findCoupon.maximumDiscountAmount;
@@ -118,6 +119,7 @@ export const applyCoupon = async (req: Request, res: Response) => {
     success: true,
     message: "Coupon applied successfully.",
     coupon: findCoupon,
+    discount,
   });
 };
 

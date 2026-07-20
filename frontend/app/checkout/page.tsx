@@ -63,7 +63,7 @@ export default function CheckoutPage() {
                   <Elements stripe={loadStripe(stripeApiKey)}>
                     <PaymentPage
                       setStep={setStep}
-                      amount={totalPrice}
+                      amount={totalPrice - (orderData?.discount || 0)}
                       fullName={orderData?.fullName}
                     />
                   </Elements>

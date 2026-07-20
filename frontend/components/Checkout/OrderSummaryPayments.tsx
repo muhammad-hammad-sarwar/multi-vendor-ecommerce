@@ -34,7 +34,7 @@ export default function OrderSummaryPayments() {
 
         <div className="flex justify-between text-lg font-semibold">
           <span>Total</span>
-          <span>${orderData?.totalPrice}</span>
+          <span>${orderData?.totalPrice - (orderData?.discount || 0)}</span>
         </div>
       </div>
     </div>

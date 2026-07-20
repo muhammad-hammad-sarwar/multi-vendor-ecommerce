@@ -10,6 +10,8 @@ import {
 } from "@stripe/react-stripe-js";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import ButtonLoader from "../Layout/ButtonLoader/ButtonLoader";
+import { loadAllProducts } from "@/redux/actions/product";
 
 export default function PaymentPage({ fullName: name, amount, setStep }) {
   const paymentMethods = [
@@ -36,6 +38,7 @@ export default function PaymentPage({ fullName: name, amount, setStep }) {
   const stripe = useStripe();
   const elements = useElements();
   const [orderData, setOrderData] = useState(null);
+  const [loading, setLoading] = useState(false);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -63,41 +66,55 @@ export default function PaymentPage({ fullName: name, amount, setStep }) {
     e: React.SubmitEvent<HTMLFormElement>,
   ) => {
     e.preventDefault();
-    const {
-      data: { client_secret },
-    } = await api.post("/payment/process", { amount: Math.floor(amount) });
+    setLoading(true);
 
-    if (!stripe || !elements) return;
+    try {
+      const {
+        data: { client_secret },
+      } = await api.post("/payment/process", {
+        amount: Math.floor(amount),
+      });
 
-    const result = await stripe.confirmCardPayment(client_secret, {
-      payment_method: {
-        card: elements.getElement(CardNumberElement),
-      },
-    });
+      if (!stripe || !elements) return;
 
-    if (result.error) {
-      toast.error(result.error?.message);
-    } else {
-      if (result.paymentIntent?.status === "succeeded")
-        await api
-          .post("/orders", {
-            cart: cartItems,
-            user: orderData?.user,
-            shippingInfo: orderData?.shippingInfo,
-            totalPrice: orderData?.totalPrice,
-            paymentInfo: {
-              id: result?.paymentIntent?.id,
-              status: result.paymentIntent.status,
-              type: "Credit Card",
-            },
-          })
-          .then(() => {
-            toast.success("Order placed successfully");
-            setStep(3);
-            dispatch(clearCart());
-            localStorage.removeItem("cartItems");
-            localStorage.removeItem("orderData");
-          });
+      const result = await stripe.confirmCardPayment(client_secret, {
+        payment_method: {
+          card: elements.getElement(CardNumberElement),
+        },
+      });
+
+      if (result.error) {
+        toast.error(result.error.message);
+        return;
+      }
+
+      if (result.paymentIntent?.status === "succeeded") {
+        await api.post("/orders", {
+          cart: cartItems,
+          user: orderData?.user,
+          shippingInfo: orderData?.shippingInfo,
+          totalPrice: orderData?.totalPrice,
+          paymentInfo: {
+            id: result.paymentIntent.id,
+            status: result.paymentIntent.status,
+            type: "Credit Card",
+          },
+        });
+
+        toast.success("Order placed successfully");
+        setStep(3);
+        dispatch(clearCart());
+        localStorage.removeItem("cartItems");
+        localStorage.removeItem("orderData");
+
+        // Reload products after successful order
+        dispatch(loadAllProducts());
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -202,7 +219,7 @@ export default function PaymentPage({ fullName: name, amount, setStep }) {
                     type="submit"
                     className="cursor-pointer mt-4 h-11 rounded-lg bg-green-600 px-6 text-white"
                   >
-                    Pay ${amount}
+                    {loading ? <ButtonLoader /> : `Pay ${amount}`}
                   </button>
                 </form>
               )}

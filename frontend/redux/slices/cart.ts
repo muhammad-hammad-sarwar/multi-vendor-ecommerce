@@ -32,14 +32,14 @@ const cartSlice = createSlice({
       );
 
       if (item) {
-        if (item.quantity + quantity <= item.stock) {
+        if (item.quantity + quantity <= item.stock - item.sold_out) {
           item.quantity += quantity;
           toast.success("Cart updated.");
         } else {
           toast.error("Product stock limited!");
         }
       } else {
-        if (quantity <= action.payload.stock) {
+        if (quantity <= action.payload.stock - action.payload.sold_out) {
           state.cartItems.push({
             ...action.payload,
             quantity,
@@ -60,7 +60,7 @@ const cartSlice = createSlice({
       );
 
       if (item) {
-        if (item?.quantity < item?.stock) {
+        if (item?.quantity < item?.stock - item?.sold_out) {
           item.quantity += 1;
         } else {
           toast.error("Product stock limited!");

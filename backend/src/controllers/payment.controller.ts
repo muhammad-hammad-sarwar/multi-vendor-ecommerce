@@ -4,7 +4,7 @@ import { Stripe } from "../server.js";
 export const createPaymentIntent = async (req: Request, res: Response) => {
   const paymentintent = await Stripe.paymentIntents.create({
     currency: "usd",
-    amount: req.body?.amount,
+    amount: req.body?.amount < 50 ? 50 : req.body.amount, // Just for min price hit
     metadata: { company: "SOLO" },
   });
 

@@ -5,8 +5,8 @@ interface ICoupon {
   _id: string;
   name: string;
   discountPercentage: number;
-  // productId: string;
   product: string;
+  discountAmount?: number;
 }
 
 interface CouponState {
@@ -39,7 +39,8 @@ const couponSlice = createSlice({
 
     applyCouponSuccess(state, action) {
       state.loading = false;
-      const { product, discountPercentage, name, _id } = action.payload;
+      const { product, discountPercentage, name, _id } = action.payload.coupon;
+      const discount = action.payload.discount;
 
       const alreadyApplied = state.appliedCoupons.find(
         (c) => c.product == product,
@@ -55,16 +56,15 @@ const couponSlice = createSlice({
         discountPercentage,
         name,
         product,
+        discountAmount: discount,
       });
 
       state.totalDiscount = state.appliedCoupons.reduce(
-        (acc, c) => acc + c?.discountPercentage,
+        (acc, c) => acc + (c.discountAmount || 0),
         0,
       );
 
-      toast.success(
-        `Coupon Code applied with discount of USD$ ${action.payload?.discount}`,
-      );
+      toast.success(`Coupon Code applied with discount of USD$ ${discount}`);
     },
 
     applyCouponFailure(state, action) {

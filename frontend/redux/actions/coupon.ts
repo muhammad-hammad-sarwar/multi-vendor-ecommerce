@@ -18,7 +18,12 @@ export const checkCouponCodeValidity =
     try {
       dispatch(applyCouponStart());
       const res = await api.post("/coupon/apply", { cart, couponCode });
-      dispatch(applyCouponSuccess(res.data?.coupon));
+      dispatch(
+        applyCouponSuccess({
+          coupon: res.data?.coupon,
+          discount: res.data?.discount,
+        }),
+      );
     } catch (error) {
       dispatch(applyCouponFailure(error?.response?.data?.message));
     }
