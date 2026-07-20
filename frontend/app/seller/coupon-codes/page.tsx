@@ -1,5 +1,11 @@
 "use client";
-import { useAppSelector } from "@/redux/hooks/hooks";
+import api from "@/axios/api";
+import LoadingDots from "@/components/Common/LoadingDots";
+import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
+import useBodyScrollLock from "@/hooks/useBodyScrollLock";
+import { deleteCoupon, getCoupons } from "@/redux/actions/coupon";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import {
   FiPlus,
@@ -7,30 +13,101 @@ import {
   FiPercent,
   FiPackage,
   FiCalendar,
-  FiEdit2,
   FiTrash2,
   FiX,
 } from "react-icons/fi";
+import { toast } from "react-toastify";
 
 export default function CouponsPage() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const { products } = useAppSelector((state) => state.products);
+  const {
+    loading: CouponLoading,
+    error,
+    coupons,
+    deleteLoading,
+  } = useAppSelector((state) => state.coupon);
+
   const [couponCode, setCouponCode] = useState("");
   const [discount, setDiscount] = useState("");
   const [selectedProduct, setSelectedProduct] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [minPurchase, setMinPurchase] = useState("");
   const [maxDiscount, setMaxDiscount] = useState("");
+  const [couponToDelete, setCouponToDelete] = useState(null);
+  const dispatch = useAppDispatch();
+  useBodyScrollLock(open);
+  useEffect(() => {
+    dispatch(getCoupons());
+  }, []);
 
-  const coupons = [];
+  const columns: GridColDef[] = [
+    {
+      field: "productId",
+      headerName: "Product ID",
+      flex: 1,
+      minWidth: 150,
+    },
+    {
+      field: "name",
+      headerName: "Name",
+      flex: 1,
+      minWidth: 150,
+    },
+    {
+      field: "discount",
+      headerName: "Discount",
+      flex: 1,
+      minWidth: 150,
+    },
+    {
+      field: "delete",
+      headerName: "Delete",
+      sortable: false,
+      filterable: false,
+      minWidth: 100,
+      renderCell: ({ row }) => (
+        <button
+          onClick={() => setCouponToDelete(row?.id)}
+          className="cursor-pointer text-red-600 hover:text-red-800 transition"
+          title="Delete Product"
+        >
+          <FiTrash2 size={18} />
+        </button>
+      ),
+    },
+  ];
 
-  const handleSubmit = (e: React.SubmitEvent) => {
+  const rows =
+    (coupons &&
+      coupons?.map((c) => ({
+        id: c._id, // DataGrid requires an `id` field
+        productId: c.product,
+        name: c.name,
+        discount: c.discountPercentage,
+      }))) ??
+    [];
+
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
 
     setLoading(true);
 
-    setTimeout(() => {
+    try {
+      console.log(discount);
+      await api.post("/coupon", {
+        name: couponCode,
+        discountPercentage: discount,
+        maximumDiscountAmount: maxDiscount,
+        product: selectedProduct,
+        expiryDate,
+      });
+      toast.success("Coupon code created successfully");
+      dispatch(getCoupons());
+    } catch (error) {
+      toast.error(error.response?.data?.message);
+    } finally {
       setLoading(false);
       setOpen(false);
 
@@ -38,20 +115,13 @@ export default function CouponsPage() {
       setDiscount("");
       setSelectedProduct("");
       setExpiryDate("");
-    }, 1500);
+      setMaxDiscount("");
+      setMinPurchase("");
+    }
   };
 
-  useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
-
-    return () => {
-      document.body.style.overflow = "auto";
-    };
-  }, [open]);
+  if (CouponLoading || (!error && !coupons))
+    return <LoadingDots text="Loading Coupons" />;
 
   return (
     <>
@@ -73,43 +143,20 @@ export default function CouponsPage() {
       </div>
 
       <div className="overflow-hidden rounded-xl border bg-white shadow-sm">
-        <table className="w-full">
-          <thead className="bg-gray-100">
-            <tr className="text-left">
-              <th className="p-4">Coupon</th>
-              <th className="p-4">Product</th>
-              <th className="p-4">Discount</th>
-              <th className="p-4">Expiry</th>
-              <th className="p-4 text-center">Actions</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {coupons.map((coupon) => (
-              <tr key={coupon.id} className="border-t hover:bg-gray-50">
-                <td className="p-4 font-medium">{coupon.code}</td>
-
-                <td className="p-4">{coupon.product}</td>
-
-                <td className="p-4">{coupon.discount}%</td>
-
-                <td className="p-4">{coupon.expiry}</td>
-
-                <td className="p-4">
-                  <div className="flex justify-center gap-4">
-                    <button className="text-blue-600 hover:text-blue-800 cursor-pointer">
-                      <FiEdit2 />
-                    </button>
-
-                    <button className="text-red-600 hover:text-red-800 cursor-pointer">
-                      <FiTrash2 />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          initialState={{
+            pagination: {
+              paginationModel: {
+                pageSize: 5,
+              },
+            },
+          }}
+          pageSizeOptions={[5]}
+          checkboxSelection
+          disableRowSelectionOnClick
+        />
       </div>
 
       {open && (
@@ -299,6 +346,60 @@ export default function CouponsPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {couponToDelete !== null && (
+        <div
+          onClick={() => setCouponToDelete(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+                <FiTrash2 className="text-red-600 text-xl" />
+              </div>
+
+              <div>
+                <h2 className="text-xl font-semibold">Delete Product</h2>
+
+                <p className="text-sm text-gray-500">
+                  This action cannot be undone.
+                </p>
+              </div>
+            </div>
+
+            <p className="mt-6 text-gray-700 leading-relaxed">
+              Are you sure you want to permanently delete this product? Once
+              deleted, it cannot be recovered.
+            </p>
+
+            <div className="mt-8 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setCouponToDelete(null)}
+                className="cursor-pointer rounded-lg border px-5 py-2 font-medium hover:bg-gray-100 transition"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                disabled={deleteLoading}
+                onClick={() =>
+                  dispatch(deleteCoupon(couponToDelete)).then(() =>
+                    setCouponToDelete(null),
+                  )
+                }
+                className="cursor-pointer rounded-lg bg-red-600 px-6 py-2 font-medium text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {deleteLoading ? <ButtonLoader /> : "Delete Coupon"}
+              </button>
+            </div>
           </div>
         </div>
       )}

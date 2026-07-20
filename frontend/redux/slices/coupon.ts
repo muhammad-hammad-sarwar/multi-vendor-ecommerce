@@ -2,9 +2,11 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 
 interface ICoupon {
+  _id: string;
   name: string;
-  discount: number;
-  productId: string;
+  discountPercentage: number;
+  // productId: string;
+  product: string;
 }
 
 interface CouponState {
@@ -12,13 +14,19 @@ interface CouponState {
   totalDiscount: number | null;
   appliedCoupons: ICoupon[];
   error: string | null;
+
+  coupons: ICoupon[] | null;
+  deleteLoading: boolean;
 }
 
-const initialState = {
+const initialState: CouponState = {
   loading: false,
   totalDiscount: null,
   error: null,
   appliedCoupons: [],
+
+  coupons: null,
+  deleteLoading: false,
 };
 
 const couponSlice = createSlice({
@@ -31,25 +39,26 @@ const couponSlice = createSlice({
 
     applyCouponSuccess(state, action) {
       state.loading = false;
-      const { productId, discount, couponCode } = action.payload;
+      const { product, discountPercentage, name, _id } = action.payload;
 
       const alreadyApplied = state.appliedCoupons.find(
-        (c) => c?.productId == productId,
+        (c) => c.product == product,
       );
 
       if (alreadyApplied) {
-        toast.error(`Coupon ${couponCode} already applied`);
+        toast.error(`Coupon ${name} already applied`);
         return;
       }
 
       state.appliedCoupons.push({
-        discount: discount,
-        name: couponCode,
-        productId: productId,
+        _id,
+        discountPercentage,
+        name,
+        product,
       });
 
       state.totalDiscount = state.appliedCoupons.reduce(
-        (acc, c) => acc + c?.discount,
+        (acc, c) => acc + c?.discountPercentage,
         0,
       );
 
@@ -63,9 +72,44 @@ const couponSlice = createSlice({
       state.error = action.payload;
       toast.error(state.error);
     },
+
+    getCouponsStart(state) {
+      state.loading = true;
+    },
+    getCouponsSuccess(state, action) {
+      state.loading = false;
+      state.coupons = action.payload;
+    },
+    getCouponsFailure(state, action) {
+      state.loading = false;
+      state.error = action.payload;
+    },
+
+    deleteCouponStart(state) {
+      state.deleteLoading = true;
+    },
+    deleteCouponSuccess(state, action) {
+      state.deleteLoading = false;
+      state.coupons = action.payload;
+      toast.success("Coupon Deleted Successfully");
+    },
+    deleteCouponFailure(state, action) {
+      state.deleteLoading = false;
+      state.error = action.payload;
+      toast.error(state.error);
+    },
   },
 });
 
-export const { applyCouponStart, applyCouponSuccess, applyCouponFailure } =
-  couponSlice.actions;
+export const {
+  applyCouponStart,
+  applyCouponSuccess,
+  applyCouponFailure,
+  getCouponsStart,
+  getCouponsSuccess,
+  getCouponsFailure,
+  deleteCouponStart,
+  deleteCouponSuccess,
+  deleteCouponFailure,
+} = couponSlice.actions;
 export default couponSlice.reducer;
