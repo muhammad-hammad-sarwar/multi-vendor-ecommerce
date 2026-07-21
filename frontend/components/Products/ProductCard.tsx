@@ -18,7 +18,7 @@ export function ProductCard({
   isEvent = false,
 }: {
   product: Product;
-  isEvent: boolean;
+  isEvent?: boolean;
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
