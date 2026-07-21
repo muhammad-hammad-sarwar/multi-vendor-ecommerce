@@ -358,7 +358,9 @@ export default function ProductDetailsPage() {
           {related?.length == 0 ? (
             <div>No Related {isEvent ? "Events" : "Products"}</div>
           ) : (
-            related.map((p) => <ProductCard key={p?._id} product={p} />)
+            related.map((p) => (
+              <ProductCard key={p?._id} isEvent={true} product={p} />
+            ))
           )}
         </div>
       </div>

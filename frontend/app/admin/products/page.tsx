@@ -1,9 +1,6 @@
 "use client";
-import LoadingDots from "@/components/Common/LoadingDots";
-import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
 import DeleteModal from "@/components/Layout/Modal/DeleteModal";
-import useBodyScrollLock from "@/hooks/useBodyScrollLock";
-import { deleteSellerProduct } from "@/redux/actions/product";
+import { deleteProduct } from "@/redux/actions/admin";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Link from "next/link";
@@ -11,15 +8,10 @@ import { useState } from "react";
 import { FiEye, FiTrash2 } from "react-icons/fi";
 import { toast } from "react-toastify";
 
-export default function AllProducts() {
-  const [productToDelete, setProductToDelete] = useState<number | null>(null);
-  const { deleteLoading, shopLoading, error, products } = useAppSelector(
-    (state) => state.products,
-  );
-
+export default function AdminProductsPage() {
+  const [productToDelete, setProductToDelete] = useState<string | null>(null);
+  const { products, loading } = useAppSelector((state) => state.admin);
   const dispatch = useAppDispatch();
-  useBodyScrollLock(productToDelete);
-
   const columns: GridColDef[] = [
     {
       field: "productId",
@@ -46,7 +38,7 @@ export default function AllProducts() {
       minWidth: 120,
     },
     {
-      field: "sold_out",
+      field: "sold",
       headerName: "Sold Out",
       sortable: false,
       filterable: false,
@@ -85,7 +77,6 @@ export default function AllProducts() {
       ),
     },
   ];
-
   const rows =
     (products &&
       products?.map((p) => ({
@@ -100,15 +91,13 @@ export default function AllProducts() {
 
   const handleDelete = async () => {
     try {
-      dispatch(deleteSellerProduct(productToDelete));
-      setProductToDelete(null);
+      dispatch(deleteProduct(productToDelete));
     } catch (error) {
       toast.error(error?.response?.data?.message);
+    } finally {
+      setProductToDelete(null);
     }
   };
-
-  if (shopLoading || (!error && !products))
-    return <LoadingDots text="Loading your products..." />;
 
   return (
     <>
@@ -129,12 +118,13 @@ export default function AllProducts() {
         checkboxSelection
         disableRowSelectionOnClick
       />
+
       {productToDelete !== null && (
         <DeleteModal
           text={"product"}
           handleCancel={() => setProductToDelete(null)}
           handleDelete={handleDelete}
-          loading={deleteLoading}
+          loading={loading.deleteProduct}
         />
       )}
     </>

@@ -14,6 +14,8 @@ export interface IShop {
   phoneNumber: string;
   zipCode: string;
   createdAt: string;
+  isVerified: boolean;
+  role: "seller";
 }
 
 interface ShopState {

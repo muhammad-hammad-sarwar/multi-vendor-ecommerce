@@ -98,3 +98,32 @@ export const isLoggedIn = async (
     next(error);
   }
 };
+
+export const isAdmin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (!req.cookies?.token) throw new AppError("You are not authorized.", 401);
+
+  const decoded = jwt.verify(
+    req.cookies?.token,
+    process.env.JWT_SECRET as string,
+  ) as {
+    userId: string;
+  };
+
+  if (!decoded?.userId) throw new AppError("Invalid token", 401);
+  const user = await User.findById(decoded?.userId).select("+isVerified");
+
+  if (!user) throw new AppError("User does not exist", 404);
+
+  if (!user.isVerified)
+    throw new AppError("Please verify your email to continue", 401);
+
+  if (user.role != "admin") throw new AppError("Unauthorized", 403);
+
+  req.user = user;
+
+  next();
+};

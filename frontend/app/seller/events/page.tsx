@@ -45,7 +45,7 @@ export default function AllEvents() {
       minWidth: 120,
     },
     {
-      field: "sold_out",
+      field: "sold",
       headerName: "Sold Out",
       sortable: false,
       filterable: false,

@@ -1,29 +1,25 @@
 "use client";
-import LoadingDots from "@/components/Common/LoadingDots";
-import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
+
 import DeleteModal from "@/components/Layout/Modal/DeleteModal";
-import useBodyScrollLock from "@/hooks/useBodyScrollLock";
-import { deleteSellerProduct } from "@/redux/actions/product";
+import { deleteEvent } from "@/redux/actions/admin";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
+import { Chip } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Link from "next/link";
 import { useState } from "react";
 import { FiEye, FiTrash2 } from "react-icons/fi";
 import { toast } from "react-toastify";
 
-export default function AllProducts() {
-  const [productToDelete, setProductToDelete] = useState<number | null>(null);
-  const { deleteLoading, shopLoading, error, products } = useAppSelector(
-    (state) => state.products,
-  );
-
+type EventStatus = "Active" | "Upcoming" | "Expired";
+export default function AdminEventsPage() {
+  const [eventToDelete, setEventToDelete] = useState<string | null>(null);
+  const { events, loading } = useAppSelector((state) => state.admin);
   const dispatch = useAppDispatch();
-  useBodyScrollLock(productToDelete);
 
   const columns: GridColDef[] = [
     {
-      field: "productId",
-      headerName: "Product ID",
+      field: "eventId",
+      headerName: "Event ID",
       flex: 1,
       minWidth: 150,
     },
@@ -32,6 +28,24 @@ export default function AllProducts() {
       headerName: "Name",
       flex: 1,
       minWidth: 150,
+    },
+    {
+      field: "status",
+      headerName: "Status",
+      flex: 1,
+      minWidth: 130,
+      renderCell: ({ value }) => {
+        const color =
+          value === "Active"
+            ? "success"
+            : value === "Upcoming"
+              ? "warning"
+              : "error";
+
+        return (
+          <Chip label={value} color={color} size="small" variant="filled" />
+        );
+      },
     },
     {
       field: "quantity",
@@ -58,15 +72,16 @@ export default function AllProducts() {
       sortable: false,
       filterable: false,
       minWidth: 100,
-      renderCell: ({ row }) => (
-        <Link
-          href={`/products/${row?.productId}`}
-          className="block pt-3 text-gray-600 hover:text-black transition"
-          title="View Product"
-        >
-          <FiEye size={18} />
-        </Link>
-      ),
+      renderCell: ({ row }) =>
+        row.status != "Expired" && (
+          <Link
+            href={`/products/${row?.eventId}?isEvent=true`}
+            className="block pt-3 text-gray-600 hover:text-black transition"
+            title="View Product"
+          >
+            <FiEye size={18} />
+          </Link>
+        ),
     },
     {
       field: "delete",
@@ -76,7 +91,7 @@ export default function AllProducts() {
       minWidth: 100,
       renderCell: ({ row }) => (
         <button
-          onClick={() => setProductToDelete(row?.productId)}
+          onClick={() => setEventToDelete(row?.eventId)}
           className="cursor-pointer text-red-600 hover:text-red-800 transition"
           title="Delete Product"
         >
@@ -86,34 +101,47 @@ export default function AllProducts() {
     },
   ];
 
+  const findStatus = (start, end) => {
+    const now = new Date();
+
+    if (new Date(end) <= now) return "Expired";
+    if (new Date(start) > now) return "Upcoming";
+
+    return "Active";
+  };
+
   const rows =
-    (products &&
-      products?.map((p) => ({
+    (events &&
+      events?.map((p) => ({
         id: p._id, // DataGrid requires an `id` field
-        productId: p._id,
+        eventId: p._id,
         name: p.name,
+        status: findStatus(p.startDate, p.endDate),
         quantity: p.stock - p.sold_out,
         stock: p.stock,
-        sold: p.sold_out,
+        sold_out: p.sold_out,
       }))) ??
     [];
 
   const handleDelete = async () => {
     try {
-      dispatch(deleteSellerProduct(productToDelete));
-      setProductToDelete(null);
+      dispatch(deleteEvent(eventToDelete));
     } catch (error) {
       toast.error(error?.response?.data?.message);
+    } finally {
+      setEventToDelete(null);
     }
   };
 
-  if (shopLoading || (!error && !products))
-    return <LoadingDots text="Loading your products..." />;
-
   return (
     <>
-      <h1 className="text-3xl font-bold text-blue-600">All Products</h1>
-      <p className="mt-2 mb-8 text-gray-500">Manage your all products.</p>
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-blue-600">All Events</h1>
+
+          <p className="text-gray-500 mt-1">Manage all promotional events.</p>
+        </div>
+      </div>
 
       <DataGrid
         rows={rows}
@@ -129,12 +157,13 @@ export default function AllProducts() {
         checkboxSelection
         disableRowSelectionOnClick
       />
-      {productToDelete !== null && (
+
+      {eventToDelete !== null && (
         <DeleteModal
-          text={"product"}
-          handleCancel={() => setProductToDelete(null)}
+          text={"event"}
+          handleCancel={() => setEventToDelete(null)}
           handleDelete={handleDelete}
-          loading={deleteLoading}
+          loading={loading.deleteEvent}
         />
       )}
     </>

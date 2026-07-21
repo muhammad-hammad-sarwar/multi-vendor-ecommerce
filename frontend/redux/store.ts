@@ -9,6 +9,7 @@ import couponReducer from "./slices/coupon";
 import orderReducer from "./slices/order";
 import conversationReducer from "./slices/conversations";
 import messageReducer from "./slices/message";
+import adminReducer from "./slices/admin";
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ export const store = configureStore({
     order: orderReducer,
     conversation: conversationReducer,
     message: messageReducer,
+    admin: adminReducer,
   },
 });
 

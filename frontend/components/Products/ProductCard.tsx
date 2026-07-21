@@ -13,7 +13,13 @@ import { addToWishlist, removeFromWishlist } from "@/redux/slices/wishlist";
 import Rating from "../Common/Ratings";
 import { useRouter } from "next/navigation";
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({
+  product,
+  isEvent = false,
+}: {
+  product: Product;
+  isEvent: boolean;
+}) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [isFavourite, setIsFavourite] = useState(false);
@@ -33,7 +39,13 @@ export function ProductCard({ product }: { product: Product }) {
   return (
     <>
       <div className="cursor-pointer relative">
-        <div onClick={() => router.push(`/products/${product._id}`)}>
+        <div
+          onClick={() =>
+            router.push(
+              `/products/${product._id}${isEvent ? "?isEvent=true" : ""}`,
+            )
+          }
+        >
           <div className="h-88 bg-white border rounded-xl p-4 hover:shadow-md transition flex flex-col gap-3">
             <div className="relative w-full h-40">
               <img

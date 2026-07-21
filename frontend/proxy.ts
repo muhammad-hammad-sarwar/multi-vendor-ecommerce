@@ -40,6 +40,7 @@ export const config = {
     "/profile/:path*",
     "/shop/:path*",
     "/seller/:path*",
+    "/admin/:path*",
 
     "/login",
     "/sign-up",

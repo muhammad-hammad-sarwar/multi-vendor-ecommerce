@@ -20,6 +20,7 @@ const orderSchema = new Schema(
     },
     paymentInfo: {
       id: { type: String },
+      // succeeded
       status: { type: String }, // Status of payment
       type: { type: String, enum: ["PayPal", "Credit Card", "CashOnDelivery"] }, // Either PayPal, Stripe or CashOnDelivery
     },

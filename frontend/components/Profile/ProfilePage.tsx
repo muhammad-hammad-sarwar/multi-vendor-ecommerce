@@ -20,7 +20,9 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import api from "@/axios/api";
 import { logout } from "@/redux/slices/user";
-import { useAppDispatch } from "@/redux/hooks/hooks";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
+import { LuLayoutDashboard } from "react-icons/lu";
+import Link from "next/link";
 
 const tabs = [
   { name: "Profile", icon: FiUser },
@@ -37,6 +39,7 @@ export default function ProfilePage() {
   const [active, setActive] = useState("Profile");
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { user } = useAppSelector((state) => state.user);
 
   const handleLogout = async () => {
     try {
@@ -56,6 +59,21 @@ export default function ProfilePage() {
   return (
     <section className=" flex p-3 md:px-10 md:py-6">
       <aside className="bg-white border-r w-16 md:w-60 flex flex-col h-90 md:h-100 rounded-lg">
+        {user && user.role === "admin" && (
+          <Link href={"/admin/dashboard"}>
+            <button
+              className={
+                "cursor-pointer flex items-center gap-3 px-4 py-3 transition"
+              }
+            >
+              <LuLayoutDashboard className="text-xl shrink-0" />
+
+              <span className="hidden md:inline text-start text-sm font-medium">
+                Admin Dashboard
+              </span>
+            </button>
+          </Link>
+        )}
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = active === tab.name;

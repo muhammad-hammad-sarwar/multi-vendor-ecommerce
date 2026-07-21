@@ -20,6 +20,7 @@ import paymentRouter from "./routes/payment.route.js";
 import orderRouter from "./routes/order.route.js";
 import conversationRouter from "./routes/conversation.route.js";
 import messageRouter from "./routes/message.route.js";
+import adminRouter from "./routes/admin.route.js";
 
 if (!process.env?.STRIPE_SECRET_KEY)
   throw new Error("STRIPE_SECRET_KEY is missing");
@@ -54,6 +55,7 @@ app.use("/payment", paymentRouter);
 app.use("/orders", orderRouter);
 app.use("/conversations", conversationRouter);
 app.use("/messages", messageRouter);
+app.use("/admin", adminRouter);
 
 // Error Handling
 app.use(errorMiddleware);

@@ -18,6 +18,8 @@ export interface IUser {
   avatar: string;
   addresses?: IAddress[];
   phoneNumber: string;
+  isVerified: boolean;
+  role: "admin" | "user";
 }
 
 export interface UserState {
