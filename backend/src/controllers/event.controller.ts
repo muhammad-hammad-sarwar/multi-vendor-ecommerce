@@ -57,9 +57,9 @@ export const getShopEvents = async (req: Request, res: Response) => {
   const { id } = req.params;
   if (!id) throw new AppError("Shop id is required", 400);
 
-  const products = await Event.find({ shop: id }).populate(
-    "reviews.user",
-    "avatar name",
-  );
+  const products = await Event.find({
+    shop: id,
+    endDate: { $gt: new Date() },
+  }).populate("reviews.user", "avatar name");
   return res.json({ success: true, products });
 };

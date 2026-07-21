@@ -1,10 +1,16 @@
+import clsx from "clsx";
+
 interface LoadingDotsProps {
   text?: string;
+  h?: string;
 }
 
-const LoadingDots = ({ text = "Loading..." }: LoadingDotsProps) => {
+const LoadingDots = ({
+  text = "Loading...",
+  h = "min-h-[60vh]",
+}: LoadingDotsProps) => {
   return (
-    <div className="flex min-h-[60vh] w-full items-center justify-center">
+    <div className={clsx("flex w-full items-center justify-center", h)}>
       <div className="flex flex-col items-center gap-6">
         <div className="flex gap-3">
           <span className="h-4 w-4 rounded-full bg-green-400 animate-bounce [animation-delay:-0.3s]" />

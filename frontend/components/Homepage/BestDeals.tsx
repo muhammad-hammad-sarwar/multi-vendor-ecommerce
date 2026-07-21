@@ -39,7 +39,7 @@ export default function BestDeals() {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-          {data.map((product: Product) => (
+          {data?.map((product: Product) => (
             <ProductCard key={product._id} product={product} />
           ))}
         </div>

@@ -11,8 +11,10 @@ import { addToCart } from "@/redux/slices/cart";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
 import { addToWishlist, removeFromWishlist } from "@/redux/slices/wishlist";
 import Rating from "../Common/Ratings";
+import { useRouter } from "next/navigation";
 
 export function ProductCard({ product }: { product: Product }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [isFavourite, setIsFavourite] = useState(false);
   const { wishlist } = useAppSelector((store) => store.wishlist);
@@ -30,8 +32,8 @@ export function ProductCard({ product }: { product: Product }) {
 
   return (
     <>
-      <div className="relative">
-        <Link href={`/products/${product._id}`}>
+      <div className="cursor-pointer relative">
+        <div onClick={() => router.push(`/products/${product._id}`)}>
           <div className="h-88 bg-white border rounded-xl p-4 hover:shadow-md transition flex flex-col gap-3">
             <div className="relative w-full h-40">
               <img
@@ -42,7 +44,13 @@ export function ProductCard({ product }: { product: Product }) {
             </div>
 
             <div className="flex flex-col gap-1">
-              <p className="text-xs text-blue-600">{product?.shop?.name}</p>
+              <Link
+                onClick={(e) => e.stopPropagation()}
+                href={`/shop/preview/${product?.shop?._id}`}
+                className="text-xs text-blue-600"
+              >
+                {product?.shop?.name}
+              </Link>
 
               <h3 className="text-sm font-semibold text-gray-900 line-clamp-2">
                 {product.name}
@@ -85,7 +93,7 @@ export function ProductCard({ product }: { product: Product }) {
               </div>
             </div>
           </div>
-        </Link>
+        </div>
 
         <div className="absolute top-3 right-3 flex flex-col items-center gap-3 text-gray-500">
           {isFavourite ? (

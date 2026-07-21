@@ -17,6 +17,7 @@ export interface IUser extends Document {
   avatar: string;
   addresses?: IAddress[];
   phoneNumber: string;
+  role: "user" | "admin";
   isVerified?: boolean;
   verifyTokenHash: string;
   verifyTokenExpiry: Date;
@@ -52,6 +53,7 @@ const userSchema = new Schema<IUser>(
       // maxLength: [15, "Phone Number must be 11 digits"],
       default: "",
     },
+    role: { type: String, enum: ["user", "admin"], default: "user" },
     addresses: [
       {
         type: {
@@ -87,9 +89,7 @@ const userSchema = new Schema<IUser>(
       select: false,
     },
   },
-  {
-    timestamps: true,
-  },
+  { timestamps: true },
 );
 
 export const User = mongoose.model<IUser>("user", userSchema);

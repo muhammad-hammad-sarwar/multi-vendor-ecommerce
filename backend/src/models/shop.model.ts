@@ -8,6 +8,7 @@ export interface IShop extends Document {
   avatar: string;
   address: string;
   phoneNumber: string;
+  role: "seller";
   zipCode: string;
   isVerified?: boolean;
   verifyTokenHash: string;
@@ -54,6 +55,8 @@ const shopSchema = new Schema<IShop>(
       type: String,
       required: true,
     },
+
+    role: { type: String, enum: ["seller"] },
 
     // Verify User after creation
     isVerified: {

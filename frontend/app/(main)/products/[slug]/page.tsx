@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { FiHeart, FiShoppingCart } from "react-icons/fi";
 import { ProductCard } from "@/components/Products/ProductCard";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
@@ -10,6 +10,9 @@ import { AiFillHeart } from "react-icons/ai";
 import Link from "next/link";
 import useCountDown from "@/hooks/useCountDown";
 import Rating from "@/components/Common/Ratings";
+import { createConversation } from "@/redux/actions/conversations";
+import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
+import { toast } from "react-toastify";
 
 export default function ProductDetailsPage() {
   const params = useParams();
@@ -17,19 +20,26 @@ export default function ProductDetailsPage() {
   const isEvent = searchParams.get("isEvent");
   const { loading, allProducts } = useAppSelector((state) => state.products);
   const { wishlist } = useAppSelector((store) => store.wishlist);
+  const { user, isAuthenticated } = useAppSelector((state) => state.user);
   const {
     allEvents,
     loading: eventLoading,
     error: EventError,
   } = useAppSelector((state) => state.events);
+  const {
+    loading: conversationLoading,
+    conversation,
+    error: ConversationError,
+  } = useAppSelector((state) => state.conversation);
   const product = isEvent
     ? allEvents?.find((item) => item._id === params.slug)
     : allProducts?.find((item) => item._id === params.slug);
   const [tab, setTab] = useState("Details");
   const [activeImage, setActiveImage] = useState(product?.images?.[0]);
   const [isFavourite, setIsFavourite] = useState(false);
-  const dispatch = useAppDispatch();
   const { timeLeft } = useCountDown(`${(isEvent && product?.endDate) || ""}`);
+  const dispatch = useAppDispatch();
+  const router = useRouter();
 
   const related = isEvent
     ? allEvents?.filter(
@@ -53,6 +63,25 @@ export default function ProductDetailsPage() {
       setActiveImage(product?.images?.[0]);
     }
   }, [params, allProducts, wishlist]);
+  const handleMessage = async () => {
+    if (!isAuthenticated) {
+      toast.error("Please login to continue");
+      return;
+    }
+
+    try {
+      const conversation = await dispatch(
+        createConversation({
+          sellerId: product.shop._id,
+          userId: user._id,
+        }),
+      );
+
+      router.push(`/conversation/${conversation._id}`);
+    } catch (error) {
+      toast.error(error.response?.data?.message);
+    }
+  };
 
   if (loading || !allProducts) return <>loading</>;
   // Product here is being treated as an event and a product as well
@@ -191,8 +220,11 @@ export default function ProductDetailsPage() {
               </span>
             </div>
 
-            <button className="ml-auto text-blue-600 text-sm">
-              Message Seller
+            <button
+              onClick={handleMessage}
+              className="ml-auto bg-black text-white h-10 w-30 rounded-lg cursor-pointer"
+            >
+              {conversationLoading ? <ButtonLoader /> : "Message Seller"}
             </button>
           </div>
         </div>

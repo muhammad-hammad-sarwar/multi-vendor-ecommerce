@@ -28,7 +28,8 @@ export default function ShopPage() {
       p.reviews?.length > 0 ? reviews.push(...p.reviews) : null,
     );
 
-  let totalRatings = reviews.reduce((s, r) => s + r?.rating, 0);
+  let totalRatings = reviews.reduce((sum, r) => sum + r?.rating, 0);
+  console.log(totalRatings);
 
   useEffect(() => {
     dispatch(loadCurrentShopInfo(params?.slug));
@@ -41,8 +42,8 @@ export default function ShopPage() {
   return (
     <section className="bg-gray-100 min-h-screen px-10 py-10">
       <div className="mx-auto flex max-w-7xl gap-8">
-        <ShopSidebarInfo
-          averageRating={(totalRatings / reviews.length).toFixed(2)}
+        <ShopSidebarInfo // If reviews are zero we will have to divide by 0 which is NaN
+          averageRating={(totalRatings / (reviews?.length || 1)).toFixed(2)}
           totalProducts={currentShopProducts?.length}
           shop={currentShop}
           isOwner={false}

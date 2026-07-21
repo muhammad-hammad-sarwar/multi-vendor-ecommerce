@@ -24,7 +24,7 @@ export async function proxy(request: NextRequest) {
 
   if (
     !sellerToken &&
-    (pathname.startsWith("/shop") ||
+    ((pathname.startsWith("/shop") && !pathname.startsWith("/shop/preview")) ||
       (pathname.startsWith("/seller") &&
         pathname !== "/seller-login" &&
         pathname !== "/seller-sign-up"))

@@ -50,7 +50,7 @@ export default function Header() {
   return (
     <>
       <header className="w-full border-b bg-white">
-        <div className="hidden md:flex md:items-center md:justify-between px-4 md:px-10 py-4">
+        <div className="hidden md:flex md:items-center md:justify-between px-4 md:px-10 py-2">
           <Link href={"/"}>
             <Image
               className="w-20 h-16"

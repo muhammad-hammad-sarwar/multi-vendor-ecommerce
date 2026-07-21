@@ -23,29 +23,7 @@ export default function ShopSidebarInfo({
   averageRating,
 }) {
   const [logoutLoading, setLogoutLoading] = useState(false);
-  const { products } = useAppSelector((store) => store.products);
   const router = useRouter();
-
-  // const getShopRatings = () => {
-  //   let totalRating = 0;
-  //   let totalReviews = 0;
-  //   const reviews = [];
-
-  //   products?.forEach((product) => {
-  //     product.reviews?.forEach((review) => {
-  //       reviews.push(review);
-  //       totalRating += review.rating;
-  //       totalReviews++;
-  //     });
-  //   });
-
-  //   return {
-  //     averageRating: totalReviews ? totalRating / totalReviews : 0,
-  //     reviews,
-  //   };
-  // };
-
-  // const { averageRating, reviews } = getShopRatings();
 
   const handleLogout = async () => {
     setLogoutLoading(true);

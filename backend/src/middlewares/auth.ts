@@ -56,3 +56,45 @@ export const isAuthenticated = async (
 
   next();
 };
+
+export const isLoggedIn = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    // User
+    if (req.cookies?.token) {
+      const decoded = jwt.verify(
+        req.cookies.token,
+        process.env.JWT_SECRET as string,
+      ) as { userId: string };
+
+      const user = await User.findById(decoded.userId).select("+isVerified");
+
+      if (user && user.isVerified) {
+        req.user = user;
+        return next();
+      }
+    }
+
+    // Seller
+    if (req.cookies?.seller_token) {
+      const decoded = jwt.verify(
+        req.cookies.seller_token,
+        process.env.JWT_SECRET as string,
+      ) as { shopId: string };
+
+      const shop = await Shop.findById(decoded.shopId).select("+isVerified");
+
+      if (shop && shop.isVerified) {
+        req.user = shop;
+        return next();
+      }
+    }
+
+    throw new AppError("You are not authorized.", 401);
+  } catch (error) {
+    next(error);
+  }
+};

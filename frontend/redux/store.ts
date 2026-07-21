@@ -7,6 +7,8 @@ import cartReducer from "./slices/cart";
 import wishlistReducer from "./slices/wishlist";
 import couponReducer from "./slices/coupon";
 import orderReducer from "./slices/order";
+import conversationReducer from "./slices/conversations";
+import messageReducer from "./slices/message";
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +20,8 @@ export const store = configureStore({
     wishlist: wishlistReducer,
     coupon: couponReducer,
     order: orderReducer,
+    conversation: conversationReducer,
+    message: messageReducer,
   },
 });
 
