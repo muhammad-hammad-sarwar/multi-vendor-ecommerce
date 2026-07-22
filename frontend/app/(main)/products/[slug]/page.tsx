@@ -365,7 +365,11 @@ export default function ProductDetailsPage() {
             <div>No Related {isEvent ? "Events" : "Products"}</div>
           ) : (
             related.map((p) => (
-              <ProductCard key={p?._id} isEvent={true} product={p} />
+              <ProductCard
+                key={p?._id}
+                isEvent={isEvent === "true"} // because params read as isEvent"true"
+                product={p}
+              />
             ))
           )}
         </div>
