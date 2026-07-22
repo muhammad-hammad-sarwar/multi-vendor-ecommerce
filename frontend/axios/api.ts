@@ -1,8 +1,11 @@
 import axios from "axios";
 
+console.log(process.env?.NODE_ENV);
 const api = axios.create({
-  baseURL: "http://localhost:8000/",
-  // baseURL: "https://multi-vendor-ecommerce-jc8e.vercel.app/",
+  baseURL:
+    process.env?.NODE_ENV === "development"
+      ? "http://localhost:8000/"
+      : "https://multi-vendor-ecommerce-jc8e.vercel.app/",
   withCredentials: true,
 });
 

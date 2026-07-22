@@ -3,6 +3,7 @@ import { AppError } from "../utils/AppError.js";
 import { Order } from "../models/order.model.js";
 import { Product } from "../models/product.model.js";
 import { Event as EventModel } from "../models/event.model.js";
+import { User } from "../models/user.model.js";
 
 export const createOrder = async (req: Request, res: Response) => {
   const { cart, shippingInfo, totalPrice, paymentInfo } = req.body;
@@ -104,7 +105,10 @@ export const getSellerOrders = async (req: Request, res: Response) => {
 
 export const updateStatus = async (req: Request, res: Response) => {
   const shop = req.user;
-  if (!shop) throw new AppError("Please login to continue", 401);
+  if (!shop || shop.role != "seller")
+    throw new AppError("Please login to continue", 401);
+  const admin = await User.findOne({ role: "admin" });
+  if (!admin) throw new AppError("Admin is Unavailable", 400);
 
   const { orderId, status } = req.params;
   if (!orderId || !status)
@@ -120,17 +124,25 @@ export const updateStatus = async (req: Request, res: Response) => {
     throw new AppError("You are not authorized to change status", 401);
 
   if (order.status == status)
-    throw new AppError(`Status is already ${status}`, 400);
+    throw new AppError(`Order is already ${status}`, 400);
 
   if (status == "Delivered") {
     order.deliveredAt = new Date();
     if (order.paymentInfo) order.paymentInfo.status = "succedded";
+    // Add to seller account
+    const sellerShare = +(order.totalPrice * 0.9).toFixed(2);
+    shop.availableBalance += sellerShare;
+    admin.availableBalance += order.totalPrice;
   }
 
   order.status = status;
-  await order.save();
+  Promise.all([await order.save(), await shop.save(), await admin.save()]);
 
-  return res.json({ success: true, message: "Status Updated successfully" });
+  return res.json({
+    success: true,
+    message: "Status Updated successfully",
+    shop,
+  });
 };
 
 export const getUserOrders = async (req: Request, res: Response) => {
@@ -174,6 +186,9 @@ export const grantRefund = async (req: Request, res: Response) => {
   const shop = req.user;
   if (!shop) throw new AppError("Please login to continue", 401);
 
+  const admin = await User.findOne({ role: "admin" });
+  if (!admin) throw new AppError("Admin is Unavailable", 400);
+
   const { orderId } = req.params;
   if (!orderId) throw new AppError("Order Id is required", 400);
 
@@ -208,7 +223,13 @@ export const grantRefund = async (req: Request, res: Response) => {
   }
 
   order.status = "Refund Success";
-  await order.save();
+  shop.availableBalance -= order.totalPrice * 0.9;
+  admin.availableBalance -= order.totalPrice;
+  Promise.all([await order.save(), await admin.save(), await shop.save()]);
 
-  return res.json({ success: true, message: "Refund Granted successfully" });
+  return res.json({
+    success: true,
+    message: "Refund Granted successfully",
+    shop,
+  });
 };

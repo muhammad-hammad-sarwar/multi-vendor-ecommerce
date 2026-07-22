@@ -4,15 +4,15 @@ import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
 import Loader from "@/components/Layout/Loader";
 import { getAllOrders } from "@/redux/actions/order";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
+import { addShop } from "@/redux/slices/shop";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 export default function OrderDetails() {
   const params = useParams();
   const [orderloading, setOrderLoading] = useState(false);
-  const [status, setStatus] = useState("On the way");
   const { orders, loading, error } = useAppSelector((state) => state.order);
   const { shop, loading: shopLoading } = useAppSelector((state) => state.shop);
   const dispatch = useAppDispatch();
@@ -22,10 +22,10 @@ export default function OrderDetails() {
     if (!status) toast.error("Please Update the Status");
     setOrderLoading(true);
     try {
-      await api.patch(`/orders/seller/${data?._id}/${status}`).then(() => {
-        toast.success("Status updated successfully");
-        dispatch(getAllOrders(true));
-      });
+      const res = await api.patch(`/orders/seller/${data?._id}/${status}`);
+      toast.success("Status updated successfully");
+      dispatch(getAllOrders(true));
+      dispatch(addShop(res.data?.shop));
     } catch (error) {
       toast.error(error?.response?.data?.message);
     } finally {
@@ -36,10 +36,10 @@ export default function OrderDetails() {
   const handleRefundStatus = async () => {
     setOrderLoading(true);
     try {
-      await api.patch(`/orders/seller/refund/${data?._id}`).then(() => {
-        toast.success("Status updated successfully");
-        dispatch(getAllOrders(true));
-      });
+      const res = await api.patch(`/orders/seller/refund/${data?._id}`);
+      toast.success("Status updated successfully");
+      dispatch(getAllOrders(true));
+      dispatch(addShop(res.data?.shop));
     } catch (error) {
       console.log("Error from refund status", error);
       toast.error(error?.response?.data?.message);
@@ -52,7 +52,21 @@ export default function OrderDetails() {
     (o) => o?.shop == shop?._id && o?._id == params?.slug,
   );
 
-  if (!loading && !shopLoading && !data) return <Loader />;
+  const [status, setStatus] = useState(
+    data?.status === "Processing" ? "On the way" : "Delivered",
+  );
+
+  useEffect(() => {
+    if (!data) return;
+
+    setStatus(data.status === "Processing" ? "On the way" : "Delivered");
+  }, [data]);
+
+  if (loading || shopLoading || (!error && !shop)) {
+    return <Loader />;
+  }
+
+  if (!data) return <div>Order Not Found</div>;
 
   return (
     <div className="mx-auto bg-white">
@@ -144,7 +158,7 @@ export default function OrderDetails() {
         </div>
       </div>
 
-      {data?.status == "Processing" && (
+      {(data?.status == "Processing" || data?.status == "On the way") && (
         <form
           onSubmit={handleUpdateStatus}
           className="flex flex-col justify-center gap-3 mt-6"
@@ -159,7 +173,9 @@ export default function OrderDetails() {
             onChange={(e) => setStatus(e.target.value)}
             className="max-w-40 rounded-lg border border-gray-300 px-4 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
           >
-            <option value="On the way">On the way</option>
+            {data?.status === "Processing" && (
+              <option value="On the way">On the way</option>
+            )}
             <option value="Delivered">Delivered</option>
           </select>
 

@@ -18,6 +18,7 @@ export interface IUser extends Document {
   addresses?: IAddress[];
   phoneNumber: string;
   role: "user" | "admin";
+  availableBalance: number;
   isVerified?: boolean;
   verifyTokenHash: string;
   verifyTokenExpiry: Date;
@@ -46,6 +47,11 @@ const userSchema = new Schema<IUser>(
     avatar: {
       type: String,
       required: true,
+    },
+    availableBalance: {
+      type: Number,
+      default: 0,
+      min: 0,
     },
     phoneNumber: {
       type: String,

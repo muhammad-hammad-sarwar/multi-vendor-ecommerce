@@ -150,8 +150,8 @@ export const login = async (
   res
     .cookie("token", token, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === "development" ? false : true,
+      sameSite: process.env.NODE_ENV === "development" ? "lax" : "none",
       expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     })
     .json({ success: true, message: "Welcome back", user: safeUser });

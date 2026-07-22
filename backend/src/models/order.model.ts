@@ -5,7 +5,7 @@ const orderSchema = new Schema(
     cart: { type: Array, required: true },
     shippingInfo: { type: Object, required: true },
     user: { type: Object, required: true },
-    totalPrice: { type: Number, requred: true },
+    totalPrice: { type: Number, required: true },
     status: {
       // Status of order itself
       type: String,
