@@ -28,6 +28,7 @@ export interface UserState {
   profileLoading: boolean;
   error: string | null;
   isAuthenticated: boolean;
+  initialized: boolean;
 }
 
 const initialState: UserState = {
@@ -36,6 +37,7 @@ const initialState: UserState = {
   profileLoading: false,
   error: null,
   isAuthenticated: false,
+  initialized: false,
 };
 
 const userSlice = createSlice({
@@ -43,27 +45,31 @@ const userSlice = createSlice({
   initialState,
 
   reducers: {
-    loadUserStart(state) {
-      state.loading = true;
-      state.error = null;
-    },
-
     // When login add user to store
     addUser(state, action) {
       state.isAuthenticated = true;
       state.user = action.payload;
+      state.initialized = true;
+    },
+
+    loadUserStart(state) {
+      state.loading = true;
+      state.error = null;
+      state.initialized = false;
     },
 
     loadUserSuccess(state, action: PayloadAction<IUser>) {
       state.loading = false;
       state.user = action.payload;
       state.isAuthenticated = true;
+      state.initialized = true;
     },
 
     loadUserFailed(state, action: PayloadAction<string>) {
       state.loading = false;
       state.error = action.payload;
       state.user = null;
+      state.initialized = true;
     },
 
     // For Avatar update

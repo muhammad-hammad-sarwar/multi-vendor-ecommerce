@@ -1,3 +1,4 @@
+import AdminGuard from "@/components/AdminDashboard/AdminGuard";
 import AdminHeader from "@/components/AdminDashboard/AdminHeader";
 import AdminSidebar from "@/components/AdminDashboard/AdminSidebar";
 import AdminInit from "@/redux/AdminInit";
@@ -15,18 +16,20 @@ export default function AdminLayout({
 }>) {
   return (
     <>
-      <AdminHeader />
-      <section className="flex h-[calc(100vh-64px)] bg-gray-100">
-        <AdminSidebar />
+      <AdminGuard>
+        <AdminHeader />
+        <section className="flex h-[calc(100vh-64px)] bg-gray-100">
+          <AdminSidebar />
 
-        <main className="flex-1 min-w-0 p-5 md:p-8 overflow-y-auto">
-          <div className="min-h-[80vh] rounded-xl border bg-white p-6 shadow-sm">
-            {children}
-          </div>
-        </main>
-      </section>
+          <main className="flex-1 min-w-0 p-5 md:p-8 overflow-y-auto">
+            <div className="min-h-[80vh] rounded-xl border bg-white p-6 shadow-sm">
+              {children}
+            </div>
+          </main>
+        </section>
 
-      <AdminInit />
+        <AdminInit />
+      </AdminGuard>
     </>
   );
 }
