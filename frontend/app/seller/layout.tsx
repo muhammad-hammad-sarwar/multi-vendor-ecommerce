@@ -16,11 +16,11 @@ export default function SellerLayout({
   return (
     <>
       <SellerHeader />
-      <section className="flex min-h-screen bg-gray-100">
+      <section className="flex h-[calc(100vh-64px)] bg-gray-100">
         <SellerSidebar />
 
-        <main className="min-w-0 flex-1 p-5 md:p-8">
-          <div className="rounded-xl bg-white shadow-sm border min-h-[85vh] p-6">
+        <main className="flex-1 min-w-0 p-5 md:p-8 overflow-y-auto">
+          <div className="min-h-[80vh] rounded-xl border bg-white p-6 shadow-sm">
             {children}
           </div>
         </main>

@@ -1,6 +1,5 @@
 "use client";
-import LoadingDots from "@/components/Common/LoadingDots";
-import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
+import Loader from "@/components/Layout/Loader";
 import DeleteModal from "@/components/Layout/Modal/DeleteModal";
 import useBodyScrollLock from "@/hooks/useBodyScrollLock";
 import { deleteSellerProduct } from "@/redux/actions/product";
@@ -94,7 +93,7 @@ export default function AllProducts() {
         name: p.name,
         quantity: p.stock - p.sold_out,
         stock: p.stock,
-        sold: p.sold_out,
+        sold_out: p.sold_out,
       }))) ??
     [];
 
@@ -107,8 +106,7 @@ export default function AllProducts() {
     }
   };
 
-  if (shopLoading || (!error && !products))
-    return <LoadingDots text="Loading your products..." />;
+  if (shopLoading || (!error && !products)) return <Loader />;
 
   return (
     <>

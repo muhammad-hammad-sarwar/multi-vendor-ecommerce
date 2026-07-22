@@ -41,4 +41,17 @@ shopRouter.get("/events", isSeller, shopController.getShopEvents);
 shopRouter.delete("/products/:id", isSeller, shopController.deleteProductById);
 shopRouter.delete("/events/:id", isSeller, shopController.deleteEventById);
 
+// Withdrawal method
+shopRouter.post(
+  "/withdraw",
+  isSeller,
+  catchAsync(shopController.addWithdrawMethod),
+);
+
+shopRouter.delete(
+  "/withdraw/:id",
+  isSeller,
+  catchAsync(shopController.deleteWithdrawMethod),
+);
+
 export default shopRouter;

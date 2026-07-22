@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function EventCard({ event }: { event: IEvent }) {
-  const { timeLeft } = useCountDown(`${event?.endDate}`);
+  const { timeLeft, isMounted } = useCountDown(`${event?.endDate}`);
   return (
     <div className="w-full border rounded-xl flex flex-col md:flex-row overflow-hidden hover:shadow-md transition bg-white">
       <div className="w-full md:w-[320px] h-55 relative shrink-0">
@@ -46,9 +46,13 @@ export default function EventCard({ event }: { event: IEvent }) {
           </div>
 
           <div className="mt-4 text-sm font-medium text-red-600">
-            {timeLeft.days == 0
-              ? "Sale Ended!"
-              : `Ends in: ${timeLeft.days}d ${timeLeft.hours}h ${timeLeft.minutes}m ${timeLeft.seconds}s`}
+            {isMounted && timeLeft.days === null ? (
+              <div className="bg-red-400 w-40 h-8 rounded-sm animate-pulse" />
+            ) : timeLeft.days == 0 ? (
+              "Sale Ended!"
+            ) : (
+              `Ends in: ${timeLeft.days}d ${timeLeft.hours}h ${timeLeft.minutes}m ${timeLeft.seconds}s`
+            )}
           </div>
 
           <Link href={`/products/${event?._id}?isEvent=true`}>

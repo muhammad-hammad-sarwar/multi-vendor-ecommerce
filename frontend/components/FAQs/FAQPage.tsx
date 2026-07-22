@@ -1,5 +1,6 @@
 "use client";
 
+import clsx from "clsx";
 import { useState } from "react";
 import { FiPlus, FiMinus } from "react-icons/fi";
 
@@ -78,7 +79,10 @@ export default function FAQPage() {
             return (
               <div
                 key={index}
-                className="bg-white border rounded-lg overflow-hidden"
+                className={clsx(
+                  "bg-white border rounded-lg overflow-hidden",
+                  // isOpen ? "animate-accordion-down" : "animate-accordion-up",
+                )}
               >
                 <button
                   onClick={() => toggle(index)}

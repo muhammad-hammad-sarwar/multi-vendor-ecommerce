@@ -11,23 +11,14 @@ import {
 } from "react-icons/fi";
 import { CgProfile } from "react-icons/cg";
 import { useAppSelector } from "@/redux/hooks/hooks";
+import Logo from "../Common/Logo";
 
 export default function SellerHeader() {
   const { shop, isSeller } = useAppSelector((state) => state.shop);
   return (
-    <header className="sticky top-0 z-50 h-16 bg-white border-b">
+    <header className="h-16 bg-white border-b">
       <div className="mx-auto flex h-full items-center justify-between px-4 md:px-8">
-        <Link href={"/"}>
-          <Image
-            className="w-20 h-16"
-            src={
-              "https://cdn.dribbble.com/userupload/17039933/file/original-dbbc84c08bd6b4b49fc97827fa5be468.jpg?resize=752x&vertical=center"
-            }
-            width={80}
-            height={80}
-            alt="multi-vendor"
-          />
-        </Link>
+        <Logo />
 
         <div className="flex items-center gap-3">
           <div className="hidden lg:flex items-center gap-6">

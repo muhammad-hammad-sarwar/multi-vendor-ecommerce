@@ -83,7 +83,12 @@ export default function ShopSidebarInfo({
           <div className="mt-2 flex gap-2 text-gray-600">
             <FiStar className="mt-1 text-yellow-500" />
 
-            <p>{averageRating} / 5</p>
+            <p>
+              {Number.isInteger(averageRating)
+                ? averageRating
+                : averageRating.toFixed(2)}{" "}
+              / 5
+            </p>
           </div>
         </div>
 

@@ -5,9 +5,10 @@ import bcrypt from "bcrypt";
 import { sendEmail } from "../utils/sendEmail.js";
 import jwt from "jsonwebtoken";
 import { deleteFile } from "../utils/deleteFile.js";
-import { shopSchema } from "../schemas/shop.schema.js";
+import { shopSchema, withdrawMethodSchema } from "../schemas/shop.schema.js";
 import { Product } from "../models/product.model.js";
 import { Event } from "../models/event.model.js";
+import { Withdraw } from "../models/withdraw.model.js";
 
 export const signUp = async (
   req: Request,
@@ -292,5 +293,69 @@ export const updateProfile = async (req: Request, res: Response) => {
     success: true,
     message: "Profile updated successfully.",
     shop: await Shop.findById(shop._id),
+  });
+};
+
+export const addWithdrawMethod = async (req: Request, res: Response) => {
+  if (!req.user || req.user.role != "seller")
+    throw new AppError("Please Login to continue", 400);
+  const result = withdrawMethodSchema.safeParse(req.body);
+
+  if (!result.success) {
+    throw new AppError(result.error.issues[0].message, 400);
+  }
+
+  const withdrawMethods = req.user.withdrawMethods;
+  const { accountNumber, swiftCode } = result.data;
+  const exists = withdrawMethods.find(
+    (m) =>
+      m.accountNumber.trim() === accountNumber.trim() &&
+      m.swiftCode.trim().toUpperCase() === swiftCode.trim().toUpperCase(),
+  );
+
+  if (exists) throw new AppError("Bank Address already exists", 400);
+  withdrawMethods.push(result.data);
+
+  await req.user.save();
+  res.send({
+    success: true,
+    message: "Withdraw method created successfully",
+    shop: await Shop.findById(req.user._id).select("+isVerified"),
+  });
+};
+
+export const deleteWithdrawMethod = async (req: Request, res: Response) => {
+  if (!req.user || req.user.role != "seller")
+    throw new AppError("Please Login to continue", 400);
+
+  const { id } = req.params;
+  const method = req.user.withdrawMethods?.find(
+    (m) => m?._id?.toString() === id.toString(),
+  );
+
+  if (!method) throw new AppError("Withdrawal method not found", 404);
+  const pending = await Withdraw.find({
+    seller: req.user._id,
+    status: "Processing",
+    "paymentMethod.accountNumber": method.accountNumber,
+    "paymentMethod.swiftCode": method.swiftCode,
+  });
+
+  if (pending)
+    throw new AppError(
+      "This withdrawal method is linked to a pending withdrawal request.",
+      400,
+    );
+
+  req.user.withdrawMethods = req.user.withdrawMethods.filter(
+    (m) => m._id?.toString() !== id,
+  );
+
+  await req.user.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Withdrawal method deleted successfully",
+    shop: await Shop.findById(req.user._id).select("+isVerified"),
   });
 };

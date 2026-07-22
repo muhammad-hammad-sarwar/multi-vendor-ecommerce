@@ -22,3 +22,19 @@ export const shopSchema = z.object({
   zipCode: z.string("Zip code is required"),
   //   .regex(/^\d{4,10}$/, "Invalid zip code"),
 });
+
+export const withdrawMethodSchema = z.object({
+  bankName: z.string().min(1, "Bank name is required"),
+
+  bankCountry: z.string().min(1, "Bank country is required"),
+
+  swiftCode: z.string().min(1, "SWIFT code is required"),
+
+  accountNumber: z.string().min(1, "Account number is required"),
+
+  accountHolderName: z.string().min(1, "Account holder name is required"),
+
+  bankAddress: z.string().min(1, "Bank address is required"),
+});
+
+export type WithdrawMethodInput = z.infer<typeof withdrawMethodSchema>;

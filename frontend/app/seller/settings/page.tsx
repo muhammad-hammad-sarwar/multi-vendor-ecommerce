@@ -1,11 +1,10 @@
 "use client";
-import LoadingDots from "@/components/Common/LoadingDots";
 import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
+import Loader from "@/components/Layout/Loader";
 import {
   updateShopAvatar,
   updateShopProfile,
 } from "@/redux/actions/shop.action";
-import { updateUserProfileAvatar } from "@/redux/actions/user";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -71,8 +70,7 @@ export default function SellerSettings() {
     setZipCode(shop.zipCode);
   }, [shop]);
 
-  if (shopLoading || (!error && !shop))
-    return <LoadingDots text="Loading shop info" />;
+  if (shopLoading || (!error && !shop)) return <Loader />;
 
   return (
     <div className="mx-auto">

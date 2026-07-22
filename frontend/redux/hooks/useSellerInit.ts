@@ -3,6 +3,7 @@ import { useAppDispatch } from "./hooks";
 import { loadSellerProducts } from "../actions/product";
 import { loadSellerEvents } from "../actions/event";
 import { getAllOrders } from "../actions/order";
+import { getWithdrawRequests } from "../actions/withdraw";
 export const useSellerInit = () => {
   const dispatch = useAppDispatch();
 
@@ -10,5 +11,6 @@ export const useSellerInit = () => {
     dispatch(loadSellerProducts());
     dispatch(loadSellerEvents());
     dispatch(getAllOrders(true));
+    dispatch(getWithdrawRequests());
   }, [dispatch]);
 };

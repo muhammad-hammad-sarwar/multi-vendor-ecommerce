@@ -27,11 +27,13 @@ export default function ShopPage() {
   }, []);
 
   if (loading || !shop) return <ShopPageLoader />;
+  const averageRating = totalRatings / reviews.length;
+
   return (
     <section className="bg-gray-100 min-h-screen px-10 py-10">
       <div className="mx-auto flex max-w-7xl gap-8">
         <ShopSidebarInfo
-          averageRating={(totalRatings / reviews.length).toFixed(2)}
+          averageRating={averageRating}
           totalProducts={products?.length}
           shop={shop}
           isOwner={true}

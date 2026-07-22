@@ -8,6 +8,7 @@ import {
   loadAdminUsers,
   loadAdminSellers,
 } from "../actions/admin";
+import { getWithdrawRequests } from "../actions/withdraw";
 
 export const useAdminInit = () => {
   const dispatch = useAppDispatch();
@@ -18,5 +19,6 @@ export const useAdminInit = () => {
     dispatch(loadAdminUsers());
     dispatch(loadAdminSellers());
     dispatch(loadAdminOrders());
+    dispatch(getWithdrawRequests(true));
   }, [dispatch]);
 };

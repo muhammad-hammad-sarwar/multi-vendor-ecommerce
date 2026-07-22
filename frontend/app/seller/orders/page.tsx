@@ -1,10 +1,10 @@
 "use client";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { useAppSelector } from "@/redux/hooks/hooks";
-import LoadingDots from "@/components/Common/LoadingDots";
 import { Chip } from "@mui/material";
 import Link from "next/link";
 import { FiEye } from "react-icons/fi";
+import Loader from "@/components/Layout/Loader";
 
 export default function AllOrders() {
   const { orders, loading, error } = useAppSelector((state) => state.order);
@@ -77,8 +77,7 @@ export default function AllOrders() {
       }))
     : [];
 
-  if (loading || (!error && !orders))
-    return <LoadingDots text="Loading orders..." />;
+  if (loading || (!error && !orders)) return <Loader />;
 
   return (
     <>

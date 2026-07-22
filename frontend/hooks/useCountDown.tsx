@@ -2,15 +2,14 @@ import { useEffect, useState } from "react";
 
 export default function useCountDown(time: string) {
   const [timeLeft, setTimeLeft] = useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
+    days: null,
+    hours: null,
+    minutes: null,
+    seconds: null,
   });
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
     const interval = setInterval(() => {
       const difference = +new Date(time) - +new Date();
 
@@ -25,7 +24,7 @@ export default function useCountDown(time: string) {
         });
       }
     }, 1000);
-
+    setIsMounted(true);
     return () => clearInterval(interval);
   }, [time]);
 

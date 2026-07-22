@@ -7,6 +7,7 @@ import { Chip } from "@mui/material";
 import { FiEye } from "react-icons/fi";
 
 export default function SellerDashboard() {
+  const { shop } = useAppSelector((state) => state.shop);
   const { products, loading, error } = useAppSelector(
     (state) => state.products,
   );
@@ -92,14 +93,7 @@ export default function SellerDashboard() {
         }))
     : [];
 
-  const totalEarnings =
-    orders &&
-    orders
-      .filter((o) => o.status === "Delivered")
-      .reduce((acc, o) => o.totalPrice + acc, 0);
-
-  const availableBalance = totalEarnings - totalEarnings * 0.1;
-
+  const availableBalance = shop?.availableBalance;
   return (
     <>
       <h1 className="text-3xl font-bold text-blue-600">Dashboard</h1>

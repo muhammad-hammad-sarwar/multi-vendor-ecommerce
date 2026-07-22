@@ -37,7 +37,9 @@ export default function ProductDetailsPage() {
   const [tab, setTab] = useState("Details");
   const [activeImage, setActiveImage] = useState(product?.images?.[0]);
   const [isFavourite, setIsFavourite] = useState(false);
-  const { timeLeft } = useCountDown(`${(isEvent && product?.endDate) || ""}`);
+  const { timeLeft, isMounted } = useCountDown(
+    `${(isEvent && product?.endDate) || ""}`,
+  );
   const dispatch = useAppDispatch();
   const router = useRouter();
 
@@ -197,9 +199,13 @@ export default function ProductDetailsPage() {
 
           {isEvent && (
             <div className="mt-4 text-sm font-medium text-red-600">
-              {timeLeft.days == 0
-                ? "Sale Ended!"
-                : `Ends in: ${timeLeft.days}d ${timeLeft.hours}h ${timeLeft.minutes}m ${timeLeft.seconds}s`}
+              {isMounted && timeLeft.days === null ? (
+                <div className="bg-red-400 w-40 h-8 rounded-sm animate-pulse" />
+              ) : timeLeft.days == 0 ? (
+                "Sale Ended!"
+              ) : (
+                `Ends in: ${timeLeft.days}d ${timeLeft.hours}h ${timeLeft.minutes}m ${timeLeft.seconds}s`
+              )}
             </div>
           )}
 

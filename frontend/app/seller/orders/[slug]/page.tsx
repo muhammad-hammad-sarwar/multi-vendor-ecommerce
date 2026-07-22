@@ -1,7 +1,7 @@
 "use client";
 import api from "@/axios/api";
-import LoadingDots from "@/components/Common/LoadingDots";
 import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
+import Loader from "@/components/Layout/Loader";
 import { getAllOrders } from "@/redux/actions/order";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
 import Link from "next/link";
@@ -52,8 +52,7 @@ export default function OrderDetails() {
     (o) => o?.shop == shop?._id && o?._id == params?.slug,
   );
 
-  if (!loading && !shopLoading && !data)
-    return <LoadingDots text="Loading Order Details..." />;
+  if (!loading && !shopLoading && !data) return <Loader />;
 
   return (
     <div className="mx-auto bg-white">

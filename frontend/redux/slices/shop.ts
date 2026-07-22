@@ -3,6 +3,16 @@ import { Product } from "./product";
 import { toast } from "react-toastify";
 import { IEvent } from "./events";
 
+export interface WithdrawMethod {
+  _id: string;
+  bankName: string;
+  bankCountry: string;
+  swiftCode: string;
+  accountNumber: string;
+  accountHolderName: string;
+  bankAddress: string;
+}
+
 export interface IShop {
   _id: string;
   name: string;
@@ -11,7 +21,9 @@ export interface IShop {
   password: string;
   avatar: string;
   address: string;
+  availableBalance: number;
   phoneNumber: string;
+  withdrawMethods: WithdrawMethod[];
   zipCode: string;
   createdAt: string;
   isVerified: boolean;

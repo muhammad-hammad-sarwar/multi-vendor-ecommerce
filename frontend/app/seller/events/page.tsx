@@ -1,6 +1,6 @@
 "use client";
-import LoadingDots from "@/components/Common/LoadingDots";
 import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
+import Loader from "@/components/Layout/Loader";
 import useBodyScrollLock from "@/hooks/useBodyScrollLock";
 import { deleteSellerEvent } from "@/redux/actions/event";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
@@ -98,8 +98,7 @@ export default function AllEvents() {
       }))) ??
     [];
 
-  if (shopLoading || (!error && !events))
-    return <LoadingDots text="Loading your events..." />;
+  if (shopLoading || (!error && !events)) return <Loader />;
 
   return (
     <>

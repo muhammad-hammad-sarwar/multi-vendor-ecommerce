@@ -1,7 +1,7 @@
 "use client";
 import api from "@/axios/api";
-import LoadingDots from "@/components/Common/LoadingDots";
 import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
+import Loader from "@/components/Layout/Loader";
 import useBodyScrollLock from "@/hooks/useBodyScrollLock";
 import { deleteCoupon, getCoupons } from "@/redux/actions/coupon";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
@@ -120,12 +120,11 @@ export default function CouponsPage() {
     }
   };
 
-  if (CouponLoading || (!error && !coupons))
-    return <LoadingDots text="Loading Coupons" />;
+  if (CouponLoading || (!error && !coupons)) return <Loader />;
 
   return (
     <>
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex flex-col gap-3 sm:gap-0 sm:flex-row sm:justify-between sm:items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-blue-600">Coupons</h1>
           <p className="text-gray-500 mt-1">
@@ -135,7 +134,7 @@ export default function CouponsPage() {
 
         <button
           onClick={() => setOpen(true)}
-          className="bg-black hover:bg-gray-800 transition text-white px-5 py-2.5 rounded-lg flex items-center gap-2 cursor-pointer"
+          className="bg-black hover:bg-gray-800 transition text-white w-40 pl-4 py-2.5 rounded-lg flex items-center gap-2 cursor-pointer"
         >
           <FiPlus />
           Create Coupon

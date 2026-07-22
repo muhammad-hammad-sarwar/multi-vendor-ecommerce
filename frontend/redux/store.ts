@@ -10,6 +10,7 @@ import orderReducer from "./slices/order";
 import conversationReducer from "./slices/conversations";
 import messageReducer from "./slices/message";
 import adminReducer from "./slices/admin";
+import withdrawReducer from "./slices/withdraw";
 
 export const store = configureStore({
   reducer: {
@@ -24,6 +25,7 @@ export const store = configureStore({
     conversation: conversationReducer,
     message: messageReducer,
     admin: adminReducer,
+    withdraw: withdrawReducer,
   },
 });
 

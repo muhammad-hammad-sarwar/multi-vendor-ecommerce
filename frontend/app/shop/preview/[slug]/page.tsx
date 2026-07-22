@@ -38,12 +38,13 @@ export default function ShopPage() {
   }, []);
 
   if (infoLoading || (!error && !currentShop)) return <ShopPageLoader />;
+  const averageRating = totalRatings / reviews.length;
 
   return (
     <section className="bg-gray-100 min-h-screen px-10 py-10">
       <div className="mx-auto flex max-w-7xl gap-8">
         <ShopSidebarInfo // If reviews are zero we will have to divide by 0 which is NaN
-          averageRating={(totalRatings / (reviews?.length || 1)).toFixed(2)}
+          averageRating={averageRating}
           totalProducts={currentShopProducts?.length}
           shop={currentShop}
           isOwner={false}

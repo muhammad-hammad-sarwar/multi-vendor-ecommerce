@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 export default function SellerSidebar() {
   const pathname = usePathname();
   return (
-    <aside className="sticky top-0 h-screen w-18 md:w-64 bg-white border-r shadow-sm">
+    <aside className="sticky top-0 h-[calc(100vh-64px)] w-18 md:w-64 bg-white border-r shadow-sm">
       <nav className="py-4">
         {sellerDashboardTabs.map((tab, i) => {
           const Icon = tab.icon;

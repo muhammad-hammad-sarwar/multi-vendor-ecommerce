@@ -2,7 +2,6 @@ import { Router } from "express";
 import * as authController from "../controllers/auth.controller.js";
 import { upload } from "../middlewares/upload.middleware.js";
 import catchAsync from "../utils/catchAsync.js";
-import { isAuthenticated } from "../middlewares/auth.js";
 
 const authRouter = Router();
 authRouter.post(
