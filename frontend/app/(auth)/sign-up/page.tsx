@@ -1,6 +1,7 @@
 "use client";
 import api from "@/axios/api";
 import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
+import { useAppSelector } from "@/redux/hooks/hooks";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -13,6 +14,7 @@ export default function SignUpPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [avatar, setAvatar] = useState<File | null>(null);
+  const { isSeller } = useAppSelector((state) => state.shop);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -23,6 +25,7 @@ export default function SignUpPage() {
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (loading || isSeller) return;
     const formData = new FormData();
     if (avatar) formData.append("avatar", avatar);
     formData.append("email", email);

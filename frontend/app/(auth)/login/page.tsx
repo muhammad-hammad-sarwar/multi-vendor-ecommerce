@@ -2,7 +2,7 @@
 import api from "@/axios/api";
 import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
 import { addUserWhileLogin } from "@/redux/actions/user";
-import { useAppDispatch } from "@/redux/hooks/hooks";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -15,11 +15,13 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isVisible, setIsVisible] = useState(false);
+  const { isAuthenticated } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
+      if (loading || isAuthenticated) return;
       setLoading(true);
       const res = await api.post("/auth/login", { email, password });
       toast.success("Logged In successfully");

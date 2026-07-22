@@ -8,6 +8,7 @@ import { FiEye } from "react-icons/fi";
 import { useAppSelector } from "@/redux/hooks/hooks";
 
 export default function AdminDashboard() {
+  const { user } = useAppSelector((state) => state.user);
   const { orders, sellers, loading, error } = useAppSelector(
     (state) => state.admin,
   );
@@ -156,7 +157,7 @@ export default function AdminDashboard() {
               </div>
 
               <h2 className="mt-6 text-3xl font-bold text-gray-900">
-                {sellers.length}
+                {sellers?.length}
               </h2>
 
               <Link
@@ -187,7 +188,7 @@ export default function AdminDashboard() {
               </div>
 
               <h2 className="mt-6 text-3xl font-bold text-gray-900">
-                {orders.length}
+                {orders?.length}
               </h2>
 
               <Link

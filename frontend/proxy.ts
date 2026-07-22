@@ -18,7 +18,12 @@ export async function proxy(request: NextRequest) {
     );
   }
 
-  if (!token && (pathname == "/checkout" || pathname.startsWith("/profile"))) {
+  if (
+    !token &&
+    (pathname == "/checkout" ||
+      pathname.startsWith("/profile") ||
+      pathname.startsWith("/admin"))
+  ) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
