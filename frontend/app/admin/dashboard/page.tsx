@@ -91,12 +91,14 @@ export default function AdminDashboard() {
       }))) ??
     [];
 
-  const totalEarnings =
+  const totalRevenue =
     orders?.reduce((acc, order) => {
-      if (order.paymentInfo?.status === "succeeded") {
-        return acc + order.totalPrice * 0.1;
+      if (
+        order.paymentInfo?.status === "succedded" &&
+        order.status === "Delivered"
+      ) {
+        return acc + (order.totalPrice ?? 0);
       }
-
       return acc;
     }, 0) ?? 0;
 
@@ -134,7 +136,7 @@ export default function AdminDashboard() {
               </div>
 
               <h2 className="mt-6 text-3xl font-bold text-gray-900">
-                ${totalEarnings.toFixed(2)}
+                ${totalRevenue.toFixed(2)}
               </h2>
             </>
           )}

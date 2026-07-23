@@ -132,7 +132,7 @@ export const updateStatus = async (req: Request, res: Response) => {
     // Add to seller account
     const sellerShare = +(order.totalPrice * 0.9).toFixed(2);
     shop.availableBalance += sellerShare;
-    admin.availableBalance += order.totalPrice;
+    // admin.availableBalance += order.totalPrice;
   }
 
   order.status = status;
@@ -184,11 +184,8 @@ export const processRefund = async (req: Request, res: Response) => {
 
 export const grantRefund = async (req: Request, res: Response) => {
   const shop = req.user;
-  if (!shop) throw new AppError("Please login to continue", 401);
-
-  const admin = await User.findOne({ role: "admin" });
-  if (!admin) throw new AppError("Admin is Unavailable", 400);
-
+  if (!shop || shop.role != "seller")
+    throw new AppError("Please login to continue", 401);
   const { orderId } = req.params;
   if (!orderId) throw new AppError("Order Id is required", 400);
 
@@ -224,8 +221,8 @@ export const grantRefund = async (req: Request, res: Response) => {
 
   order.status = "Refund Success";
   shop.availableBalance -= order.totalPrice * 0.9;
-  admin.availableBalance -= order.totalPrice;
-  Promise.all([await order.save(), await admin.save(), await shop.save()]);
+  // admin.availableBalance -= order.totalPrice;
+  Promise.all([await order.save(), await shop.save()]);
 
   return res.json({
     success: true,
