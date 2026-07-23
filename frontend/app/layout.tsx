@@ -4,6 +4,7 @@ import "./globals.css";
 import { ToastContainer } from "react-toastify";
 import AppProvider from "@/redux/Provider";
 import ReduxAppInit from "@/redux/ReduxAppInit";
+import InitSocket from "./socket/Init.socket";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -28,6 +29,7 @@ export default function RootLayout({
           <ToastContainer position="bottom-center" theme="colored" />
           {children}
           <ReduxAppInit />
+          <InitSocket />
         </AppProvider>
       </body>
     </html>

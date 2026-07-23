@@ -503,7 +503,7 @@ export const sellerDashboardTabs = [
     url: "/seller/create-event",
   },
   { name: "Withdraw Money", icon: FiDollarSign, url: "/seller/withdraw" },
-  { name: "Shop Inbox", icon: FiMessageSquare, url: "/seller/inbox" },
+  { name: "Shop Inbox", icon: FiMessageSquare, url: "/conversation" },
   {
     name: "Discount Codes",
     icon: FiTag,

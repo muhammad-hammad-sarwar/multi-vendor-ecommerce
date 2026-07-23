@@ -42,7 +42,7 @@ export default function SellerHeader() {
               <FiTag className="text-2xl text-gray-600 hover:text-blue-600 transition" />
             </Link>
 
-            <Link href="/seller/inbox">
+            <Link href="/conversation">
               <FiMessageCircle className="text-2xl text-gray-600 hover:text-blue-600 transition" />
             </Link>
           </div>

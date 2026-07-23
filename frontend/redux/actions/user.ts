@@ -90,7 +90,7 @@ export const updateUserProfileAddresses =
 
       dispatch(updateProfileSuccess(res.data?.user));
     } catch (err) {
-      console.dir(err);
+      // console.dir(err);
       dispatch(updateProfileFailure(err?.response?.data?.message || "Failed"));
     }
   };
@@ -106,7 +106,7 @@ export const deleteUserProfileAddress =
 
       dispatch(updateProfileSuccess(res.data?.user));
     } catch (err) {
-      console.dir(err);
+      // console.dir(err);
       dispatch(updateProfileFailure(err?.response?.data?.message || "Failed"));
     }
   };

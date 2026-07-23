@@ -29,6 +29,22 @@ const conversationSlice = createSlice({
   name: "conversation",
   initialState,
   reducers: {
+    updateLastMessage: (state, action) => {
+      const message = action.payload;
+
+      const index = state.conversations.findIndex(
+        (c) => c._id === message.conversationId,
+      );
+
+      if (index === -1) return;
+
+      state.conversations[index].lastMessage = message.text;
+      state.conversations[index].lastMessageAt = message.createdAt;
+
+      const conversation = state.conversations.splice(index, 1)[0];
+      // removes the current convo and then add it at top
+      state.conversations.unshift(conversation);
+    },
     setConversation: (state, action) => {
       state.conversation = action.payload;
     },
@@ -81,6 +97,7 @@ export const {
   getConversationsSuccess,
   getConversationsFailure,
   clearConversation,
+  updateLastMessage,
 } = conversationSlice.actions;
 
 export default conversationSlice.reducer;

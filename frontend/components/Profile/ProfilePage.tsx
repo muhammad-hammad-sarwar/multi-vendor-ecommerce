@@ -23,6 +23,7 @@ import { logout } from "@/redux/slices/user";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
 import { LuLayoutDashboard } from "react-icons/lu";
 import Link from "next/link";
+import { socket } from "@/app/socket/socket";
 
 const tabs = [
   { name: "Profile", icon: FiUser },
@@ -46,6 +47,7 @@ export default function ProfilePage() {
       await api.post("/auth/logout");
       toast.success("Logged out successfully");
       dispatch(logout());
+      socket.disconnect();
       router.push("/");
     } catch (error) {
       toast.error(error?.message);
@@ -53,7 +55,7 @@ export default function ProfilePage() {
   };
 
   const handleInbox = () => {
-    router.push("/inbox");
+    router.push("/conversation");
   };
 
   return (

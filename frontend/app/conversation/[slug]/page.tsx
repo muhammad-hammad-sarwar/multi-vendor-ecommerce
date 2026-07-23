@@ -1,9 +1,14 @@
 "use client";
+import { socket } from "@/app/socket/socket";
 import api from "@/axios/api";
 import { MessageSkeleton } from "@/components/Conversation/MessageSkeleton";
 import { getMessages } from "@/redux/actions/message";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
-import { setConversation } from "@/redux/slices/conversations";
+import {
+  setConversation,
+  updateLastMessage,
+} from "@/redux/slices/conversations";
+import { addMessage } from "@/redux/slices/message";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -28,14 +33,28 @@ export default function CurrentConversationPage() {
   );
 
   const [message, setMessage] = useState("");
+  const bottomRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async () => {
     if (!message.trim()) return;
 
-    await api
-      .post(`/messages/${params.slug}`, { text: message })
-      .catch((error) => toast.error(error?.response?.data?.message));
+    try {
+      const { data } = await api.post(`/messages/${params.slug}`, {
+        text: message,
+      });
+      socket.emit("sendMessage", {
+        messageId: data?.message?._id,
+        senderId: currentSenderId,
+        receiverId: otherPerson?._id,
+        text: data?.message?.text,
+        conversationId,
+        createdAt: data?.message?.createdAt,
+      });
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    }
+
     setMessage("");
   };
 
@@ -68,6 +87,19 @@ export default function CurrentConversationPage() {
     }
   }, [conversationId, conversations]);
 
+  useEffect(() => {
+    socket.on("getMessage", (message) => {
+      dispatch(addMessage(message));
+      dispatch(updateLastMessage(message));
+    });
+  }, []);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }, [messages?.length]);
+
   const currentSenderId = isAuthenticated
     ? user?._id
     : isSeller
@@ -91,7 +123,7 @@ export default function CurrentConversationPage() {
 
         <Image
           src={`http://localhost:8000/uploads/${otherPerson?.avatar}`}
-          alt={otherPerson?.avatar}
+          alt={otherPerson?.avatar || "Avatar"}
           width={52}
           height={52}
           unoptimized
@@ -112,11 +144,14 @@ export default function CurrentConversationPage() {
           <MessageSkeleton />
         ) : messages?.length > 0 ? (
           messages.map((msg) => (
-            <MessageBubble
-              key={msg._id}
-              msg={msg}
-              currentSenderId={currentSenderId}
-            />
+            <>
+              <MessageBubble
+                key={msg._id}
+                msg={msg}
+                currentSenderId={currentSenderId}
+              />
+              <div ref={bottomRef} />
+            </>
           ))
         ) : (
           <div className="flex h-full flex-col items-center justify-center px-6 text-center">

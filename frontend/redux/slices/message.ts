@@ -25,6 +25,9 @@ const messageSlice = createSlice({
   name: "message",
   initialState,
   reducers: {
+    addMessage: (state, action) => {
+      state.messages.push(action.payload);
+    },
     getMessagesStart(state) {
       state.loading = true;
       state.error = null;
@@ -53,6 +56,7 @@ export const {
   getMessagesSuccess,
   getMessagesFailure,
   clearConversation,
+  addMessage,
 } = messageSlice.actions;
 
 export default messageSlice.reducer;

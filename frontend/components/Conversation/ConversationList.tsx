@@ -1,12 +1,8 @@
 "use client";
-
-import { useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
-import LoadingDots from "../Common/LoadingDots";
-import { getConversations } from "@/redux/actions/conversations";
 import { formatDistanceToNow } from "date-fns";
 import { ConversationListSkeleton } from "./ConversationListSkeleton";
 import { setConversation } from "@/redux/slices/conversations";

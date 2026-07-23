@@ -37,6 +37,10 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/seller-login", request.url));
   }
 
+  if (!token && !sellerToken && pathname.startsWith("/conversation")) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
   return NextResponse.next();
 }
 
@@ -46,6 +50,7 @@ export const config = {
     "/shop/:path*",
     "/seller/:path*",
     "/admin/:path*",
+    "/conversation/:path*",
 
     "/login",
     "/sign-up",

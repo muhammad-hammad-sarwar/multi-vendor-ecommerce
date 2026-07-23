@@ -15,6 +15,7 @@ import {
 } from "react-icons/fi";
 import ButtonLoader from "../Layout/ButtonLoader/ButtonLoader";
 import Link from "next/link";
+import { socket } from "@/app/socket/socket";
 
 export default function ShopSidebarInfo({
   isOwner,
@@ -28,6 +29,7 @@ export default function ShopSidebarInfo({
   const handleLogout = async () => {
     setLogoutLoading(true);
     await api.post("/shop/logout");
+    socket.disconnect();
     router.push("/seller-login");
   };
 
