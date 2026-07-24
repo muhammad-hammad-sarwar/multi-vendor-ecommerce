@@ -5,6 +5,7 @@ declare global {
   namespace Express {
     interface Request {
       user?: IUser | IShop;
+      uploadedFiles?: { url: string; publicId: string }[];
     }
   }
 }

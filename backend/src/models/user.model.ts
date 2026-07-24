@@ -14,7 +14,7 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
-  avatar: string;
+  avatar: { publicId: string; url: string };
   addresses?: IAddress[];
   phoneNumber: string;
   role: "user" | "admin";
@@ -44,7 +44,7 @@ const userSchema = new Schema<IUser>(
       select: false,
     },
     avatar: {
-      type: String,
+      type: { publicId: String, url: String },
       required: true,
     },
     phoneNumber: {

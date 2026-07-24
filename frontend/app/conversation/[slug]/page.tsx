@@ -51,6 +51,8 @@ export default function CurrentConversationPage() {
         conversationId,
         createdAt: data?.message?.createdAt,
       });
+      // dispatch(addMessage(data?.message));
+      // dispatch(updateLastMessage(data?.message));
     } catch (error) {
       toast.error(error?.response?.data?.message);
     }
@@ -89,6 +91,7 @@ export default function CurrentConversationPage() {
 
   useEffect(() => {
     socket.on("getMessage", (message) => {
+      console.log(message);
       dispatch(addMessage(message));
       dispatch(updateLastMessage(message));
     });

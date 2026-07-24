@@ -54,6 +54,7 @@ export default function ProfileDetails() {
   if (loading || (!error && !user))
     return <LoadingDots text="Loading profile data..." />;
 
+  // user?.avatar?.url ??
   return (
     <div className="w-full max-w-4xl">
       <div className="max-w-28 mx-auto relative flex flex-col items-center mb-8">

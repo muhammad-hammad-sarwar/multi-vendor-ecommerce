@@ -5,7 +5,7 @@ import { User } from "../models/user.model.js";
 import { Shop } from "../models/shop.model.js";
 import { Product } from "../models/product.model.js";
 import { Event } from "../models/event.model.js";
-import { deleteFile } from "../utils/deleteFile.js";
+import { deleteMultipleFromCloudinary } from "../utils/deleteFile.js";
 
 export const getDashboard = async (req: Request, res: Response) => {};
 
@@ -51,7 +51,7 @@ export const deleteProduct = async (req: Request, res: Response) => {
   if (!product) throw new AppError("Product does not exists", 404);
 
   const images = product.images;
-  images.forEach((img) => deleteFile(img));
+  await deleteMultipleFromCloudinary(images);
 
   await product.deleteOne();
 
@@ -74,7 +74,7 @@ export const deleteEvent = async (req: Request, res: Response) => {
   if (!event) throw new AppError("Event does not exists", 404);
 
   const images = event.images;
-  images.forEach((img) => deleteFile(img));
+  await deleteMultipleFromCloudinary(images);
 
   await event.deleteOne();
 

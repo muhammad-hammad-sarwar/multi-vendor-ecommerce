@@ -26,7 +26,7 @@ export default function LoginPage() {
       dispatch(addShop(result.data?.shop));
       router.push(`/shop/${result.data?.shopId}`);
     } catch (error) {
-      toast.error(`${error}`);
+      toast.error(`${error.response?.data?.message}`);
     } finally {
       setLoading(false);
     }

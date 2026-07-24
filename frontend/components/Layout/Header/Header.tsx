@@ -46,7 +46,7 @@ export default function Header() {
   );
 
   useEffect(() => {}, [user]);
-
+  // user?.avatar?.url ??
   return (
     <>
       <header className="w-full border-b bg-white">

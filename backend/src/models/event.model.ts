@@ -22,7 +22,7 @@ export interface IEvent extends Document {
   }[];
 
   endDate: Date;
-  images: string[];
+  images: { publicId: string; url: string }[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -103,11 +103,7 @@ const eventSchema = new Schema<IEvent>(
       required: true,
     },
     shop: { type: mongoose.Schema.Types.ObjectId, ref: "shop" },
-    images: [
-      {
-        type: String,
-      },
-    ],
+    images: [{ publicId: String, url: String }],
   },
   { timestamps: true },
 );

@@ -1,12 +1,14 @@
 import { Router } from "express";
 import * as authController from "../controllers/auth.controller.js";
-import { upload } from "../middlewares/upload.middleware.js";
 import catchAsync from "../utils/catchAsync.js";
+import upload from "../middlewares/upload.middleware.js";
+import cloudinaryUpload from "../middlewares/cloudinary.upload.js";
 
 const authRouter = Router();
 authRouter.post(
   "/sign-up",
   upload.single("avatar"),
+  cloudinaryUpload("profile-pictures"),
   catchAsync(authController.signUp),
 );
 

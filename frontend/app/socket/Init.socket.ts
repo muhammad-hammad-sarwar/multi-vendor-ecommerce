@@ -8,19 +8,28 @@ export default function InitSocket() {
   const { isSeller, shop } = useAppSelector((state) => state.shop);
 
   useEffect(() => {
-    !socket.connected && socket.connect();
-    if (isAuthenticated && user._id) {
-      socket.on("connect", () => {
-        socket.emit("addUser", user._id);
-      });
+    const id = isAuthenticated ? user?._id : isSeller ? shop?._id : null;
+
+    if (!id) return;
+
+    if (!socket.connected) {
+      socket.connect();
     }
 
-    if (isSeller && shop._id) {
-      socket.on("connect", () => {
-        socket.emit("addUser", shop._id);
-      });
+    const register = () => {
+      socket.emit("addUser", id);
+    };
+
+    if (socket.connected) {
+      register();
+    } else {
+      socket.once("connect", register);
     }
-  }, [user?._id, shop?._id]);
+
+    return () => {
+      socket.off("connect", register);
+    };
+  }, [isAuthenticated, isSeller, user?._id, shop?._id]);
 
   return null;
 }

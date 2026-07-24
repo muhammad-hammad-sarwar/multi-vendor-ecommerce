@@ -5,8 +5,8 @@ export interface IShop extends Document {
   description: string;
   email: string;
   password: string;
-  avatar: string;
   address: string;
+  avatar: { publicId: string; url: string };
   phoneNumber: string;
   role: "seller";
   availableBalance: number;
@@ -50,7 +50,7 @@ const shopSchema = new Schema<IShop>(
       select: false,
     },
     avatar: {
-      type: String,
+      type: { publicId: String, url: String },
       required: true,
     },
     address: {

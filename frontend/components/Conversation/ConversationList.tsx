@@ -6,14 +6,23 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
 import { formatDistanceToNow } from "date-fns";
 import { ConversationListSkeleton } from "./ConversationListSkeleton";
 import { setConversation } from "@/redux/slices/conversations";
+import { useEffect, useState } from "react";
+import { socket } from "@/app/socket/socket";
 
 export default function ConversationList() {
   const params = useParams();
   const dispatch = useAppDispatch();
   const { isAuthenticated } = useAppSelector((state) => state.user);
+  const [onlineUsers, setOnlineUsers] = useState([]);
   const { conversations, loading, error } = useAppSelector(
     (state) => state.conversation,
   );
+
+  useEffect(() => {
+    socket.on("getUsers", (users) => {
+      setOnlineUsers(users);
+    });
+  }, []);
 
   if (loading || (!error && !conversations)) {
     return <ConversationListSkeleton />;
@@ -57,8 +66,9 @@ export default function ConversationList() {
                     className="h-13 w-13 rounded-full object-cover"
                   />
 
-                  {/* Replace with actual online status later */}
-                  <span className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white bg-green-500" />
+                  {onlineUsers.find((u) => u.userId == otherPerson._id) && (
+                    <span className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white bg-green-500" />
+                  )}
                 </div>
 
                 <div className="min-w-0 flex-1">

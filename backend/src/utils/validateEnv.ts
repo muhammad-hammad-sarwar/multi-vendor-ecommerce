@@ -6,6 +6,9 @@ export default function validateEnv() {
     "APP_PASSWORD",
     "STRIPE_SECRET_KEY",
     "STRIPE_API_KEY",
+    "CLOUD_NAME",
+    "CLOUDINARY_API_KEY",
+    "CLOUDINARY_API_SECRET",
   ];
 
   for (const key of required) {

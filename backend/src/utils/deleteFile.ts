@@ -1,12 +1,14 @@
-import fs from "fs";
-import path from "path";
+import { cloudinary } from "../server.js";
 
-export const deleteFile = (filename: string) => {
-  const filePath = path.join(process.cwd(), "uploads", filename);
+export const deleteFromCloudinary = async (publicId: string) => {
+  return await cloudinary.uploader.destroy(publicId);
+};
 
-  fs.unlink(filePath, (err) => {
-    if (err) {
-      console.log("File delete failed:", err.message);
-    }
-  });
+export interface UploadedFile {
+  publicId: string;
+  url: string;
+}
+
+export const deleteMultipleFromCloudinary = async (files: UploadedFile[]) => {
+  await Promise.all(files.map((file) => deleteFromCloudinary(file.publicId)));
 };

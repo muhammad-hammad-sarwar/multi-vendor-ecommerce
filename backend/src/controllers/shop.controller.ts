@@ -4,11 +4,11 @@ import { Shop } from "../models/shop.model.js";
 import bcrypt from "bcrypt";
 import { sendEmail } from "../utils/sendEmail.js";
 import jwt from "jsonwebtoken";
-import { deleteFile } from "../utils/deleteFile.js";
 import { shopSchema, withdrawMethodSchema } from "../schemas/shop.schema.js";
 import { Product } from "../models/product.model.js";
 import { Event } from "../models/event.model.js";
 import { Withdraw } from "../models/withdraw.model.js";
+import { deleteFromCloudinary } from "../utils/deleteFile.js";
 
 export const signUp = async (
   req: Request,
@@ -18,9 +18,10 @@ export const signUp = async (
   const { success, error, data } = shopSchema.safeParse(req.body);
   if (!success) throw new AppError(`${error.issues[0]?.message}`, 400);
   const shop = await Shop.findOne({ email: data.email });
+  const file = req.uploadedFiles?.[0];
   if (shop) {
     // Delete the shop avatar
-    req.file?.filename && deleteFile(req.file?.filename);
+    file?.publicId && deleteFromCloudinary(file?.publicId);
     throw new AppError("shop with this email already exists", 409);
   }
 
@@ -29,10 +30,9 @@ export const signUp = async (
   const verifyTokenHashUUID = crypto.randomUUID();
   const verifyTokenHash = await bcrypt.hash(verifyTokenHashUUID, 10);
   const verifyTokenExpiry = new Date(Date.now() + 10 * 60 * 1000);
-  const avatar = req.file?.filename;
   const newShop = await Shop.create({
     ...data,
-    avatar,
+    avatar: file,
     password: hashedPassword,
     verifyTokenHash,
     verifyTokenExpiry,
@@ -214,6 +214,7 @@ export const deleteProductById = async (req: Request, res: Response) => {
   if (product.shop.toString() != req?.user?._id.toString())
     throw new AppError("You are Not Authorized to delete the product", 401);
 
+  product.images.forEach((img) => deleteFromCloudinary(img?.publicId));
   await Product.deleteOne({ _id: id });
   const products = await Product.find({ shop: req.user._id });
 

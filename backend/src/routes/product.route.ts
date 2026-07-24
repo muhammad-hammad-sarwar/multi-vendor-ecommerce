@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { upload } from "../middlewares/upload.middleware.js";
 import * as productController from "../controllers/product.controller.js";
 import catchAsync from "../utils/catchAsync.js";
 import { isAuthenticated, isSeller } from "../middlewares/auth.js";
+import upload from "../middlewares/upload.middleware.js";
+import cloudinaryUpload from "../middlewares/cloudinary.upload.js";
 
 const productRouter = Router();
 
@@ -10,6 +11,7 @@ productRouter.post(
   "/",
   isSeller,
   upload.array("images"),
+  cloudinaryUpload("products"),
   catchAsync(productController.createProduct),
 );
 

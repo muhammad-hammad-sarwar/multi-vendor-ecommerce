@@ -1,8 +1,9 @@
 import { Router } from "express";
 import * as profileController from "../controllers/profile.controller.js";
-import { upload } from "../middlewares/upload.middleware.js";
 import catchAsync from "../utils/catchAsync.js";
 import { isAuthenticated, isSeller } from "../middlewares/auth.js";
+import upload from "../middlewares/upload.middleware.js";
+import cloudinaryUpload from "../middlewares/cloudinary.upload.js";
 
 const profileRouter = Router();
 
@@ -10,6 +11,7 @@ profileRouter.put(
   "/avatar",
   isAuthenticated,
   upload.single("avatar"),
+  cloudinaryUpload("profile-pictures"),
   catchAsync(profileController.updateProfileAvatar),
 );
 

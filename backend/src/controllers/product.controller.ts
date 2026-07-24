@@ -2,13 +2,20 @@ import { Request, Response } from "express";
 import { createProductSchema } from "../schemas/product.schema.js";
 import { Product } from "../models/product.model.js";
 import { AppError } from "../utils/AppError.js";
-import { deleteFile } from "../utils/deleteFile.js";
 import { Order } from "../models/order.model.js";
 import { Event } from "../models/event.model.js";
+import { deleteMultipleFromCloudinary } from "../utils/deleteFile.js";
 
 export const createProduct = async (req: Request, res: Response) => {
-  const files = req.files as Express.Multer.File[];
+  const files = req.uploadedFiles;
   try {
+    if (!files || files.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Please upload at least one image.",
+      });
+    }
+
     const result = createProductSchema.safeParse(req.body);
 
     if (!files || files.length === 0)
@@ -16,7 +23,7 @@ export const createProduct = async (req: Request, res: Response) => {
 
     if (!result.success) {
       // Delete Product images
-      files.forEach((file) => deleteFile(file.filename));
+      await deleteMultipleFromCloudinary(files);
 
       return res.status(400).json({
         success: false,
@@ -26,15 +33,13 @@ export const createProduct = async (req: Request, res: Response) => {
 
     if (!req.user) {
       // Delete Product images
-      files.forEach((file) => deleteFile(file.filename));
+      await deleteMultipleFromCloudinary(files);
       throw new AppError("Please login to continue.", 401);
     }
 
-    const images = files.map((file) => file.filename);
-
     const product = await Product.create({
       ...result.data,
-      images,
+      images: files,
       shop: req?.user._id,
       sold_out: 0,
     });
@@ -45,7 +50,7 @@ export const createProduct = async (req: Request, res: Response) => {
     });
   } catch (error) {
     // deleting files
-    files?.forEach((file) => deleteFile(file.filename));
+    files && files.length > 0 && (await deleteMultipleFromCloudinary(files));
   }
 };
 

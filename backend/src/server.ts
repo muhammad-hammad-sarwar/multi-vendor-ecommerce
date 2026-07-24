@@ -3,6 +3,7 @@ dotenv.config();
 import validateEnv from "./utils/validateEnv.js";
 import stripe from "stripe";
 import { connectDB } from "./db/database.js";
+import { v2 as cloudinary } from "cloudinary";
 validateEnv();
 
 import express from "express";
@@ -22,10 +23,25 @@ import conversationRouter from "./routes/conversation.route.js";
 import messageRouter from "./routes/message.route.js";
 import adminRouter from "./routes/admin.route.js";
 import withdrawRouter from "./routes/withdraw.route.js";
+import { AppError } from "./utils/AppError.js";
 
 if (!process.env?.STRIPE_SECRET_KEY)
   throw new Error("STRIPE_SECRET_KEY is missing");
 export const Stripe = new stripe(process.env?.STRIPE_SECRET_KEY);
+
+if (!process.env.CLOUD_NAME) throw new Error("CLOUD_NAME is missing");
+
+if (!process.env.CLOUDINARY_API_KEY)
+  throw new Error("CLOUDINARY_API_KEY is missing");
+
+if (!process.env.CLOUDINARY_API_SECRET)
+  throw new Error("CLOUDINARY_API_SECRET is missing");
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const app = express();
 
@@ -74,3 +90,4 @@ if (process.env.NODE_ENV === "development") {
 
 // For vercel
 export default app;
+export { cloudinary };

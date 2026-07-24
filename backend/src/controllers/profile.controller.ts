@@ -2,17 +2,21 @@ import { Request, Response } from "express";
 import { AppError } from "../utils/AppError.js";
 import { User } from "../models/user.model.js";
 import bcrypt from "bcrypt";
-import { deleteFile } from "../utils/deleteFile.js";
+import { deleteFromCloudinary } from "../utils/deleteFile.js";
 
 export const updateProfileAvatar = async (req: Request, res: Response) => {
   if (!req?.user) throw new AppError("Please login to continue", 401);
-  if (!req.file?.filename) throw new AppError("Please Enter the file", 400);
-
-  if (req?.user?.avatar) {
-    deleteFile(req.user?.avatar);
+  const file = req.uploadedFiles?.[0];
+  if (file?.publicId) throw new AppError("Please Enter the file", 400);
+  if (req?.user?.avatar?.publicId) {
+    deleteFromCloudinary(req.user?.avatar?.publicId);
   }
 
-  req.user.avatar = req.file?.filename;
+  if (!file?.publicId) {
+    throw new AppError("Avatar Not available", 404);
+  }
+
+  req.user.avatar = file;
   await req.user?.save();
 
   return res.status(200).json({
@@ -100,7 +104,7 @@ export const updateProfilePassword = async (req: Request, res: Response) => {
 };
 
 export const updateProfileAddresses = async (req: Request, res: Response) => {
-  if (!req.user) {
+  if (!req.user || req.user.role != "user") {
     throw new AppError("Please login to continue.", 401);
   }
 
@@ -140,7 +144,7 @@ export const updateProfileAddresses = async (req: Request, res: Response) => {
 };
 
 export const deleteUserAddress = async (req: Request, res: Response) => {
-  if (!req.user) {
+  if (!req.user || req.user.role != "user") {
     throw new AppError("Please login to continue.", 401);
   }
 

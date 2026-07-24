@@ -1,14 +1,16 @@
 import { Router } from "express";
 import * as shopController from "../controllers/shop.controller.js";
-import { upload } from "../middlewares/upload.middleware.js";
 import catchAsync from "../utils/catchAsync.js";
 import { isSeller } from "../middlewares/auth.js";
 import { updateProfileAvatar } from "../controllers/profile.controller.js";
+import upload from "../middlewares/upload.middleware.js";
+import cloudinaryUpload from "../middlewares/cloudinary.upload.js";
 
 const shopRouter = Router();
 shopRouter.post(
   "/sign-up",
   upload.single("avatar"),
+  cloudinaryUpload("profile-pictures"),
   catchAsync(shopController.signUp),
 );
 
@@ -26,6 +28,7 @@ shopRouter.put(
   "/avatar",
   isSeller,
   upload.single("avatar"),
+  cloudinaryUpload("profile-pictures"),
   catchAsync(updateProfileAvatar),
 );
 

@@ -28,8 +28,7 @@ export default function LoginPage() {
       dispatch(addUserWhileLogin(res.data?.user));
       router.push("/");
     } catch (error) {
-      console.log(error);
-      toast.error(`${error}`);
+      toast.error(`${error.response?.data?.message}`);
     } finally {
       setLoading(false);
     }

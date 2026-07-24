@@ -4,19 +4,19 @@ import { User } from "../models/user.model.js";
 import bcrypt from "bcrypt";
 import { sendEmail } from "../utils/sendEmail.js";
 import jwt from "jsonwebtoken";
-import { deleteFile } from "../utils/deleteFile.js";
+import { deleteFromCloudinary } from "../utils/deleteFile.js";
 
 export const signUp = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
-  console.log(process.env?.DB_URL);
-  const { name, email, password, address } = req.body;
+  const { name, email, password } = req.body;
   const user = await User.findOne({ email });
+  const file = req.uploadedFiles?.[0];
   if (user) {
     // Delete the user avatar
-    req.file?.filename && deleteFile(req.file?.filename);
+    file?.publicId && deleteFromCloudinary(file?.publicId);
     throw new AppError("user with this email already exists", 409);
   }
 
@@ -25,13 +25,11 @@ export const signUp = async (
   const verifyTokenHashUUID = crypto.randomUUID();
   const verifyTokenHash = await bcrypt.hash(verifyTokenHashUUID, 10);
   const verifyTokenExpiry = new Date(Date.now() + 10 * 60 * 1000);
-  const avatar = req.file?.filename;
   const newUser = await User.create({
     name,
     email,
     password: hashedPassword,
-    avatar,
-    // address,
+    avatar: file,
     verifyTokenHash,
     verifyTokenExpiry,
   });
@@ -58,7 +56,9 @@ export const verifyToken = async (
   next: NextFunction,
 ) => {
   const { uid, token } = req.body;
-  const user = await User.findOne({ _id: uid });
+  const user = await User.findOne({ _id: uid }).select(
+    "+verifyTokenHash +verifyTokenExpiry +isVerified",
+  );
   if (!user) throw new AppError("User not found", 404);
 
   const verifyTokenExpiry = user.verifyTokenExpiry;
@@ -93,12 +93,16 @@ export const resendVerification = async (
     throw new AppError("Email is required", 400);
   }
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email }).select(
+    "+verifyTokenHash +verifyTokenExpiry +isVerified",
+  );
   if (!user) throw new AppError("User not found", 404);
 
-  if (user.isVerified) {
-    throw new AppError("User already verified", 400);
-  }
+  if (user.isVerified)
+    return res.json({ success: true, message: "You are Verified" });
+
+  if (user.verifyTokenExpiry > new Date())
+    throw new AppError("Email has already been sent. Please wait!", 400);
 
   const verifyTokenHash = crypto.randomUUID();
   const hashedToken = await bcrypt.hash(verifyTokenHash, 10);

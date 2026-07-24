@@ -45,7 +45,7 @@ export default function SignUpPage() {
         "Registered successfully. Please check mail for link to verify your account",
       );
     } catch (error) {
-      toast.error(`${error}`);
+      toast.error(`${error?.response?.data?.message}`);
     } finally {
       setLoading(false);
     }

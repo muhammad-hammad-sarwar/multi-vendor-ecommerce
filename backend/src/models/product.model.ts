@@ -18,7 +18,7 @@ export interface IProduct extends Document {
   }[];
   sold_out: number;
   shop: Types.ObjectId;
-  images: string[];
+  images: { publicId: string; url: string }[];
   createdAt: Date;
   updatedAt: Date;
 
@@ -98,11 +98,7 @@ const productSchema = new Schema<IProduct>(
       default: 0,
     },
     shop: { type: mongoose.Schema.Types.ObjectId, ref: "shop" },
-    images: [
-      {
-        type: String,
-      },
-    ],
+    images: [{ publicId: String, url: String }],
   },
   { timestamps: true },
 );
