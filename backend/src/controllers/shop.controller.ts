@@ -176,7 +176,11 @@ export const loadShop = async (req: Request, res: Response) => {
 };
 
 export const logout = async (req: Request, res: Response) => {
-  res.clearCookie("seller_token");
+  res.clearCookie("seller_token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV !== "development",
+    sameSite: process.env.NODE_ENV === "development" ? "lax" : "none",
+  });
 
   res.json({ success: true, message: "Logged out successfully" });
 };
