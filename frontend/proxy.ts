@@ -2,65 +2,62 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function proxy(request: NextRequest) {
-  const token = (await cookies()).get("token");
-  const sellerToken = (await cookies()).get("seller_token");
-  const { pathname } = request.nextUrl;
+  // const token = (await cookies()).get("token");
+  // const sellerToken = (await cookies()).get("seller_token");
+  // const { pathname } = request.nextUrl;
 
-  console.log("Cookies:", request.cookies.getAll());
-  console.log("Token:", request.cookies.get("token"));
+  // console.log("Cookies:", request.cookies.getAll());
+  // console.log("Token:", request.cookies.get("token"));
 
-  if (
-    (sellerToken || token) &&
-    (pathname === "/seller-login" ||
-      pathname === "/seller-sign-up" ||
-      pathname === "/login" ||
-      pathname === "/sign-up")
-  ) {
-    return NextResponse.redirect(
-      new URL(token ? "/profile" : "/seller/dashboard", request.url),
-    );
-  }
+  // if (
+  //   (sellerToken || token) &&
+  //   (pathname === "/seller-login" ||
+  //     pathname === "/seller-sign-up" ||
+  //     pathname === "/login" ||
+  //     pathname === "/sign-up")
+  // ) {
+  //   return NextResponse.redirect(
+  //     new URL(token ? "/profile" : "/seller/dashboard", request.url),
+  //   );
+  // }
 
-  if (
-    !token &&
-    (pathname == "/checkout" ||
-      pathname.startsWith("/profile") ||
-      pathname.startsWith("/admin"))
-  ) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
+  // if (
+  //   !token &&
+  //   (pathname == "/checkout" ||
+  //     pathname.startsWith("/profile") ||
+  //     pathname.startsWith("/admin"))
+  // ) {
+  //   return NextResponse.redirect(new URL("/login", request.url));
+  // }
 
-  if (
-    !sellerToken &&
-    ((pathname.startsWith("/shop") && !pathname.startsWith("/shop/preview")) ||
-      (pathname.startsWith("/seller") &&
-        pathname !== "/seller-login" &&
-        pathname !== "/seller-sign-up"))
-  ) {
-    return NextResponse.redirect(new URL("/seller-login", request.url));
-  }
+  // if (
+  //   !sellerToken &&
+  //   ((pathname.startsWith("/shop") && !pathname.startsWith("/shop/preview")) ||
+  //     (pathname.startsWith("/seller") &&
+  //       pathname !== "/seller-login" &&
+  //       pathname !== "/seller-sign-up"))
+  // ) {
+  //   return NextResponse.redirect(new URL("/seller-login", request.url));
+  // }
 
-  if (!token && !sellerToken && pathname.startsWith("/conversation")) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
+  // if (!token && !sellerToken && pathname.startsWith("/conversation")) {
+  //   return NextResponse.redirect(new URL("/login", request.url));
+  // }
 
   return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    "/profile/:path*",
-    "/shop/:path*",
-    "/seller/:path*",
-    "/admin/:path*",
-    "/conversation/:path*",
-
-    "/login",
-    "/sign-up",
-
-    "/seller-login",
-    "/seller-sign-up",
-
-    "/checkout",
+    // "/profile/:path*",
+    // "/shop/:path*",
+    // "/seller/:path*",
+    // "/admin/:path*",
+    // "/conversation/:path*",
+    // "/login",
+    // "/sign-up",
+    // "/seller-login",
+    // "/seller-sign-up",
+    // "/checkout",
   ],
 };
