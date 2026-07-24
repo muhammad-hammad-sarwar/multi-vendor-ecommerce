@@ -219,7 +219,7 @@ export default function PaymentPage({ fullName: name, amount, setStep }) {
                     type="submit"
                     className="cursor-pointer mt-4 h-11 rounded-lg bg-green-600 px-6 text-white"
                   >
-                    {loading ? <ButtonLoader /> : `Pay ${amount}`}
+                    {loading ? <ButtonLoader /> : `Pay $${amount}`}
                   </button>
                 </form>
               )}

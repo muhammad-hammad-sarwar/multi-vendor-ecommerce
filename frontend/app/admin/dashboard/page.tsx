@@ -3,12 +3,10 @@ import Link from "next/link";
 import { Wallet, ShoppingBag, Store, ArrowRight } from "lucide-react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Chip } from "@mui/material";
-import { FiEye } from "react-icons/fi";
 
 import { useAppSelector } from "@/redux/hooks/hooks";
 
 export default function AdminDashboard() {
-  const { user } = useAppSelector((state) => state.user);
   const { orders, sellers, loading, error } = useAppSelector(
     (state) => state.admin,
   );
@@ -65,18 +63,6 @@ export default function AdminDashboard() {
       flex: 1,
       minWidth: 120,
     },
-    {
-      field: "view",
-      headerName: "View",
-      sortable: false,
-      filterable: false,
-      minWidth: 100,
-      renderCell: ({ row }) => (
-        <Link href={`/admin/orders/${row.orderId}`} className="pt-3 block">
-          <FiEye size={18} />
-        </Link>
-      ),
-    },
   ];
 
   const rows =
@@ -94,7 +80,7 @@ export default function AdminDashboard() {
   const totalRevenue =
     orders?.reduce((acc, order) => {
       if (
-        order.paymentInfo?.status === "succedded" &&
+        order.paymentInfo?.status === "succeeded" ||
         order.status === "Delivered"
       ) {
         return acc + (order.totalPrice ?? 0);
@@ -123,10 +109,6 @@ export default function AdminDashboard() {
                 <div>
                   <p className="text-sm font-medium text-gray-500">
                     Total Earnings
-                  </p>
-
-                  <p className="mt-1 text-xs text-gray-400">
-                    10% commission from successful payments
                   </p>
                 </div>
 

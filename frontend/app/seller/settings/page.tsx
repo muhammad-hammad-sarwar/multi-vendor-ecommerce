@@ -17,6 +17,7 @@ import {
   FiUser,
   FiLock,
 } from "react-icons/fi";
+import { toast } from "react-toastify";
 
 export default function SellerSettings() {
   const {
@@ -34,16 +35,19 @@ export default function SellerSettings() {
   const [password, setPassword] = useState("");
   const dispatch = useAppDispatch();
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setAvatar(file);
     const formData = new FormData();
     formData.append("avatar", file);
-
-    dispatch(updateShopAvatar(formData)).then(() => {
+    const success = await dispatch(updateShopAvatar(formData));
+    if (success) {
       setAvatar(file);
-    });
+      toast.success("Avatar Updated Successfully.");
+      return;
+    }
+
+    toast.error("Avatar was not updated. Please try again");
   };
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
@@ -57,7 +61,7 @@ export default function SellerSettings() {
         address,
         description,
       }),
-    );
+    ).then(() => setPassword(""));
   };
 
   useEffect(() => {
@@ -85,11 +89,7 @@ export default function SellerSettings() {
           <div className="h-40 w-40 rounded-full overflow-hidden border-4 border-blue-100 shadow-lg">
             {avatar || shop?.avatar ? (
               <Image
-                src={
-                  avatar
-                    ? URL.createObjectURL(avatar)
-                    : `http://localhost:8000/uploads/${shop?.avatar}`
-                }
+                src={avatar ? URL.createObjectURL(avatar) : shop?.avatar?.url}
                 alt="Shop Avatar"
                 width={160}
                 height={160}

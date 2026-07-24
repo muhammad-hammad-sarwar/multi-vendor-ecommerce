@@ -49,7 +49,7 @@ export function ProductCard({
           <div className="h-88 bg-white border rounded-xl p-4 hover:shadow-md transition flex flex-col gap-3">
             <div className="relative w-full h-40">
               <img
-                src={`http://localhost:8000/uploads/${product?.images?.[0]}`}
+                src={product?.images?.[0]?.url}
                 alt={product.name}
                 className="w-full h-full object-cover rounded-lg"
               />

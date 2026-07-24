@@ -1,6 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 
+export interface Img {
+  url: string;
+  publicId: string;
+  _id: string;
+}
+
 export interface IAddress {
   _id: string;
   country: string;
@@ -15,7 +21,7 @@ export interface IUser {
   _id: string;
   name: string;
   email: string;
-  avatar: string;
+  avatar: Img;
   addresses?: IAddress[];
   phoneNumber: string;
   isVerified: boolean;

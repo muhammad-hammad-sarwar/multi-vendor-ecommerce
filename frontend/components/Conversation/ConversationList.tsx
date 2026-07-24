@@ -7,7 +7,7 @@ import { formatDistanceToNow } from "date-fns";
 import { ConversationListSkeleton } from "./ConversationListSkeleton";
 import { setConversation } from "@/redux/slices/conversations";
 import { useEffect, useState } from "react";
-import { socket } from "@/app/socket/socket";
+import { socket } from "@/socket/socket";
 
 export default function ConversationList() {
   const params = useParams();
@@ -58,7 +58,7 @@ export default function ConversationList() {
               >
                 <div className="relative">
                   <Image
-                    src={`http://localhost:8000/uploads/${otherPerson.avatar}`}
+                    src={otherPerson.avatar?.url}
                     alt={otherPerson.name}
                     width={52}
                     height={52}

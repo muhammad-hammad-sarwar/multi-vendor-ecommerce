@@ -4,7 +4,7 @@ import "./globals.css";
 import { ToastContainer } from "react-toastify";
 import AppProvider from "@/redux/Provider";
 import ReduxAppInit from "@/redux/ReduxAppInit";
-import InitSocket from "./socket/Init.socket";
+import InitSocket from "../hooks/Init.socket";
 
 const poppins = Poppins({
   variable: "--font-poppins",

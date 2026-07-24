@@ -46,7 +46,7 @@ export default function Header() {
   );
 
   useEffect(() => {}, [user]);
-  // user?.avatar?.url ??
+
   return (
     <>
       <header className="w-full border-b bg-white">
@@ -91,8 +91,8 @@ export default function Header() {
                       className="flex items-center gap-3 p-3 hover:bg-gray-100"
                     >
                       <Image
-                        src={`http://localhost:8000/uploads/${product?.images?.[0]}`}
-                        alt={product?.name}
+                        src={product?.images?.[0]?.url}
+                        alt={"product"}
                         width={60}
                         height={60}
                         className="rounded-md object-cover"
@@ -184,7 +184,7 @@ export default function Header() {
                   <Image
                     width={34}
                     height={34}
-                    src={`http://localhost:8000/uploads/${user?.avatar}`}
+                    src={user?.avatar?.url}
                     alt="avatar"
                     className="object-cover"
                     unoptimized // remove this when use cloudinary
@@ -262,12 +262,16 @@ export default function Header() {
               {filteredProducts.length ? (
                 filteredProducts.map((product) => (
                   <Link
+                    onClick={() => {
+                      setOpen(false);
+                      setSearch("");
+                    }}
                     key={product?._id}
-                    href={`/products/${encodeURIComponent(product?.name)}`}
+                    href={`/products/${product?._id}`}
                     className="flex items-center gap-3 p-3 hover:bg-gray-100"
                   >
                     <Image
-                      src={`http://localhost:8000/uploads/${product?.images?.[0]}`}
+                      src={product?.images?.[0]?.url}
                       alt={product?.name}
                       width={60}
                       height={60}
@@ -313,7 +317,7 @@ export default function Header() {
                 <Image
                   width={80}
                   height={80}
-                  src={`http://localhost:8000/uploads/${user?.avatar}`}
+                  src={user?.avatar?.url}
                   alt="avatar"
                   className="object-cover"
                   unoptimized // remove this when use cloudinary

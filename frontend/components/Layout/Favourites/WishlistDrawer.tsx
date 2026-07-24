@@ -63,7 +63,7 @@ export function WishlistDrawer({
               </div>
 
               <img
-                src={`http://localhost:8000/uploads/${item?.images?.[0]}`}
+                src={item?.images?.[0]?.url}
                 className="w-20 h-20 object-cover rounded"
               />
 

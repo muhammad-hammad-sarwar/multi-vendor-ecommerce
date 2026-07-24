@@ -109,7 +109,7 @@ export default function OrderDetails() {
           >
             <div className="flex gap-4">
               <img
-                src={`http://localhost:8000/uploads/${item?.images[0]}`}
+                src={item?.images[0]?.url}
                 alt={item?.name}
                 className="w-20 h-20 rounded-lg object-cover border"
               />

@@ -18,6 +18,8 @@ import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
 import api from "@/axios/api";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+import { loadSellerEvents } from "@/redux/actions/event";
+import { useAppDispatch } from "@/redux/hooks/hooks";
 
 export default function CreateEvent() {
   const [loading, setLoading] = useState(false);
@@ -34,6 +36,7 @@ export default function CreateEvent() {
   const [images, setImages] = useState<File[]>([]);
   const today = new Date().toISOString().split("T")[0];
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   const getMinEndDate = (start: string) => {
     if (!start) return "";
@@ -61,6 +64,10 @@ export default function CreateEvent() {
 
   const handleImages = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
+    if (e.target.files?.length + images?.length > 5) {
+      toast.error("MAX 5 Images Allowed");
+      return;
+    }
 
     setImages((prev) => [...prev, ...Array.from(e.target.files)]);
   };
@@ -78,7 +85,7 @@ export default function CreateEvent() {
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (originalPrice <= discountPrice) {
+    if (Number(originalPrice) < Number(discountPrice)) {
       toast.error("Discount Price must be lesser than original price");
       return;
     }
@@ -100,23 +107,32 @@ export default function CreateEvent() {
       formData.append("tags[]", tag);
     });
 
-    images.forEach((image) => {
+    images?.forEach((image) => {
       formData.append("images", image);
     });
 
     try {
-      console.log("Start Date", formData.get("startDate"));
-      console.log("End Date", formData.get("endDate"));
-
       await api.post("/events", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
       toast.success("Event created successfully");
+      dispatch(loadSellerEvents());
       router.push("/seller/events");
     } catch (error) {
       toast.error(error?.response?.data?.message);
     } finally {
+      setName("");
+      setDescription("");
+      setCategory("");
+      setTagInput("");
+      setTags([]);
+      setOriginalPrice("");
+      setDiscountPrice("");
+      setStartDate(null);
+      setEndDate(null);
+      setStock("");
+      setImages([]);
       setLoading(false);
     }
   };

@@ -28,12 +28,12 @@ export default function OrderSuccessPage() {
         </p>
 
         <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-          <Link
+          {/* <Link
             href="/orders"
             className="px-6 py-3 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition font-medium"
           >
             View My Orders
-          </Link>
+          </Link> */}
 
           <Link
             href="/products"

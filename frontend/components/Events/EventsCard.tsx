@@ -10,7 +10,7 @@ export default function EventCard({ event }: { event: IEvent }) {
     <div className="w-full border rounded-xl flex flex-col md:flex-row overflow-hidden hover:shadow-md transition bg-white">
       <div className="w-full md:w-[320px] h-55 relative shrink-0">
         <Image
-          src={`http://localhost:8000/uploads/${event?.images[0]}`}
+          src={event?.images[0]?.url}
           alt={event?.name}
           fill
           className="object-cover"

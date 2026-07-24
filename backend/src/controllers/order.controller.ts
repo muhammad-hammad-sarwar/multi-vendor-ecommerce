@@ -107,8 +107,6 @@ export const updateStatus = async (req: Request, res: Response) => {
   const shop = req.user;
   if (!shop || shop.role != "seller")
     throw new AppError("Please login to continue", 401);
-  const admin = await User.findOne({ role: "admin" });
-  if (!admin) throw new AppError("Admin is Unavailable", 400);
 
   const { orderId, status } = req.params;
   if (!orderId || !status)
@@ -128,15 +126,14 @@ export const updateStatus = async (req: Request, res: Response) => {
 
   if (status == "Delivered") {
     order.deliveredAt = new Date();
-    if (order.paymentInfo) order.paymentInfo.status = "succedded";
+    if (order.paymentInfo) order.paymentInfo.status = "succeeded";
     // Add to seller account
     const sellerShare = +(order.totalPrice * 0.9).toFixed(2);
     shop.availableBalance += sellerShare;
-    // admin.availableBalance += order.totalPrice;
   }
 
   order.status = status;
-  Promise.all([await order.save(), await shop.save(), await admin.save()]);
+  Promise.all([await order.save(), await shop.save()]);
 
   return res.json({
     success: true,

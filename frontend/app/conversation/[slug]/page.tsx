@@ -1,5 +1,5 @@
 "use client";
-import { socket } from "@/app/socket/socket";
+import { socket } from "@/socket/socket";
 import api from "@/axios/api";
 import { MessageSkeleton } from "@/components/Conversation/MessageSkeleton";
 import { getMessages } from "@/redux/actions/message";
@@ -125,8 +125,8 @@ export default function CurrentConversationPage() {
         </button>
 
         <Image
-          src={`http://localhost:8000/uploads/${otherPerson?.avatar}`}
-          alt={otherPerson?.avatar || "Avatar"}
+          src={otherPerson?.avatar?.url}
+          alt={otherPerson?.avatar?._id || "Avatar"}
           width={52}
           height={52}
           unoptimized

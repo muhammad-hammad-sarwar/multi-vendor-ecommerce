@@ -13,6 +13,8 @@ import Rating from "@/components/Common/Ratings";
 import { createConversation } from "@/redux/actions/conversations";
 import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
 import { toast } from "react-toastify";
+import Image from "next/image";
+import { IEvent } from "@/redux/slices/events";
 
 export default function ProductDetailsPage() {
   const params = useParams();
@@ -26,11 +28,9 @@ export default function ProductDetailsPage() {
     loading: eventLoading,
     error: EventError,
   } = useAppSelector((state) => state.events);
-  const {
-    loading: conversationLoading,
-    conversation,
-    error: ConversationError,
-  } = useAppSelector((state) => state.conversation);
+  const { loading: conversationLoading } = useAppSelector(
+    (state) => state.conversation,
+  );
   const product = isEvent
     ? allEvents?.find((item) => item._id === params.slug)
     : allProducts?.find((item) => item._id === params.slug);
@@ -65,6 +65,7 @@ export default function ProductDetailsPage() {
       setActiveImage(product?.images?.[0]);
     }
   }, [params, allProducts, wishlist]);
+
   const handleMessage = async () => {
     if (!isAuthenticated) {
       toast.error("Please login to continue");
@@ -129,19 +130,23 @@ export default function ProductDetailsPage() {
       <div className="grid md:grid-cols-2 gap-10">
         <div>
           <img
-            src={`http://localhost:8000/uploads/${activeImage}`}
+            src={activeImage?.url}
             className="w-full h-100 object-contain border rounded-lg"
           />
 
           <div className="flex gap-3 mt-4">
-            {product?.images.map((img) => (
-              <img
-                key={img}
-                src={`http://localhost:8000/uploads/${img}`}
+            {product?.images.map((img, i) => (
+              <Image
+                key={img?._id || i}
+                src={img?.url}
+                alt={"Product"}
+                width={80}
+                height={80}
                 onClick={() => setActiveImage(img)}
                 className={`w-20 h-20 object-cover border rounded cursor-pointer ${
                   activeImage === img ? "border-blue-500" : ""
                 }`}
+                unoptimized
               />
             ))}
           </div>
@@ -164,14 +169,26 @@ export default function ProductDetailsPage() {
           </div>
 
           <div className="flex items-center gap-4">
-            <button
-              onClick={() =>
-                dispatch(addToCart({ ...product, isEvent: isEvent === "true" }))
-              }
-              className="cursor-pointer bg-black text-white px-6 py-2 rounded-lg flex items-center gap-2"
-            >
-              <FiShoppingCart /> Add to Cart
-            </button>
+            {isEvent &&
+            new Date((product as IEvent)?.startDate) > new Date() ? (
+              <p>
+                Event starts On:{" "}
+                <span className="font-bold">
+                  {new Date((product as IEvent)?.startDate).toLocaleString()}
+                </span>
+              </p>
+            ) : (
+              <button
+                onClick={() =>
+                  dispatch(
+                    addToCart({ ...product, isEvent: isEvent === "true" }),
+                  )
+                }
+                className="cursor-pointer bg-black text-white px-6 py-2 rounded-lg flex items-center gap-2"
+              >
+                <FiShoppingCart /> Add to Cart
+              </button>
+            )}
 
             {isFavourite ? (
               <button
@@ -212,7 +229,7 @@ export default function ProductDetailsPage() {
           <div className="flex items-center gap-4 border p-3 rounded-lg">
             <Link href={`/shop/preview/${product?.shop?._id}`}>
               <img
-                src={`http://localhost:8000/uploads/${product?.shop?.avatar}`}
+                src={product?.shop?.avatar?.url}
                 className="w-12 h-12 rounded-full"
               />
             </Link>
@@ -242,7 +259,7 @@ export default function ProductDetailsPage() {
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`pb-2 ${
+              className={`cursor-pointer pb-2 ${
                 tab === t ? "border-b-2 border-blue-600" : ""
               }`}
             >
@@ -261,16 +278,19 @@ export default function ProductDetailsPage() {
                 {product?.reviews?.length == 0 ? (
                   <h2>No Product Reviews</h2>
                 ) : (
-                  product?.reviews?.map((review) => (
+                  product?.reviews?.map((review, i) => (
                     <div
-                      key={review?._id}
+                      key={review?._id || i}
                       className="flex items-start justify-between gap-4 rounded-lg border p-4"
                     >
                       <div className="flex items-start gap-3">
-                        <img
-                          src={`http://localhost:8000/uploads/${review?.user?.avatar}`}
+                        <Image
+                          width={48}
+                          height={48}
+                          src={review?.user?.avatar?.url}
                           alt={review?.user?.name}
                           className="w-12 h-12 rounded-full object-cover border"
+                          unoptimized
                         />
 
                         <div>
@@ -295,15 +315,18 @@ export default function ProductDetailsPage() {
             <div className="rounded-xl border border-gray-200 bg-white p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <img
-                    src={`http://localhost:8000/uploads/${product?.shop.avatar}`}
-                    alt={product?.shop.name}
+                  <Image
+                    width={64}
+                    height={64}
+                    src={product?.shop?.avatar?.url}
+                    alt={product?.shop?.name}
                     className="h-16 w-16 rounded-full object-cover border"
+                    unoptimized
                   />
 
                   <div>
                     <h2 className="text-xl font-semibold text-gray-900">
-                      {product?.shop.name}
+                      {product?.shop?.name}
                     </h2>
 
                     <p className="text-sm text-gray-500">Verified Seller</p>

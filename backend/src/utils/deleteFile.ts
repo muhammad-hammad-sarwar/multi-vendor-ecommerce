@@ -1,6 +1,7 @@
 import { cloudinary } from "../server.js";
 
 export const deleteFromCloudinary = async (publicId: string) => {
+  if (!publicId) return;
   return await cloudinary.uploader.destroy(publicId);
 };
 

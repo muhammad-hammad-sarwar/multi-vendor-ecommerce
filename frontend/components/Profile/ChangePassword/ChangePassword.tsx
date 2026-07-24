@@ -123,10 +123,15 @@ export default function ChangePassword() {
         </div>
 
         <button
+          disabled={profileLoading}
           type="submit"
           className="w-full md:w-42 border-2 hover:bg-blue-600 hover:text-white border-blue-600 text-blue-600 px-6 h-12 rounded-lg font-medium cursor-pointer transition"
         >
-          {profileLoading ? <ButtonLoader /> : "Update Password"}
+          {profileLoading ? (
+            <ButtonLoader bg="bg-blue-600" />
+          ) : (
+            "Update Password"
+          )}
         </button>
       </form>
     </div>

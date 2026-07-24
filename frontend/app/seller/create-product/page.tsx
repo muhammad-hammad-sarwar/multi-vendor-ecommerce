@@ -14,9 +14,16 @@ import {
 import { categoriesData } from "@/lib/utils/static";
 import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
 import api from "@/axios/api";
+import { toast } from "react-toastify";
+import { loadCurrentShopProducts } from "@/redux/actions/shop.action";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
+import { useRouter } from "next/navigation";
 
 export default function CreateProduct() {
   const [loading, setLoading] = useState(false);
+  const dispatch = useAppDispatch();
+  const { shop } = useAppSelector((state) => state.shop);
+  const router = useRouter();
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -51,6 +58,10 @@ export default function CreateProduct() {
 
   const handleImages = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
+    if (e.target.files?.length + images?.length > 5) {
+      toast.error("MAX 5 Images Allowed");
+      return;
+    }
 
     const newImages = Array.from(e.target.files);
     setImages((prev) => [...prev, ...newImages]);
@@ -75,15 +86,25 @@ export default function CreateProduct() {
 
     tags.forEach((tag) => formData.append("tags[]", tag));
 
-    images.forEach((image) => {
-      formData.append("images", image);
-    });
-
     await api.post("/products", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
 
+    dispatch(loadCurrentShopProducts(shop?._id));
+
+    toast.success("Product Created Successfully");
+    setName("");
+    setDescription("");
+    setCategory("");
+    setTagInput("");
+    setTags([]);
+    setOriginalPrice("");
+    setDiscountPrice("");
+    setStock("");
+    setImages([]);
+
     setLoading(false);
+    router.push("/seller/products");
   };
 
   return (
@@ -103,7 +124,7 @@ export default function CreateProduct() {
             <FiBox className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
 
             <input
-              // required
+              required
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -123,7 +144,7 @@ export default function CreateProduct() {
             <FiFileText className="absolute left-3 top-4 text-gray-400" />
 
             <textarea
-              // required
+              required
               id="description"
               rows={5}
               value={description}
@@ -144,7 +165,7 @@ export default function CreateProduct() {
             <FiLayers className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
 
             <select
-              // required
+              required
               id="category"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
@@ -208,7 +229,7 @@ export default function CreateProduct() {
               <FiDollarSign className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
 
               <input
-                // required
+                required
                 id="originalPrice"
                 type="number"
                 value={originalPrice}
@@ -246,7 +267,7 @@ export default function CreateProduct() {
             <FiPackage className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
 
             <input
-              // required
+              required
               id="stock"
               type="number"
               value={stock}
@@ -265,7 +286,7 @@ export default function CreateProduct() {
 
           <label className="mt-2 flex items-center gap-3 cursor-pointer">
             <input
-              // required
+              required
               hidden
               multiple
               type="file"
@@ -280,12 +301,13 @@ export default function CreateProduct() {
           </label>
 
           <div className="flex gap-4 mt-5 flex-wrap">
-            {images.map((image) => (
+            {images.map((image, i) => (
               <div
                 key={image.name}
                 className="relative group overflow-hidden rounded-xl border bg-gray-100"
               >
                 <Image
+                  key={`${image.name} - ${i}`}
                   src={URL.createObjectURL(image)}
                   alt={image.name}
                   width={180}

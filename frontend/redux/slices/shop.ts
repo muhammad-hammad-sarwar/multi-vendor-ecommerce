@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Product } from "./product";
 import { toast } from "react-toastify";
 import { IEvent } from "./events";
+import { Img } from "./user";
 
 export interface WithdrawMethod {
   _id: string;
@@ -19,7 +20,7 @@ export interface IShop {
   description: string;
   email: string;
   password: string;
-  avatar: string;
+  avatar: Img;
   address: string;
   availableBalance: number;
   phoneNumber: string;
@@ -166,6 +167,10 @@ const shopSlice = createSlice({
       state.isSeller = false;
       state.shop = null;
     },
+
+    clearError(state) {
+      state.error = null;
+    },
   },
 });
 
@@ -199,5 +204,6 @@ export const {
   updateShopProfileFailure,
 
   logout,
+  clearError,
 } = shopSlice.actions;
 export default shopSlice.reducer;

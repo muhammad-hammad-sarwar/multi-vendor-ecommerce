@@ -4,7 +4,7 @@ import EventCard from "./EventsCard";
 export default function PopularEvents() {
   const { allEvents, loading, error } = useAppSelector((state) => state.events);
   return (
-    <section className="w-11/12 mx-auto py-10">
+    <section className="w-11/12 mx-auto ">
       <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-6">
         Popular Events
       </h2>
@@ -16,7 +16,7 @@ export default function PopularEvents() {
             <p className="text-sm">Loading Popular Events...</p>
           </div>
         ) : allEvents?.length == 0 ? (
-          <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-gray-300 bg-gray-50">
+          <div className="h-30 flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-gray-300 bg-gray-50">
             <h2 className="text-lg font-semibold text-gray-700">
               No Events Found
             </h2>

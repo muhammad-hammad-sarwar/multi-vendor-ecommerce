@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IShop } from "./shop";
-import { IUser } from "./user";
+import { Img, IUser } from "./user";
 
 export interface Product {
   _id: string;
@@ -13,7 +13,7 @@ export interface Product {
   stock: number;
   sold_out: number;
   shop: IShop;
-  images: string[];
+  images: Img[];
   createdAt: Date;
   updatedAt: Date;
   reviews: { comment: string; rating: number; user: IUser; _id: string }[];

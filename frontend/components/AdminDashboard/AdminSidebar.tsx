@@ -55,7 +55,7 @@ export const adminDashboardTabs: {
   },
   {
     name: "Settings",
-    url: "/admin/settings",
+    url: "/profile",
     icon: IoSettingsOutline,
   },
 ];

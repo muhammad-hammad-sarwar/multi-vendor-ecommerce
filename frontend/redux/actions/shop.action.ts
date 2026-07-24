@@ -65,15 +65,19 @@ export const updateShopAvatar =
   (formData: FormData) => async (dispatch: AppDispatch) => {
     try {
       dispatch(updateShopAvatarStart());
+      console.log(formData.get("avatar"));
       const res = await api.put("/shop/avatar", formData, {
         withCredentials: true,
       });
 
       dispatch(updateShopAvatarSuccess(res.data?.user));
+      return true;
     } catch (err) {
       dispatch(
         updateShopAvatarFailure(err?.response?.data?.message || "Failed"),
       );
+
+      return false;
     }
   };
 

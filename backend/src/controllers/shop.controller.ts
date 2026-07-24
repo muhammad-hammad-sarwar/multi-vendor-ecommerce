@@ -43,7 +43,7 @@ export const signUp = async (
   try {
     await sendEmail(
       data.email,
-      `http://localhost:3000/verify?uid=${newShop._id}&seller_token=${verifyTokenHashUUID}`,
+      `${process.env?.NODE_ENV === "development" ? "http://localhost:3000" : "https://multi-vendor-ecommerce-fe.vercel.app"}/verify?uid=${newShop._id}&seller_token=${verifyTokenHashUUID}`,
     );
   } catch (error) {
     throw new AppError("Error sending email: Please retry Verification", 500);
@@ -115,7 +115,7 @@ export const resendVerification = async (
   try {
     await sendEmail(
       shop.email,
-      `http://localhost:3000/verify?uid=${shop._id}&seller_token=${verifyTokenHash}`,
+      `${process.env?.NODE_ENV === "development" ? "http://localhost:3000" : "https://multi-vendor-ecommerce-fe.vercel.app"}/verify?uid=${shop._id}&seller_token=${verifyTokenHash}`,
     );
   } catch (error) {
     throw new AppError(
@@ -147,8 +147,8 @@ export const login = async (req: Request, res: Response) => {
   res
     .cookie("seller_token", token, {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: process.env.NODE_ENV === "development" ? false : true,
+      sameSite: process.env.NODE_ENV === "development" ? "lax" : "none",
       expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     })
     .json({

@@ -166,7 +166,6 @@ io.on("connection", (socket) => {
     console.log("❌ Disconnected:", socket.id, reason);
     removeUser(socket.id);
     io.emit("getUsers", users);
-    console.log("USERS", users);
   });
 });
 

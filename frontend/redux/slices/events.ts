@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IShop } from "./shop";
-import { IUser } from "./user";
+import { Img, IUser } from "./user";
 
 export interface IEvent {
   _id: string;
@@ -17,7 +17,7 @@ export interface IEvent {
   ratings: number;
   startDate: Date;
   endDate: Date;
-  images: string[];
+  images: Img[];
   createdAt: Date;
   updatedAt: Date;
 }

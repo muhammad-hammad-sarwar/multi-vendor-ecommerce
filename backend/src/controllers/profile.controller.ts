@@ -7,7 +7,6 @@ import { deleteFromCloudinary } from "../utils/deleteFile.js";
 export const updateProfileAvatar = async (req: Request, res: Response) => {
   if (!req?.user) throw new AppError("Please login to continue", 401);
   const file = req.uploadedFiles?.[0];
-  if (file?.publicId) throw new AppError("Please Enter the file", 400);
   if (req?.user?.avatar?.publicId) {
     deleteFromCloudinary(req.user?.avatar?.publicId);
   }

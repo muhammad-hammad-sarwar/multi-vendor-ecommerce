@@ -7,6 +7,10 @@ import { Product } from "@/redux/slices/product";
 import { addToCart } from "@/redux/slices/cart";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
 import { addToWishlist, removeFromWishlist } from "@/redux/slices/wishlist";
+import { createConversation } from "@/redux/actions/conversations";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
+import ButtonLoader from "./ButtonLoader/ButtonLoader";
 
 export default function ProductModal({
   product,
@@ -16,9 +20,15 @@ export default function ProductModal({
   setOpen: (fvrt: boolean) => void;
 }) {
   const { wishlist } = useAppSelector((store) => store.wishlist);
+  const { isAuthenticated, user } = useAppSelector((store) => store.user);
+  const { loading: conversationLoading } = useAppSelector(
+    (store) => store.conversation,
+  );
+
   const dispatch = useAppDispatch();
   const [isFavourite, setIsFavourite] = useState(false);
   const [qty, setQty] = useState(1);
+  const router = useRouter();
 
   useEffect(() => {
     const doesExist = wishlist?.find((item) => item?._id == product?._id);
@@ -26,6 +36,26 @@ export default function ProductModal({
       setIsFavourite(true);
     }
   }, [wishlist]);
+
+  const handleMessage = async () => {
+    if (!isAuthenticated) {
+      toast.error("Please login to continue");
+      return;
+    }
+
+    try {
+      const conversation = await dispatch(
+        createConversation({
+          sellerId: product.shop._id,
+          userId: user._id,
+        }),
+      );
+
+      router.push(`/conversation/${conversation._id}`);
+    } catch (error) {
+      toast.error(error.response?.data?.message);
+    }
+  };
 
   return (
     <div
@@ -39,7 +69,7 @@ export default function ProductModal({
         <div className="w-full md:w-1/2 p-6 border-r">
           <div className="w-full h-72 relative rounded-lg overflow-hidden">
             <Image
-              src={`http://localhost:8000/uploads/${product?.images?.[0]}`}
+              src={product?.images?.[0]?.url}
               alt={product.name}
               fill
               className="object-contain"
@@ -51,7 +81,7 @@ export default function ProductModal({
             <div className="overflow-hidden h-14 w-14 rounded-full">
               <Image
                 className="object-cover object-left w-full h-full"
-                src={`http://localhost:8000/uploads/${product?.shop?.avatar}`}
+                src={product?.shop?.avatar?.url}
                 alt="shop"
                 height={60}
                 width={60}
@@ -77,8 +107,11 @@ export default function ProductModal({
             </div>
           </div>
 
-          <button className="mt-4 cursor-pointer max-w-3xl text-sm bg-black text-white p-3 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-900 transition">
-            <FiMessageCircle /> Message Shop
+          <button
+            onClick={handleMessage}
+            className="ml-auto bg-black text-white h-10 w-30 rounded-lg cursor-pointer"
+          >
+            {conversationLoading ? <ButtonLoader /> : "Message Seller"}
           </button>
 
           <p className="mt-2 text-xs text-gray-500">{product.sold_out} sold</p>

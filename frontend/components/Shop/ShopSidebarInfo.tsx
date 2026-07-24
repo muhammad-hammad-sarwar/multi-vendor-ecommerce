@@ -15,7 +15,7 @@ import {
 } from "react-icons/fi";
 import ButtonLoader from "../Layout/ButtonLoader/ButtonLoader";
 import Link from "next/link";
-import { socket } from "@/app/socket/socket";
+import { socket } from "@/socket/socket";
 
 export default function ShopSidebarInfo({
   isOwner,
@@ -37,7 +37,7 @@ export default function ShopSidebarInfo({
     <aside className="sticky top-10 w-80 rounded-2xl border bg-white p-6 shadow-sm">
       <div className="flex flex-col items-center">
         <Image
-          src={`http://localhost:8000/uploads/${shop?.avatar}`}
+          src={shop?.avatar?.url}
           alt={shop?.name}
           width={130}
           height={130}
@@ -86,9 +86,11 @@ export default function ShopSidebarInfo({
             <FiStar className="mt-1 text-yellow-500" />
 
             <p>
-              {Number.isInteger(averageRating)
-                ? averageRating
-                : averageRating.toFixed(2)}{" "}
+              {averageRating
+                ? Number.isInteger(averageRating)
+                  ? averageRating
+                  : averageRating.toFixed(2)
+                : 0}{" "}
               / 5
             </p>
           </div>

@@ -84,7 +84,7 @@ export default function ShopDetailsInfo({
       )}
 
       {activeTab === "events" &&
-        (events.length === 0 ? (
+        (events?.length === 0 ? (
           <div className="rounded-2xl border bg-white py-16 text-center shadow-sm">
             <FiCalendar className="mx-auto text-gray-300" size={50} />
             <h2 className="mt-5 text-xl font-semibold">No Events Yet</h2>
@@ -93,7 +93,7 @@ export default function ShopDetailsInfo({
             </p>
           </div>
         ) : (
-          events.map((e) => <EventCard event={e} />)
+          events?.map((e) => <EventCard event={e} />)
         ))}
 
       {activeTab === "reviews" && (
@@ -110,40 +110,37 @@ export default function ShopDetailsInfo({
             </div>
           ) : (
             <>
-              {reviews.map((review) => {
-                console.log(review);
-                return (
-                  <div
-                    key={review?._id}
-                    className="flex items-start justify-between gap-4 rounded-lg border p-4"
-                  >
-                    <div className="flex items-start gap-3">
-                      <img
-                        src={`http://localhost:8000/uploads/${review?.user?.avatar}`}
-                        alt={review?.user?.name}
-                        className="w-12 h-12 rounded-full object-cover border"
-                      />
+              {reviews?.map((review) => (
+                <div
+                  key={review?._id}
+                  className="flex items-start justify-between gap-4 rounded-lg border p-4"
+                >
+                  <div className="flex items-start gap-3">
+                    <img
+                      src={review?.user?.avatar?.url}
+                      alt={review?.user?.name}
+                      className="w-12 h-12 rounded-full object-cover border"
+                    />
 
-                      <div>
-                        <h3 className="font-semibold text-gray-900">
-                          {review?.user?.name}
-                        </h3>
+                    <div>
+                      <h3 className="font-semibold text-gray-900">
+                        {review?.user?.name}
+                      </h3>
 
-                        <p className="text-sm text-gray-600 mt-1">
-                          {review?.comment}
-                        </p>
-                      </div>
-                      <p>
-                        {formatDistanceToNow(new Date(review?.createdAt), {
-                          addSuffix: true,
-                        })}
+                      <p className="text-sm text-gray-600 mt-1">
+                        {review?.comment}
                       </p>
                     </div>
-
-                    <Rating rating={review?.rating} />
+                    <p>
+                      {formatDistanceToNow(new Date(review?.createdAt), {
+                        addSuffix: true,
+                      })}
+                    </p>
                   </div>
-                );
-              })}
+
+                  <Rating rating={review?.rating} />
+                </div>
+              ))}
             </>
           )}
         </section>

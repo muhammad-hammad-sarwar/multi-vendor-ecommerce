@@ -1,7 +1,7 @@
 "use client";
 import { useAppSelector } from "@/redux/hooks/hooks";
 import { useEffect } from "react";
-import { socket } from "./socket";
+import { socket } from "../socket/socket";
 
 export default function InitSocket() {
   const { isAuthenticated, user } = useAppSelector((state) => state.user);

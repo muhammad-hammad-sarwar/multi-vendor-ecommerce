@@ -54,18 +54,13 @@ export default function ProfileDetails() {
   if (loading || (!error && !user))
     return <LoadingDots text="Loading profile data..." />;
 
-  // user?.avatar?.url ??
   return (
     <div className="w-full max-w-4xl">
       <div className="max-w-28 mx-auto relative flex flex-col items-center mb-8">
         <div className="w-28 h-28 rounded-full border-4 border-green-400 p-1 overflow-hidden">
           {avatar || user ? (
             <Image
-              src={
-                avatar
-                  ? URL.createObjectURL(avatar)
-                  : `http://localhost:8000/uploads/${user.avatar}`
-              }
+              src={avatar ? URL.createObjectURL(avatar) : user?.avatar?.url}
               alt="avatar"
               width={112}
               height={112}

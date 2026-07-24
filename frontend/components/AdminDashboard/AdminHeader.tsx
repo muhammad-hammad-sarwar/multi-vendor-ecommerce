@@ -47,7 +47,7 @@ export default function AdminHeader() {
               <HiOutlineCurrencyDollar className="text-2xl text-gray-600 hover:text-blue-600 transition" />
             </Link>
 
-            <Link href="/admin/settings">
+            <Link href="/profile">
               <IoSettingsOutline className="text-2xl text-gray-600 hover:text-blue-600 transition" />
             </Link>
           </div>
@@ -58,7 +58,7 @@ export default function AdminHeader() {
                 <Image
                   width={34}
                   height={34}
-                  src={`http://localhost:8000/uploads/${user?.avatar}`}
+                  src={user?.avatar?.url}
                   alt="avatar"
                   className="object-cover"
                   unoptimized

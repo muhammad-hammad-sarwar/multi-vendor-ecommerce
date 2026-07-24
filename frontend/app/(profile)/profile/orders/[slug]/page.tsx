@@ -39,6 +39,8 @@ export default function OrderDetailsPage() {
     }
   };
 
+  const refundDeadline = new Date(data?.updatedAt);
+  refundDeadline.setDate(refundDeadline.getDate() + 3);
   if ((loading && userLoading) || (!error && !data))
     return <LoadingDots text="Loading Order Details..." />;
 
@@ -75,7 +77,7 @@ export default function OrderDetailsPage() {
           >
             <div className="flex gap-4">
               <img
-                src={`http://localhost:8000/uploads/${item?.images[0]}`}
+                src={item?.images[0]?.url}
                 alt={item?.name}
                 className="w-20 h-20 rounded-lg object-cover border"
               />
@@ -104,6 +106,7 @@ export default function OrderDetailsPage() {
         ))}
       </div>
 
+      {/* For Review */}
       {selectedItem && (
         <div
           onClick={() => setSelectedItem(null)}
@@ -115,7 +118,7 @@ export default function OrderDetailsPage() {
           >
             <div className="flex items-center gap-3 border-b pb-4">
               <img
-                src={`http://localhost:8000/uploads/${selectedItem.images[0]}`}
+                src={selectedItem.images[0]}
                 alt={selectedItem.name}
                 className="h-14 w-14 rounded-lg object-cover"
               />
@@ -221,14 +224,15 @@ export default function OrderDetailsPage() {
           <h2 className="text-lg font-semibold mb-3">Payment Info</h2>
           <p>Status: {data?.paymentInfo?.status || "Not Paid"}</p>
 
-          {data?.status == "Delivered" && (
-            <button
-              onClick={handleRefund}
-              className="cursor-pointer mt-4 w-40 h-10 bg-pink-100 text-pink-600 text-lg font-bold rounded-md"
-            >
-              Get a Refund
-            </button>
-          )}
+          {data?.status == "Delivered" &&
+            new Date(data?.updatedAt) >= refundDeadline && (
+              <button
+                onClick={handleRefund}
+                className="cursor-pointer mt-4 w-40 h-10 bg-pink-100 text-pink-600 text-lg font-bold rounded-md"
+              >
+                Get a Refund
+              </button>
+            )}
         </div>
       </div>
 

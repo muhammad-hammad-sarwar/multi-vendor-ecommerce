@@ -53,7 +53,7 @@ export default function SellerHeader() {
                 <Image
                   width={34}
                   height={34}
-                  src={`http://localhost:8000/uploads/${shop?.avatar}`}
+                  src={shop?.avatar?.url}
                   alt="avatar"
                   className="object-cover"
                   unoptimized // remove this when use cloudinary
