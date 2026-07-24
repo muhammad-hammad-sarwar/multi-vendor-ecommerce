@@ -6,8 +6,10 @@ import Loader from "@/components/Layout/Loader";
 
 export default function AdminGuard({
   children,
+  isUser = false,
 }: {
   children: React.ReactNode;
+  isUser?: boolean;
 }) {
   const router = useRouter();
   const { initialized, user, loading, error } = useAppSelector(
@@ -15,12 +17,20 @@ export default function AdminGuard({
   );
 
   useEffect(() => {
-    if (initialized && (!user || user.role !== "admin")) {
+    if (
+      initialized &&
+      (!user || (isUser ? user?.role !== "user" : user?.role !== "admin"))
+    ) {
       router.replace("/");
     }
   }, [user, initialized, router]);
 
-  if (loading || (!user && !error) || user.role !== "admin") return <Loader />;
+  if (
+    loading ||
+    (!user && !error) ||
+    (isUser ? user?.role !== "user" : user?.role !== "admin")
+  )
+    return <Loader />;
 
   return <>{children}</>;
 }

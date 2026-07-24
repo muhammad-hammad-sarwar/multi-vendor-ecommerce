@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import { AlertTriangle } from "lucide-react";
+import ProtectedGuard from "@/components/Guards/ProtectedGuard";
 
 export default function CheckoutPage() {
   const [step, setStep] = useState(1);
@@ -41,74 +42,76 @@ export default function CheckoutPage() {
 
   return (
     <>
-      <Header />
-      <div>
-        {loading || (!error && !user) ? (
-          <LoadingDots />
-        ) : (
-          <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
-            {(step == 1 || step == 2) && <CheckoutSteps currentStep={step} />}
+      <ProtectedGuard roles={["user"]}>
+        <Header />
+        <div>
+          {loading || (!error && !user) ? (
+            <LoadingDots />
+          ) : (
+            <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
+              {(step == 1 || step == 2) && <CheckoutSteps currentStep={step} />}
 
-            <div className="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="col-span-2">
+              <div className="mt-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="col-span-2">
+                  {step == 1 && (
+                    <ShippingForm
+                      shippingCost={shippingPrice}
+                      subTotalPrice={subTotal}
+                      totalPrice={totalPrice}
+                      setStep={setStep}
+                    />
+                  )}
+                  {step == 2 && stripeApiKey ? (
+                    <Elements stripe={loadStripe(stripeApiKey)}>
+                      <PaymentPage
+                        setStep={setStep}
+                        amount={totalPrice - (orderData?.discount || 0)}
+                        fullName={orderData?.fullName}
+                      />
+                    </Elements>
+                  ) : (
+                    step == 2 && (
+                      <div className="flex min-h-[60vh] items-center justify-center px-6">
+                        <div className="max-w-md rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
+                          <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-yellow-100">
+                            <AlertTriangle className="h-7 w-7 text-yellow-600" />
+                          </div>
+
+                          <h2 className="text-xl font-semibold text-gray-900">
+                            Payments Unavailable
+                          </h2>
+
+                          <p className="mt-3 text-sm leading-6 text-gray-600">
+                            Stripe has not been configured yet. Payments are
+                            temporarily unavailable. Please try again later or
+                            contact the administrator.
+                          </p>
+
+                          <button
+                            onClick={() => window.location.reload()}
+                            className="mt-6 rounded-lg bg-black px-5 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
+                          >
+                            Refresh
+                          </button>
+                        </div>
+                      </div>
+                    )
+                  )}
+                </div>
                 {step == 1 && (
-                  <ShippingForm
+                  <OrderSummary
                     shippingCost={shippingPrice}
-                    subTotalPrice={subTotal}
+                    subTotal={subTotal}
                     totalPrice={totalPrice}
-                    setStep={setStep}
                   />
                 )}
-                {step == 2 && stripeApiKey ? (
-                  <Elements stripe={loadStripe(stripeApiKey)}>
-                    <PaymentPage
-                      setStep={setStep}
-                      amount={totalPrice - (orderData?.discount || 0)}
-                      fullName={orderData?.fullName}
-                    />
-                  </Elements>
-                ) : (
-                  step == 2 && (
-                    <div className="flex min-h-[60vh] items-center justify-center px-6">
-                      <div className="max-w-md rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
-                        <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-yellow-100">
-                          <AlertTriangle className="h-7 w-7 text-yellow-600" />
-                        </div>
-
-                        <h2 className="text-xl font-semibold text-gray-900">
-                          Payments Unavailable
-                        </h2>
-
-                        <p className="mt-3 text-sm leading-6 text-gray-600">
-                          Stripe has not been configured yet. Payments are
-                          temporarily unavailable. Please try again later or
-                          contact the administrator.
-                        </p>
-
-                        <button
-                          onClick={() => window.location.reload()}
-                          className="mt-6 rounded-lg bg-black px-5 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
-                        >
-                          Refresh
-                        </button>
-                      </div>
-                    </div>
-                  )
-                )}
+                {step == 2 && <OrderSummaryPayments />}
               </div>
-              {step == 1 && (
-                <OrderSummary
-                  shippingCost={shippingPrice}
-                  subTotal={subTotal}
-                  totalPrice={totalPrice}
-                />
-              )}
-              {step == 2 && <OrderSummaryPayments />}
+              {step == 3 && <OrderSuccessPage />}
             </div>
-            {step == 3 && <OrderSuccessPage />}
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      </ProtectedGuard>
     </>
   );
 }

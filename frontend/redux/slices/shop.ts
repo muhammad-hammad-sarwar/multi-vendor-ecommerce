@@ -33,6 +33,7 @@ export interface IShop {
 
 interface ShopState {
   // logged-in
+  initialized: boolean;
   shop: null | IShop;
   loading: boolean;
   error: null | string;
@@ -50,6 +51,7 @@ interface ShopState {
 }
 
 const initialState: ShopState = {
+  initialized: false,
   shop: null,
   loading: false,
   error: null,
@@ -71,23 +73,27 @@ const shopSlice = createSlice({
   reducers: {
     addShop(state, action) {
       state.shop = action.payload;
+      state.initialized = true;
     },
 
     loadShopStart(state) {
       state.loading = true;
       state.error = null;
+      state.initialized = false;
     },
 
     loadShopSuccess(state, action: PayloadAction<IShop>) {
       state.loading = false;
       state.shop = action.payload;
       state.isSeller = true;
+      state.initialized = true;
     },
 
     loadShopFailed(state, action: PayloadAction<string>) {
       state.loading = false;
       state.error = action.payload;
       state.shop = null;
+      state.initialized = true;
     },
 
     // For All shop sellers info

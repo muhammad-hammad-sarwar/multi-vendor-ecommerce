@@ -6,9 +6,11 @@ import ShopDetailsInfo from "@/components/Shop/ShopDetailsInfo";
 import { useEffect } from "react";
 import { loadSellerProducts } from "@/redux/actions/product";
 import { loadSellerEvents } from "@/redux/actions/event";
+import ProtectedGuard from "@/components/Guards/ProtectedGuard";
+import Loader from "@/components/Layout/Loader";
 
 export default function ShopPage() {
-  const { shop, loading } = useAppSelector((state) => state.shop);
+  const { shop, loading, error } = useAppSelector((state) => state.shop);
   const { products } = useAppSelector((state) => state.products);
   const { events } = useAppSelector((state) => state.events);
   const dispatch = useAppDispatch();
@@ -26,25 +28,27 @@ export default function ShopPage() {
     dispatch(loadSellerEvents());
   }, []);
 
-  if (loading || !shop) return <ShopPageLoader />;
+  if (loading || (!error && !shop)) return <Loader />;
   const averageRating = totalRatings / reviews.length;
 
   return (
-    <section className="bg-gray-100 min-h-screen px-10 py-10">
-      <div className="mx-auto flex max-w-7xl gap-8">
-        <ShopSidebarInfo
-          averageRating={averageRating}
-          totalProducts={products?.length}
-          shop={shop}
-          isOwner={true}
-        />
-        <ShopDetailsInfo
-          events={events}
-          reviews={reviews}
-          products={products}
-          isOwner={true}
-        />
-      </div>
-    </section>
+    <ProtectedGuard roles={["seller"]}>
+      <section className="bg-gray-100 min-h-screen px-10 py-10">
+        <div className="mx-auto flex max-w-7xl gap-8">
+          <ShopSidebarInfo
+            averageRating={averageRating}
+            totalProducts={products?.length}
+            shop={shop}
+            isOwner={true}
+          />
+          <ShopDetailsInfo
+            events={events}
+            reviews={reviews}
+            products={products}
+            isOwner={true}
+          />
+        </div>
+      </section>
+    </ProtectedGuard>
   );
 }

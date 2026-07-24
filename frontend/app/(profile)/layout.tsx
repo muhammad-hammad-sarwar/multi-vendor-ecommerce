@@ -1,5 +1,5 @@
+import ProtectedGuard from "@/components/Guards/ProtectedGuard";
 import Header from "@/components/Layout/Header/Header";
-import ReduxAppInit from "@/redux/ReduxAppInit";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -13,10 +13,11 @@ export default function ProfileLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="bg-gray-100 flex flex-col min-h-screen">
-      <Header />
-      <main className="flex-1">{children}</main>
-      {/* <ReduxAppInit /> */}
-    </div>
+    <ProtectedGuard roles={["user"]}>
+      <div className="bg-gray-100 flex flex-col min-h-screen">
+        <Header />
+        <main className="flex-1">{children}</main>
+      </div>
+    </ProtectedGuard>
   );
 }

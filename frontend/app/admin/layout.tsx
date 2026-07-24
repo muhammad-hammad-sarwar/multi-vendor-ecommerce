@@ -1,8 +1,8 @@
-import AdminGuard from "@/components/AdminDashboard/AdminGuard";
 import AdminHeader from "@/components/AdminDashboard/AdminHeader";
 import AdminSidebar from "@/components/AdminDashboard/AdminSidebar";
 import AdminInit from "@/redux/AdminInit";
 import { Metadata } from "next";
+import ProtectedGuard from "@/components/Guards/ProtectedGuard";
 
 export const metadata: Metadata = {
   title: "MultiVendor Ecommerce - Admin",
@@ -16,7 +16,7 @@ export default function AdminLayout({
 }>) {
   return (
     <>
-      <AdminGuard>
+      <ProtectedGuard roles={["admin"]}>
         <AdminHeader />
         <section className="flex h-[calc(100vh-64px)] bg-gray-100">
           <AdminSidebar />
@@ -29,7 +29,7 @@ export default function AdminLayout({
         </section>
 
         <AdminInit />
-      </AdminGuard>
+      </ProtectedGuard>
     </>
   );
 }

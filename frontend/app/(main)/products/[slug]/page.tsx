@@ -15,12 +15,17 @@ import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
 import { toast } from "react-toastify";
 import Image from "next/image";
 import { IEvent } from "@/redux/slices/events";
+import Loader from "@/components/Layout/Loader";
 
 export default function ProductDetailsPage() {
   const params = useParams();
   const searchParams = useSearchParams();
   const isEvent = searchParams.get("isEvent");
-  const { loading, allProducts } = useAppSelector((state) => state.products);
+  const {
+    loading,
+    allProducts,
+    error: productsError,
+  } = useAppSelector((state) => state.products);
   const { wishlist } = useAppSelector((store) => store.wishlist);
   const { user, isAuthenticated } = useAppSelector((state) => state.user);
   const {
@@ -86,12 +91,45 @@ export default function ProductDetailsPage() {
     }
   };
 
-  if (loading || !allProducts) return <>loading</>;
-  // Product here is being treated as an event and a product as well
-  if (!isEvent && !product && !loading) return <>No Product found</>;
-  if (isEvent && !product && !eventLoading) return <>No Event found</>;
+  if (loading || (!allProducts && !productsError)) return <Loader />;
   if (isEvent && (eventLoading || (!EventError && !allEvents)))
-    return <>loading</>;
+    return <Loader />;
+  if (!isEvent && !product && !loading)
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center px-4">
+        <div className="max-w-md rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-lg">
+          <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-blue-100">
+            <span className="text-4xl">📦</span>
+          </div>
+
+          <h2 className="text-2xl font-bold text-gray-800">
+            Product Not Found
+          </h2>
+
+          <p className="mt-3 text-gray-500">
+            The product you're looking for doesn't exist or may have been
+            removed.
+          </p>
+        </div>
+      </div>
+    );
+
+  if (isEvent && !product && !eventLoading)
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center px-4">
+        <div className="max-w-md rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-lg">
+          <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-pink-100">
+            <span className="text-4xl">🎉</span>
+          </div>
+
+          <h2 className="text-2xl font-bold text-gray-800">Event Not Found</h2>
+
+          <p className="mt-3 text-gray-500">
+            This event is no longer available or may have already ended.
+          </p>
+        </div>
+      </div>
+    );
 
   const totalProducts = isEvent
     ? allEvents?.reduce(
