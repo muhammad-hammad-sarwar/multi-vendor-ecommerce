@@ -6,6 +6,9 @@ export async function proxy(request: NextRequest) {
   const sellerToken = (await cookies()).get("seller_token");
   const { pathname } = request.nextUrl;
 
+  console.log("Cookies:", request.cookies.getAll());
+  console.log("Token:", request.cookies.get("token"));
+
   if (
     (sellerToken || token) &&
     (pathname === "/seller-login" ||
