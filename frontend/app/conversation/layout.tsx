@@ -11,7 +11,7 @@ export default function ConversationLayout({
 }) {
   return (
     <>
-      <ProtectedGuard roles={["seller", "user"]}>
+      <ProtectedGuard roles={["user"]}>
         <Header />
         <div className="w-full mx-auto h-[calc(100vh-170px)] p-6">
           <div className="flex h-full overflow-hidden rounded-2xl border bg-white shadow-sm">

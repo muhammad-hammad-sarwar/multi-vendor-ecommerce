@@ -1,15 +1,17 @@
 "use client";
+
 import Loader from "@/components/Layout/Loader";
 import { useAppSelector } from "@/redux/hooks/hooks";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-export default function ProtectedGuard({
+export default function GuestGuard({
   children,
-  roles,
+  blockedRoles,
 }: {
   children: React.ReactNode;
-  roles: ("user" | "seller" | "admin")[];
+  blockedRoles: ("user" | "seller" | "admin")[];
+  redirectTo?: string;
 }) {
   const router = useRouter();
 
@@ -17,14 +19,12 @@ export default function ProtectedGuard({
     initialized: userInitialized,
     user,
     loading: userLoading,
-    error: userError,
   } = useAppSelector((state) => state.user);
 
   const {
     initialized: shopInitialized,
     shop,
     loading: shopLoading,
-    error: shopError,
   } = useAppSelector((state) => state.shop);
 
   const role = user?.role || shop?.role;
@@ -32,19 +32,17 @@ export default function ProtectedGuard({
   useEffect(() => {
     if (!userInitialized || !shopInitialized) return;
 
-    if (!role || !roles.includes(role)) {
-      router.back();
-      // router.replace("/");
+    if (role && blockedRoles.includes(role)) {
+      router.replace("/");
     }
-  }, [role, roles, router, userInitialized, shopInitialized]);
+  }, [role, blockedRoles, router, userInitialized, shopInitialized]);
 
-  if (
-    userLoading ||
-    shopLoading ||
-    (!user && !userError && !shop && !shopError) ||
-    !roles.includes(role as "user" | "seller" | "admin")
-  ) {
-    return <Loader />;
+  if (!userInitialized || !shopInitialized || userLoading || shopLoading) {
+    return <></>;
+  }
+
+  if (role && blockedRoles.includes(role)) {
+    return <></>;
   }
 
   return <>{children}</>;

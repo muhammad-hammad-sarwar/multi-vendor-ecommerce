@@ -4,12 +4,15 @@ import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
 import { formatDistanceToNow } from "date-fns";
-import { ConversationListSkeleton } from "./ConversationListSkeleton";
-import { setConversation } from "@/redux/slices/conversations";
+import {
+  setConversation,
+  updateLastMessage,
+} from "@/redux/slices/conversations";
 import { useEffect, useState } from "react";
 import { socket } from "@/socket/socket";
+import { ConversationListSkeleton } from "@/components/Conversation/ConversationListSkeleton";
 
-export default function ConversationList() {
+export default function Inbox() {
   const params = useParams();
   const dispatch = useAppDispatch();
   const [onlineUsers, setOnlineUsers] = useState([]);
@@ -21,16 +24,22 @@ export default function ConversationList() {
     socket.on("getUsers", (users) => {
       setOnlineUsers(users);
     });
+
+    socket.on("getMessage", (message) => {
+      console.log(message);
+      dispatch(updateLastMessage(message));
+    });
   }, []);
 
-  if (loading || (!error && !conversations)) {
+  if (loading || (!error && !conversations))
     return <ConversationListSkeleton />;
-  }
+
+  if (error) <>{error}</>;
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex flex-col">
       <div className="border-b px-5 py-4">
-        <h2 className="text-xl font-bold">Messages</h2>
+        <h1 className="text-3xl font-bold text-blue-600">All Messages</h1>
       </div>
 
       <div className="flex-1 overflow-y-auto">
@@ -40,29 +49,29 @@ export default function ConversationList() {
           </div>
         ) : (
           conversations?.map((conversation) => {
-            const seller = conversation.seller;
+            const user = conversation.user;
             const isActive = params?.slug === conversation._id;
 
             return (
               <Link
                 key={conversation._id}
                 onClick={() => dispatch(setConversation(conversation))}
-                href={`/conversation/${conversation._id}`}
+                href={`/seller/inbox/${conversation._id}`}
                 className={`flex items-center gap-4 border-b px-5 py-4 transition ${
                   isActive ? "bg-green-50" : "hover:bg-gray-50"
                 }`}
               >
                 <div className="relative">
                   <Image
-                    src={seller?.avatar?.url}
-                    alt={seller?.name}
+                    src={user?.avatar?.url}
+                    alt={user?.name}
                     width={52}
                     height={52}
                     unoptimized
                     className="h-13 w-13 rounded-full object-cover"
                   />
 
-                  {onlineUsers.find((u) => u.userId == seller?._id) && (
+                  {onlineUsers.find((u) => u.userId == user?._id) && (
                     <span className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white bg-green-500" />
                   )}
                 </div>
@@ -70,15 +79,15 @@ export default function ConversationList() {
                 <div className="min-w-0 flex-1">
                   <div className="flex justify-between">
                     <h3 className="truncate font-semibold text-gray-900">
-                      {seller?.name}
+                      {user?.name}
                     </h3>
-                    {conversation.lastMessage && (
+                    {conversation?.lastMessage && (
                       <p className="text-gray-500 text-sm">{`${formatDistanceToNow(new Date(conversation.lastMessageAt))}`}</p>
                     )}
                   </div>
 
                   <p className="truncate text-sm text-gray-500">
-                    {conversation.lastMessage || "Start a conversation"}
+                    {conversation?.lastMessage || "Start a conversation"}
                   </p>
                 </div>
               </Link>

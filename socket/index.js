@@ -57,17 +57,17 @@ const createMessage = ({
   senderId,
   receiverId,
   text,
-  images,
-  conversationId,
+  image,
+  conversation,
   createdAt,
 }) => ({
   _id: messageId,
-  sender: { _id: senderId },
+  sender: senderId,
   receiverId,
   text,
-  images,
+  image,
   seen: false,
-  conversationId,
+  conversation,
   createdAt,
 });
 
@@ -99,8 +99,8 @@ io.on("connection", (socket) => {
       senderId,
       receiverId,
       text,
-      images,
-      conversationId,
+      image,
+      conversation,
       createdAt,
     }) => {
       console.log(`Message Received: ${text}`);
@@ -110,13 +110,12 @@ io.on("connection", (socket) => {
         senderId,
         receiverId,
         text,
-        images,
-        conversationId,
+        image,
+        conversation,
         createdAt,
       });
       console.log(message);
       const receiver = getUser(receiverId);
-      const sender = getUser(senderId);
 
       if (!messages[receiverId]) {
         messages[receiverId] = [message];
@@ -124,17 +123,8 @@ io.on("connection", (socket) => {
         messages[receiverId].push(message);
       }
 
-      // Now emmiting so the user can receive in realtime
-      if (sender) {
-        io.to(sender?.socketId).emit("getMessage", message);
-      } else {
-        console.log("ERROR SENDER NOT FOUND");
-      }
-
       if (receiver) {
         io.to(receiver?.socketId).emit("getMessage", message);
-      } else {
-        console.log("ERROR RECEIVER NOT FOUND");
       }
     },
   );

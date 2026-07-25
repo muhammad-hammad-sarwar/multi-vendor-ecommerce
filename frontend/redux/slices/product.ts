@@ -54,7 +54,7 @@ const productSlice = createSlice({
     },
     getAllProductsFailure(state, action) {
       state.loading = false;
-      state.error = action.payload;
+      state.error = action.payload || "Failed to Fetch Products";
     },
 
     getSellerProductStart(state) {
@@ -66,7 +66,7 @@ const productSlice = createSlice({
     },
     getSellerProductFailure(state, action) {
       state.shopLoading = false;
-      state.error = action.payload;
+      state.error = action.payload || "Failed to Fetch Seller Products";
     },
 
     deleteSellerProductStart(state) {
@@ -78,7 +78,7 @@ const productSlice = createSlice({
     },
     deleteSellerProductFailure(state, action) {
       state.deleteLoading = false;
-      state.error = action.payload;
+      state.error = action.payload || "Failed to Delete Product";
     },
   },
 });

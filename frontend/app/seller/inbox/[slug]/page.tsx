@@ -2,13 +2,11 @@
 import { socket } from "@/socket/socket";
 import api from "@/axios/api";
 import { MessageSkeleton } from "@/components/Conversation/MessageSkeleton";
-import { getMessages } from "@/redux/actions/message";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
 import {
   setConversation,
   updateLastMessage,
 } from "@/redux/slices/conversations";
-import { addMessage } from "@/redux/slices/message";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -17,19 +15,12 @@ import { toast } from "react-toastify";
 import { MessageBubble } from "@/components/Conversation/MessageBubble";
 import clsx from "clsx";
 
-interface Message {
-  _id: string;
-  text: string;
-  sender: "me" | "other";
-}
-
-export default function CurrentConversationPage() {
+export default function SellerChatMessages() {
   const params = useParams();
   const conversationId = params.slug;
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { isAuthenticated, user } = useAppSelector((state) => state.user);
-  const { isSeller, shop } = useAppSelector((state) => state.shop);
+  const { shop } = useAppSelector((state) => state.shop);
   const { conversation, conversations } = useAppSelector(
     (state) => state.conversation,
   );
@@ -62,12 +53,12 @@ export default function CurrentConversationPage() {
       });
       socket.emit("sendMessage", {
         messageId: data?.message?._id,
-        senderId: user?._id,
-        receiverId: seller?._id,
+        senderId: shop?._id,
+        receiverId: user?._id,
         text: data?.message?.text,
         conversation: conversationId,
-        image: data?.message?.image,
         createdAt: data?.message?.createdAt,
+        image: data?.message?.image,
       });
       dispatch(updateLastMessage(data?.message));
       setMessages((prev) => [...prev, data?.message]);
@@ -119,6 +110,7 @@ export default function CurrentConversationPage() {
 
   useEffect(() => {
     const handleMessage = (message) => {
+      console.log(message);
       setMessages((prev) => [...prev, message]);
       dispatch(updateLastMessage(message));
     };
@@ -136,24 +128,24 @@ export default function CurrentConversationPage() {
     });
   }, [messages?.length]);
 
-  if (loading || (!error && !messages) || !conversation)
+  if (loading || (!error && !messages && !conversation))
     return <MessageSkeleton />;
   if (error) return <>{error}</>;
 
-  const seller = conversation?.seller;
+  const user = conversation?.user;
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex flex-col max-h-[73vh] min-h-[73vh]">
       <div className="flex items-center gap-4 border-b px-5 py-3.5">
         <button
-          onClick={() => router.push("/conversation")}
+          onClick={() => router.back()}
           className="cursor-pointer hover:bg-gray-100 w-8 h-8 flex items-center justify-center rounded-full"
         >
           <FiArrowLeft size={22} />
         </button>
 
         <Image
-          src={seller?.avatar?.url}
-          alt={seller?.avatar?._id || "Avatar"}
+          src={user?.avatar?.url}
+          alt={"Avatar"}
           width={52}
           height={52}
           unoptimized
@@ -161,9 +153,9 @@ export default function CurrentConversationPage() {
         />
 
         <div>
-          <h2 className="font-semibold text-gray-900">{seller?.name}</h2>
+          <h2 className="font-semibold text-gray-900">{user?.name}</h2>
 
-          <p className="text-xs text-gray-500">Seller</p>
+          <p className="text-xs text-gray-500">Customer</p>
         </div>
       </div>
 
@@ -171,12 +163,12 @@ export default function CurrentConversationPage() {
         {messages?.length > 0 ? (
           messages.map((msg) => (
             <div key={msg?._id}>
-              <MessageBubble msg={msg} currentSenderId={user?._id} />
+              <MessageBubble msg={msg} currentSenderId={shop?._id} />
               <div ref={bottomRef} />
             </div>
           ))
         ) : (
-          <div className="flex h-full flex-col items-center justify-center px-6 text-center">
+          <div className="flex h-[40vh] flex-col items-center justify-center px-6 text-center">
             <div className="mb-3 text-5xl">📩</div>
             <h3 className="text-lg font-semibold text-gray-900">
               No chats... yet
@@ -202,7 +194,7 @@ export default function CurrentConversationPage() {
             ref={fileRef}
             type="file"
             hidden
-            accept="image/*"
+            accept="jpg, jpeg, png, webp, avif"
             onChange={handleImageUpload}
           />
 

@@ -2,6 +2,7 @@
 import { ProductCard } from "../Products/ProductCard";
 import { Product } from "@/redux/slices/product";
 import { useAppSelector } from "@/redux/hooks/hooks";
+import ErrorState from "../Common/ErrorState";
 
 export default function BestDeals() {
   const { loading, allProducts, error } = useAppSelector(
@@ -28,6 +29,8 @@ export default function BestDeals() {
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
           <p className="text-sm">Loading Best Deals...</p>
         </div>
+      ) : error ? (
+        <ErrorState message={error} />
       ) : data?.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-gray-300 bg-gray-50 py-10">
           <h2 className="text-lg font-semibold text-gray-700">

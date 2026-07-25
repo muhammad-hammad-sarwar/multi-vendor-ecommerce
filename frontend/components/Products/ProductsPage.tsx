@@ -3,6 +3,8 @@ import { ProductCard } from "./ProductCard";
 import { useSearchParams } from "next/navigation";
 import { Product } from "@/redux/slices/product";
 import { useAppSelector } from "@/redux/hooks/hooks";
+import ErrorState from "../Common/ErrorState";
+import Loader from "../Layout/Loader";
 
 export default function ProductsPage() {
   const params = useSearchParams();
@@ -11,7 +13,7 @@ export default function ProductsPage() {
     (state) => state.products,
   );
 
-  if (loading || (!error && !allProducts)) return <>loading</>;
+  if (loading || (!error && !allProducts)) return <Loader />;
 
   const filteredData =
     allProducts && category
@@ -20,7 +22,9 @@ export default function ProductsPage() {
 
   return (
     <section className="px-4 md:px-10 py-4 sm:py-6 md:py-8">
-      {filteredData?.length === 0 ? (
+      {error ? (
+        <ErrorState message={error} />
+      ) : filteredData?.length === 0 ? (
         <h2>
           No <span className="font-semibold">{category}</span> Products
           Available!

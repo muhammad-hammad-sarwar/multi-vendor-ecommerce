@@ -41,7 +41,7 @@ export default function Header() {
   useBodyScrollLock(cartOpen);
   useBodyScrollLock(wishlistOpen);
 
-  const filteredProducts = allProducts?.filter((product) =>
+  const filteredProducts = (allProducts || [])?.filter((product) =>
     product?.name?.toLowerCase()?.includes(search?.toLowerCase()),
   );
 
@@ -259,8 +259,8 @@ export default function Header() {
 
           {search.trim() && (
             <div className="absolute top-full left-0 md:hidden mt-2 w-full bg-white border rounded-lg shadow-lg max-h-96 overflow-y-auto z-50">
-              {filteredProducts.length ? (
-                filteredProducts.map((product) => (
+              {filteredProducts?.length ? (
+                filteredProducts?.map((product) => (
                   <Link
                     onClick={() => {
                       setOpen(false);

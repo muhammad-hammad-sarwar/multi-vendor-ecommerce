@@ -2,6 +2,7 @@
 import { ProductCard } from "./ProductCard";
 import { useAppSelector } from "@/redux/hooks/hooks";
 import { Product } from "@/redux/slices/product";
+import ErrorState from "../Common/ErrorState";
 
 export default function FeaturedProducts() {
   const { loading, allProducts, error } = useAppSelector(
@@ -22,6 +23,8 @@ export default function FeaturedProducts() {
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
           <p className="text-sm">Loading Featured Products...</p>
         </div>
+      ) : error ? (
+        <ErrorState message={error} />
       ) : allProducts?.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-gray-300 bg-gray-50 py-10">
           <h2 className="text-lg font-semibold text-gray-700">
@@ -33,7 +36,7 @@ export default function FeaturedProducts() {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
-          {allProducts.map((product: Product) => (
+          {allProducts?.map((product: Product) => (
             <ProductCard key={product._id} product={product} />
           ))}
         </div>

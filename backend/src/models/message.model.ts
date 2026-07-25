@@ -26,15 +26,9 @@ const messageSchema = new Schema(
       default: "",
     },
 
-    images: [
-      {
-        type: String,
-      },
-    ],
+    image: { type: { publicId: String, url: String } },
   },
-  {
-    timestamps: true,
-  },
+  { timestamps: true },
 );
 
 export const Message = model("message", messageSchema);

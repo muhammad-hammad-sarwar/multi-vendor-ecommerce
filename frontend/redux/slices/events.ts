@@ -54,7 +54,7 @@ const eventSlice = createSlice({
     },
     getAllEventsFailure(state, action) {
       state.loading = false;
-      state.error = action.payload;
+      state.error = action.payload || "Failed to Fetch Events";
     },
 
     getSellerEventsStart(state) {
@@ -66,7 +66,7 @@ const eventSlice = createSlice({
     },
     getSellerEventsFailure(state, action) {
       state.shopLoading = false;
-      state.error = action.payload;
+      state.error = action.payload || "Failed to Fetch Seller Events";
     },
 
     deleteSellerEventStart(state) {
@@ -78,7 +78,7 @@ const eventSlice = createSlice({
     },
     deleteSellerEventFailure(state, action) {
       state.deleteLoading = false;
-      state.error = action.payload;
+      state.error = action.payload || "Failed to Delete Event";
     },
   },
 });

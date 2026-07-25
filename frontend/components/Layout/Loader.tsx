@@ -1,7 +1,8 @@
+"use client";
 import Lottie from "react-lottie";
 import animationData from "@/lib/animations/24151-ecommerce-animation.json";
 
-const Loader = () => {
+export default function Loader() {
   const defaultOptions = {
     loop: true,
     autoplay: true,
@@ -15,6 +16,4 @@ const Loader = () => {
       <Lottie options={defaultOptions} width={300} height={300} />
     </div>
   );
-};
-
-export default Loader;
+}

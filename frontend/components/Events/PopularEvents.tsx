@@ -1,5 +1,6 @@
 import { useAppSelector } from "@/redux/hooks/hooks";
 import EventCard from "./EventsCard";
+import ErrorState from "../Common/ErrorState";
 
 export default function PopularEvents() {
   const { allEvents, loading, error } = useAppSelector((state) => state.events);
@@ -15,6 +16,8 @@ export default function PopularEvents() {
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
             <p className="text-sm">Loading Popular Events...</p>
           </div>
+        ) : error ? (
+          <ErrorState message={error} />
         ) : allEvents?.length == 0 ? (
           <div className="h-30 flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-gray-300 bg-gray-50">
             <h2 className="text-lg font-semibold text-gray-700">

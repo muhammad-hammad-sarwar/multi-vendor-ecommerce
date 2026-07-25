@@ -31,9 +31,10 @@ const conversationSlice = createSlice({
   reducers: {
     updateLastMessage: (state, action) => {
       const message = action.payload;
+      console.log(message);
 
       const index = state.conversations.findIndex(
-        (c) => c._id === message.conversationId,
+        (c) => c._id === message.conversation,
       );
 
       if (index === -1) return;

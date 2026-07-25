@@ -13,7 +13,7 @@ export default function ProfileLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ProtectedGuard roles={["user"]}>
+    <ProtectedGuard roles={["user", "admin"]}>
       <div className="bg-gray-100 flex flex-col min-h-screen">
         <Header />
         <main className="flex-1">{children}</main>

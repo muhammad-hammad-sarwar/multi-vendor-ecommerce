@@ -10,7 +10,7 @@ export default function SellerSidebar() {
       <nav className="py-4">
         {sellerDashboardTabs.map((tab, i) => {
           const Icon = tab.icon;
-          const active = pathname === tab.url;
+          const active = pathname === tab.url || pathname.startsWith(tab.url);
 
           return (
             <Link

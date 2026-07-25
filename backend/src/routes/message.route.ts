@@ -9,8 +9,8 @@ const messageRouter = Router();
 messageRouter.post(
   "/:conversationId",
   isLoggedIn,
-  // upload.array("images"),
-  // cloudinaryUpload("messages"),
+  upload.single("image"),
+  cloudinaryUpload("messages", true),
   catchAsync(messageController.sendMessage),
 );
 

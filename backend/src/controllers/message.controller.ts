@@ -12,11 +12,8 @@ export const sendMessage = async (
   const { conversationId } = req.params;
   const { text } = req.body;
 
-  //   Do for images - (todo)
-
-  if (!text?.trim()) {
+  if (!text?.trim() && !req?.uploadedFiles?.[0]?.url)
     return next(new AppError("Message cannot be empty", 400));
-  }
 
   const conversation = await Conversation.findById(conversationId);
 
@@ -34,7 +31,8 @@ export const sendMessage = async (
     conversation: conversation._id,
     sender: req.user._id,
     senderModel: req.user.role === "user" ? "user" : "shop",
-    text: text.trim(),
+    text: text?.trim(),
+    image: req?.uploadedFiles?.[0],
   });
 
   conversation.lastMessage = message.text;
@@ -61,9 +59,7 @@ export const getMessages = async (
   if (!conversation) {
     return next(new AppError("Conversation not found", 404));
   }
-  // console.log(
-  //   `${req.user._id}\n${conversation.seller}\n${req.user._id}\n${conversation.user}\n`,
-  // );
+
   if (
     req.user._id.toString() != conversation.seller.toString() &&
     req.user._id.toString() != conversation.user.toString()
@@ -72,11 +68,10 @@ export const getMessages = async (
 
   const messages = await Message.find({
     conversation: conversation._id,
-  })
-    .populate("sender")
-    .sort({ createdAt: 1 });
+  }).sort({ createdAt: 1 });
+  // .populate("sender")
 
-  console.log(await Message.countDocuments());
+  // console.log(await Message.countDocuments());
 
   res.status(200).json({
     success: true,
