@@ -124,7 +124,7 @@ export default function Header() {
           <div className="flex items-center gap-3 md:gap-5">
             {isSeller ? (
               <Link
-                href={`/shop/${shop._id}`}
+                href={`/shop/${shop?._id}`}
                 className="hidden sm:flex items-center bg-[#000000] text-white hover:bg-gray-800 text-sm md:text-base font-bold px-4 py-3 rounded-lg transition"
               >
                 Your Shop <ChevronRightIcon />

@@ -74,9 +74,7 @@ const shopSlice = createSlice({
     addShop(state, action) {
       state.shop = action.payload;
       state.initialized = true;
-      if (state.shop != null) {
-        state.isSeller = true;
-      }
+      state.isSeller = true;
     },
 
     loadShopStart(state) {

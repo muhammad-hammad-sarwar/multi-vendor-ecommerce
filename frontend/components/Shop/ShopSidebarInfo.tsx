@@ -16,7 +16,8 @@ import {
 import ButtonLoader from "../Layout/ButtonLoader/ButtonLoader";
 import Link from "next/link";
 import { socket } from "@/socket/socket";
-import { addShop } from "@/redux/slices/shop";
+import { logout } from "@/redux/slices/shop";
+import { toast } from "react-toastify";
 
 export default function ShopSidebarInfo({
   isOwner,
@@ -30,10 +31,17 @@ export default function ShopSidebarInfo({
 
   const handleLogout = async () => {
     setLogoutLoading(true);
-    await api.post("/shop/logout");
-    dispatch(addShop(null));
-    socket.disconnect();
-    router.push("/seller-login");
+    try {
+      await api.post("/shop/logout");
+      socket.disconnect();
+      dispatch(logout());
+      toast.success("Logged out successfully");
+    } catch (error) {
+      toast.error(error?.message);
+    } finally {
+      router.push("/seller-login");
+      setLogoutLoading(false);
+    }
   };
 
   return (

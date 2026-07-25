@@ -48,9 +48,10 @@ export default function ProfilePage() {
       toast.success("Logged out successfully");
       dispatch(logout());
       socket.disconnect();
-      router.push("/");
     } catch (error) {
       toast.error(error?.message);
+    } finally {
+      router.push("/");
     }
   };
 
