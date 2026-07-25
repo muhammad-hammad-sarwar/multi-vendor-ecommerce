@@ -6,53 +6,44 @@ const cloudinaryUpload =
   (folder: string, isMessage: boolean = false) =>
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // Remove this
-      req.uploadedFiles = [
-        {
-          publicId: "23456789ugfxt8",
-          url: "http://localhost:8000/uploads/6c753b07302059e0e14fc7813f3e3642.jpeg",
-        },
-      ];
-      return next();
+      // Single upload
+      if (req.file) {
+        const uploaded = await uploadToCloudinary({
+          folder,
+          buffer: req.file.buffer,
+        });
 
-      // // Single upload
-      // if (req.file) {
-      //   const uploaded = await uploadToCloudinary({
-      //     folder,
-      //     buffer: req.file.buffer,
-      //   });
+        req.uploadedFiles = [
+          {
+            url: uploaded.secure_url,
+            publicId: uploaded.public_id,
+          },
+        ];
 
-      //   req.uploadedFiles = [
-      //     {
-      //       url: uploaded.secure_url,
-      //       publicId: uploaded.public_id,
-      //     },
-      //   ];
+        return next();
+      }
 
-      //   return next();
-      // }
+      // Multiple uploads
+      if (req.files && Array.isArray(req.files)) {
+        const uploadedFiles = await Promise.all(
+          req.files.map((file) =>
+            uploadToCloudinary({
+              folder,
+              buffer: file.buffer,
+            }),
+          ),
+        );
 
-      // // Multiple uploads
-      // if (req.files && Array.isArray(req.files)) {
-      //   const uploadedFiles = await Promise.all(
-      //     req.files.map((file) =>
-      //       uploadToCloudinary({
-      //         folder,
-      //         buffer: file.buffer,
-      //       }),
-      //     ),
-      //   );
+        req.uploadedFiles = uploadedFiles.map((file) => ({
+          url: file.secure_url,
+          publicId: file.public_id,
+        }));
 
-      //   req.uploadedFiles = uploadedFiles.map((file) => ({
-      //     url: file.secure_url,
-      //     publicId: file.public_id,
-      //   }));
+        return next();
+      }
 
-      //   return next();
-      // }
-
-      // if (!isMessage) throw new AppError("No files uploaded.", 400);
-      // next();
+      if (!isMessage) throw new AppError("No files uploaded.", 400);
+      next();
     } catch (error) {
       next(error);
     }
