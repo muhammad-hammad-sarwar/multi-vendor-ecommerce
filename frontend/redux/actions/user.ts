@@ -27,10 +27,9 @@ export const loadUserProfile = () => async (dispatch: AppDispatch) => {
   }
 };
 
-export const loadShop = (shopId?: string) => async (dispatch: AppDispatch) => {
+export const loadShop = () => async (dispatch: AppDispatch) => {
   try {
     dispatch(loadShopStart());
-    const url = `/shop${shopId ? shopId : ""}`;
     const res = await api.get("/shop", { withCredentials: true });
 
     dispatch(loadShopSuccess(res.data.shop));

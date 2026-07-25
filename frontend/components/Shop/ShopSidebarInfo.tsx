@@ -1,6 +1,6 @@
 "use client";
 import api from "@/axios/api";
-import { useAppSelector } from "@/redux/hooks/hooks";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -16,6 +16,7 @@ import {
 import ButtonLoader from "../Layout/ButtonLoader/ButtonLoader";
 import Link from "next/link";
 import { socket } from "@/socket/socket";
+import { addShop } from "@/redux/slices/shop";
 
 export default function ShopSidebarInfo({
   isOwner,
@@ -25,10 +26,12 @@ export default function ShopSidebarInfo({
 }) {
   const [logoutLoading, setLogoutLoading] = useState(false);
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   const handleLogout = async () => {
     setLogoutLoading(true);
     await api.post("/shop/logout");
+    dispatch(addShop(null));
     socket.disconnect();
     router.push("/seller-login");
   };

@@ -18,6 +18,7 @@ export default function ProtectedGuard({
     user,
     loading: userLoading,
     error: userError,
+    isAuthenticated,
   } = useAppSelector((state) => state.user);
 
   const {
@@ -25,24 +26,36 @@ export default function ProtectedGuard({
     shop,
     loading: shopLoading,
     error: shopError,
+    isSeller,
   } = useAppSelector((state) => state.shop);
 
-  const role = user?.role || shop?.role;
+  const hasAccess =
+    (roles.includes("user") && isAuthenticated) ||
+    (roles.includes("seller") && isSeller) ||
+    (roles.includes("admin") && user?.role === "admin");
+
+  console.log({
+    roles: roles,
+    hasAccess: hasAccess,
+    isSeller: isSeller,
+    shop: isSeller,
+    shopLoading: shopLoading,
+    shopInitialized: shopInitialized,
+  });
 
   useEffect(() => {
     if (!userInitialized || !shopInitialized) return;
-
-    if (!role || !roles.includes(role)) {
-      router.back();
-      // router.replace("/");
+    if (!hasAccess) {
+      console.log(isSeller, shop, shopError, shopLoading);
+      router.replace("/");
     }
-  }, [role, roles, router, userInitialized, shopInitialized]);
+  }, [hasAccess, router, userInitialized, shopInitialized]);
 
   if (
     userLoading ||
     shopLoading ||
     (!user && !userError && !shop && !shopError) ||
-    !roles.includes(role as "user" | "seller" | "admin")
+    !hasAccess
   ) {
     return <Loader />;
   }

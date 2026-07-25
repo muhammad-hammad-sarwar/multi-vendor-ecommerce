@@ -6,7 +6,7 @@ import { BsCart } from "react-icons/bs";
 import { FiMenu, FiX } from "react-icons/fi";
 import { navItems } from "@/lib/utils/static";
 import CategoriesDropDown from "./CategoriesDropDown";
-import { ChevronRightIcon } from "lucide-react";
+import { ChevronRightIcon, Loader2 } from "lucide-react";
 import clsx from "clsx";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
@@ -25,9 +25,17 @@ const activePage: Record<string, number> = {
 };
 
 export default function Header() {
-  const { user, isAuthenticated } = useAppSelector((state) => state.user);
-  const { loading, allProducts } = useAppSelector((state) => state.products);
-  const { shop, isSeller } = useAppSelector((state) => state.shop);
+  const {
+    user,
+    isAuthenticated,
+    initialized: userInitialized,
+  } = useAppSelector((state) => state.user);
+  const { allProducts } = useAppSelector((state) => state.products);
+  const {
+    shop,
+    isSeller,
+    initialized: shopInitialized,
+  } = useAppSelector((state) => state.shop);
   const { cartItems } = useAppSelector((store) => store.cart);
   const { wishlist } = useAppSelector((store) => store.wishlist);
 
@@ -126,7 +134,12 @@ export default function Header() {
                 href={"/seller-login"}
                 className="hidden sm:flex items-center bg-[#000000] text-white hover:bg-gray-800 text-sm md:text-base font-bold px-4 py-3 rounded-lg transition"
               >
-                Become a Seller <ChevronRightIcon />
+                Become a Seller{" "}
+                {shopInitialized ? (
+                  <ChevronRightIcon className="ml-2" />
+                ) : (
+                  <Loader2 className="ml-2 animate-spin" />
+                )}
               </Link>
             )}
 
@@ -187,12 +200,14 @@ export default function Header() {
                     src={user?.avatar?.url}
                     alt="avatar"
                     className="object-cover"
-                    unoptimized // remove this when use cloudinary
                   />
                 ) : (
                   <CgProfile
                     size={24}
-                    className="cursor-pointer hover:text-gray-900 transition"
+                    className={clsx(
+                      "cursor-pointer hover:text-gray-900 transition",
+                      userInitialized ? "" : "animate-spin",
+                    )}
                   />
                 )}
               </div>

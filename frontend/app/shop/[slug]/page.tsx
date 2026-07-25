@@ -1,6 +1,5 @@
 "use client";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
-import ShopPageLoader from "@/components/Shop/ShopProfileLoader";
 import ShopSidebarInfo from "@/components/Shop/ShopSidebarInfo";
 import ShopDetailsInfo from "@/components/Shop/ShopDetailsInfo";
 import { useEffect } from "react";
@@ -33,7 +32,7 @@ export default function ShopPage() {
 
   return (
     <ProtectedGuard roles={["seller"]}>
-      <section className="bg-gray-100 min-h-screen px-10 py-10">
+      <section className="bg-gray-100 min-h-screen px-4 sm:px-6 md:px-10 py-10">
         <div className="mx-auto flex max-w-7xl gap-8">
           <ShopSidebarInfo
             averageRating={averageRating}
@@ -41,6 +40,7 @@ export default function ShopPage() {
             shop={shop}
             isOwner={true}
           />
+
           <ShopDetailsInfo
             events={events}
             reviews={reviews}

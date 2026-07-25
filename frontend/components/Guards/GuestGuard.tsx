@@ -11,38 +11,41 @@ export default function GuestGuard({
 }: {
   children: React.ReactNode;
   blockedRoles: ("user" | "seller" | "admin")[];
-  redirectTo?: string;
 }) {
   const router = useRouter();
 
   const {
+    isAuthenticated,
     initialized: userInitialized,
     user,
     loading: userLoading,
   } = useAppSelector((state) => state.user);
 
   const {
+    isSeller,
     initialized: shopInitialized,
-    shop,
     loading: shopLoading,
   } = useAppSelector((state) => state.shop);
 
-  const role = user?.role || shop?.role;
+  const hasAccess =
+    (blockedRoles.includes("user") && isAuthenticated) ||
+    (blockedRoles.includes("seller") && isSeller) ||
+    (blockedRoles.includes("admin") && user?.role === "admin");
 
   useEffect(() => {
     if (!userInitialized || !shopInitialized) return;
 
-    if (role && blockedRoles.includes(role)) {
+    if (hasAccess) {
       router.replace("/");
     }
-  }, [role, blockedRoles, router, userInitialized, shopInitialized]);
+  }, [hasAccess, router, userInitialized, shopInitialized]);
 
   if (!userInitialized || !shopInitialized || userLoading || shopLoading) {
-    return <></>;
+    return <Loader />;
   }
 
-  if (role && blockedRoles.includes(role)) {
-    return <></>;
+  if (hasAccess) {
+    return <Loader />;
   }
 
   return <>{children}</>;

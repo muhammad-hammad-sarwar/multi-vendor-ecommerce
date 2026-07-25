@@ -2,8 +2,8 @@
 import api from "@/axios/api";
 import GuestGuard from "@/components/Guards/GuestGuard";
 import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
+import { loadShop } from "@/redux/actions/user";
 import { useAppDispatch } from "@/redux/hooks/hooks";
-import { addShop } from "@/redux/slices/shop";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -24,7 +24,7 @@ export default function LoginPage() {
       setLoading(true);
       const result = await api.post("/shop/login", { email, password });
       toast.success("Logged In successfully");
-      dispatch(addShop(result.data?.shop));
+      dispatch(loadShop());
       router.push(`/shop/${result.data?.shopId}`);
     } catch (error) {
       toast.error(

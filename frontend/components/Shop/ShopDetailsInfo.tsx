@@ -7,6 +7,7 @@ import { FiCalendar, FiGrid, FiPackage, FiStar } from "react-icons/fi";
 import { ProductCard } from "../Products/ProductCard";
 import Rating from "../Common/Ratings";
 import EventCard from "../Events/EventsCard";
+import clsx from "clsx";
 type Tab = "products" | "events" | "reviews";
 
 export default function ShopDetailsInfo({
@@ -18,37 +19,34 @@ export default function ShopDetailsInfo({
   const [activeTab, setActiveTab] = useState<Tab>("products");
   return (
     <main className="flex-1">
-      <div className="mb-8 flex items-center justify-between rounded-2xl border bg-white p-6 shadow-sm">
-        <div className="flex gap-2 rounded-xl bg-gray-100 p-1">
+      <div className="mb-8 flex flex-col gap-4 md:gap-0 md:flex-row items-center justify-between rounded-2xl border bg-white p-6 shadow-sm">
+        <div className="flex flex-col md:flex-row gap-2 rounded-xl p-1">
           <button
             onClick={() => setActiveTab("products")}
-            className={`rounded-lg px-5 py-2 font-medium transition ${
-              activeTab === "products"
-                ? "bg-blue-600 text-white"
-                : "text-gray-600 hover:bg-gray-200"
-            }`}
+            className={clsx(
+              "rounded-lg px-5 py-2 font-medium transition cursor-pointer",
+              activeTab === "products" ? "text-blue-600" : "text-gray-600",
+            )}
           >
             Shop Products
           </button>
 
           <button
             onClick={() => setActiveTab("events")}
-            className={`rounded-lg px-5 py-2 font-medium transition ${
-              activeTab === "events"
-                ? "bg-blue-600 text-white"
-                : "text-gray-600 hover:bg-gray-200"
-            }`}
+            className={clsx(
+              "rounded-lg px-5 py-2 font-medium transition cursor-pointer",
+              activeTab === "events" ? "text-blue-600" : "text-gray-600",
+            )}
           >
             Running Events
           </button>
 
           <button
             onClick={() => setActiveTab("reviews")}
-            className={`rounded-lg px-5 py-2 font-medium transition ${
-              activeTab === "reviews"
-                ? "bg-blue-600 text-white"
-                : "text-gray-600 hover:bg-gray-200"
-            }`}
+            className={clsx(
+              "rounded-lg px-5 py-2 font-medium transition cursor-pointer",
+              activeTab === "reviews" ? "text-blue-600" : "text-gray-600",
+            )}
           >
             Shop Reviews
           </button>
@@ -66,7 +64,7 @@ export default function ShopDetailsInfo({
       </div>
 
       {activeTab === "products" && products?.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {products?.map((p) => (
             <ProductCard key={p?._id} product={p} />
           ))}

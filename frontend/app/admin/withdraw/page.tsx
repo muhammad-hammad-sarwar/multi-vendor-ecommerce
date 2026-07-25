@@ -1,15 +1,17 @@
 "use client";
 import api from "@/axios/api";
+import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
 import Loader from "@/components/Layout/Loader";
 import { getWithdrawRequests } from "@/redux/actions/withdraw";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
 import { Chip } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Check } from "lucide-react";
+import { useState } from "react";
 import { toast } from "react-toastify";
 
 export default function AdminWithdrawPage() {
   const dispatch = useAppDispatch();
+  const [approving, setApproving] = useState(false);
   const { withdrawRequests, loading, error } = useAppSelector(
     (state) => state.withdraw,
   );
@@ -65,19 +67,24 @@ export default function AdminWithdrawPage() {
 
         return (
           status === "Processing" && (
-            <Check
-              className="mx-auto mt-1 bg-green-100 w-8 h-8 p-1 rounded-full cursor-pointer text-green-600"
+            <button
+              disabled={approving}
               onClick={async () => {
                 try {
+                  setApproving(true);
                   await api.patch(`/withdraw/${params.id}/approve`);
-                  toast.success("Request Approved successfully");
+                  toast.success("Request approved successfully");
                   dispatch(getWithdrawRequests(true));
                 } catch (error) {
                   toast.error(error?.response?.data?.message);
+                } finally {
+                  setApproving(false);
                 }
               }}
-              size={30}
-            />
+              className="mx-auto flex h-9 min-w-24 items-center justify-center rounded-md bg-green-600 px-3 text-sm font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {approving ? <ButtonLoader /> : "Approve"}
+            </button>
           )
         );
       },
