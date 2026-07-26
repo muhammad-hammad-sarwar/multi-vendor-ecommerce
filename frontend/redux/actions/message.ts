@@ -6,14 +6,16 @@ import {
 } from "../slices/message";
 import { AppDispatch } from "../store";
 
-export const getMessages = (id) => async (dispatch: AppDispatch) => {
+export const getMessages = (id, role) => async (dispatch: AppDispatch) => {
   try {
-    dispatch(getMessagesStart());
+    dispatch(getMessagesStart({ role }));
 
-    const res = await api.get(`/messages/${id}`);
+    const res = await api.get(`/messages/${role}/${id}`);
 
-    dispatch(getMessagesSuccess(res.data.messages));
+    dispatch(getMessagesSuccess({ messages: res.data.messages, role }));
   } catch (error) {
-    dispatch(getMessagesFailure(error?.response?.data?.message));
+    dispatch(
+      getMessagesFailure({ error: error?.response?.data?.message, role }),
+    );
   }
 };

@@ -81,7 +81,7 @@ export default function AdminWithdrawPage() {
                   setApproving(false);
                 }
               }}
-              className="mx-auto flex h-9 min-w-24 items-center justify-center rounded-md bg-green-600 px-3 text-sm font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-70"
+              className="mx-auto mt-2 flex h-9 min-w-24 items-center justify-center rounded-md bg-green-600 px-3 text-sm font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-70"
             >
               {approving ? <ButtonLoader /> : "Approve"}
             </button>

@@ -103,8 +103,6 @@ io.on("connection", (socket) => {
       conversation,
       createdAt,
     }) => {
-      console.log(`Message Received: ${text}`);
-      console.log("USERS", users);
       const message = createMessage({
         messageId,
         senderId,
@@ -114,7 +112,6 @@ io.on("connection", (socket) => {
         conversation,
         createdAt,
       });
-      console.log("Outside the if", message);
       const receiver = getUser(receiverId);
 
       if (!messages[receiverId]) {
@@ -124,7 +121,7 @@ io.on("connection", (socket) => {
       }
 
       if (receiver) {
-        console.log(receiver);
+        console.log("RECEIVER FOUND", message);
         io.to(receiver?.socketId).emit("getMessage", message);
       }
     },

@@ -5,7 +5,10 @@ import { useParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
 import { formatDistanceToNow } from "date-fns";
 import { ConversationListSkeleton } from "./ConversationListSkeleton";
-import { setConversation } from "@/redux/slices/conversations";
+import {
+  setConversation,
+  updateLastMessageUser,
+} from "@/redux/slices/conversations";
 import { useEffect, useState } from "react";
 import { socket } from "@/socket/socket";
 import clsx from "clsx";
@@ -14,6 +17,7 @@ export default function ConversationList() {
   const params = useParams();
   const dispatch = useAppDispatch();
   const [onlineUsers, setOnlineUsers] = useState([]);
+  const { user } = useAppSelector((state) => state.user);
   const { conversations, loading, error } = useAppSelector(
     (state) => state.conversation,
   );
@@ -23,6 +27,20 @@ export default function ConversationList() {
       setOnlineUsers(users);
     });
   }, []);
+
+  useEffect(() => {
+    const handleMessage = (message) => {
+      if (message?.receiverId != user?._id || !Boolean(user?._id)) return;
+      console.log("GetMessage", message);
+      dispatch(updateLastMessageUser(message));
+    };
+
+    socket.on("getMessage", handleMessage);
+
+    return () => {
+      socket.off("getMessage", handleMessage);
+    };
+  }, [user?._id]);
 
   if (loading || (!error && !conversations)) {
     return <ConversationListSkeleton />;
@@ -62,7 +80,6 @@ export default function ConversationList() {
                     unoptimized
                     className="h-13 w-13 rounded-full object-cover"
                   />
-                  (
                   <span
                     className={clsx(
                       "absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white",
@@ -71,7 +88,6 @@ export default function ConversationList() {
                         : "bg-gray-400",
                     )}
                   />
-                  )
                 </div>
 
                 <div className="min-w-0 flex-1">

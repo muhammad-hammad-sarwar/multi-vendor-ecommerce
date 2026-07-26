@@ -4,50 +4,19 @@ import Image from "next/image";
 import { useParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
 import { formatDistanceToNow } from "date-fns";
-import {
-  setSellerConversation,
-  updateSellerLastMessage,
-} from "@/redux/slices/conversations";
-import { useEffect, useState } from "react";
-import { socket } from "@/socket/socket";
+import { setSellerConversation } from "@/redux/slices/conversations";
 import { ConversationListSkeleton } from "@/components/Conversation/ConversationListSkeleton";
 import clsx from "clsx";
 
 export default function Inbox() {
   const params = useParams();
   const dispatch = useAppDispatch();
-  const [onlineUsers, setOnlineUsers] = useState([]);
-  const { shop } = useAppSelector((state) => state.shop);
   const {
     sellerConversations: conversations,
     sellerLoading: loading,
     sellerError: error,
+    onlineUsers,
   } = useAppSelector((state) => state.conversation);
-
-  useEffect(() => {
-    const handleUsers = () => {
-      socket.on("getUsers", (users) => {
-        setOnlineUsers(users);
-      });
-    };
-
-    const handleMessage = () => {
-      socket.on("getMessage", (message) => {
-        if (
-          message?.receiverId != shop?._id ||
-          !Boolean(shop?._id) ||
-          message.conversation !== params?.slug
-        )
-          return;
-        dispatch(updateSellerLastMessage(message));
-      });
-    };
-
-    return () => {
-      socket.off("getUsers", handleUsers);
-      socket.off("getMessage", handleMessage);
-    };
-  }, [shop?._id, params?.slug]);
 
   if (loading || (!error && !conversations))
     return <ConversationListSkeleton />;
@@ -92,7 +61,7 @@ export default function Inbox() {
                   <span
                     className={clsx(
                       "absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white",
-                      onlineUsers.find((u) => u.userId == user?._id)
+                      onlineUsers?.find((u) => u?.userId == user?._id)
                         ? "bg-green-500"
                         : "bg-gray-400",
                     )}

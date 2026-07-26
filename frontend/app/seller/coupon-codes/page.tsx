@@ -95,7 +95,6 @@ export default function CouponsPage() {
     setLoading(true);
 
     try {
-      console.log(discount);
       await api.post("/coupon", {
         name: couponCode,
         discountPercentage: discount,
@@ -134,7 +133,7 @@ export default function CouponsPage() {
 
         <button
           onClick={() => setOpen(true)}
-          className="bg-black hover:bg-gray-800 transition text-white w-40 pl-4 py-2.5 rounded-lg flex items-center gap-2 cursor-pointer"
+          className="bg-black hover:bg-gray-800 transition text-white w-40 md:text-lg md:w-48 pl-4 py-2.5 rounded-lg flex self-end md:self-start items-center gap-2 cursor-pointer"
         >
           <FiPlus />
           Create Coupon

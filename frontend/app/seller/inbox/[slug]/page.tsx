@@ -14,6 +14,7 @@ import { FiArrowLeft, FiSend, FiImage } from "react-icons/fi";
 import { toast } from "react-toastify";
 import { MessageBubble } from "@/components/Conversation/MessageBubble";
 import clsx from "clsx";
+import { getMessages } from "@/redux/actions/message";
 
 export default function SellerChatMessages() {
   const params = useParams();
@@ -21,16 +22,18 @@ export default function SellerChatMessages() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { shop } = useAppSelector((state) => state.shop);
+  const [createMessageLoading, setCreateMessageLoading] = useState(false);
   const {
     sellerConversation: conversation,
     sellerConversations: conversations,
+    onlineUsers,
   } = useAppSelector((state) => state.conversation);
 
-  const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [createMessageLoading, setCreateMessageLoading] = useState(false);
-  const [error, setError] = useState(null);
-
+  const {
+    sellerMessages: messages,
+    sellerMessagesError: error,
+    sellerMessagesLoading: loading,
+  } = useAppSelector((state) => state.message);
   const [message, setMessage] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -48,9 +51,13 @@ export default function SellerChatMessages() {
         formData.append("image", file);
       }
 
-      const { data } = await api.post(`/messages/${params.slug}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const { data } = await api.post(
+        `/messages/seller/${params.slug}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        },
+      );
       socket.emit("sendMessage", {
         messageId: data?.message?._id,
         senderId: shop?._id,
@@ -60,8 +67,9 @@ export default function SellerChatMessages() {
         createdAt: data?.message?.createdAt,
         image: data?.message?.image,
       });
+
       dispatch(updateSellerLastMessage(data?.message));
-      setMessages((prev) => [...prev, data?.message]);
+      // setMessages((prev) => [...prev, data?.message]);
     } catch (error) {
       toast.error(error?.response?.data?.message);
     } finally {
@@ -85,43 +93,18 @@ export default function SellerChatMessages() {
   };
 
   useEffect(() => {
-    (async () => {
-      setLoading(true);
-      try {
-        const res = await api.get(`/messages/${params?.slug}`);
-        setMessages(res?.data?.messages);
-      } catch (error) {
-        setError(error?.response?.data?.message);
-      } finally {
-        setLoading(false);
-      }
-    })();
+    dispatch(getMessages(params?.slug, "seller"));
   }, [params?.slug]);
 
   useEffect(() => {
     if (!conversationId || !conversations?.length) return;
-
     const conversation = conversations?.find((c) => c._id === conversationId);
+    if (conversation) dispatch(setSellerConversation(conversation));
 
-    if (conversation) {
-      dispatch(setSellerConversation(conversation));
-    }
+    // return () => {
+    //   dispatch(setSellerConversation(null));
+    // };
   }, [conversationId, conversations]);
-
-  useEffect(() => {
-    const handleMessage = (message) => {
-      if (message?.receiverId != shop?._id || !Boolean(shop?._id)) return;
-      console.log(message);
-      setMessages((prev) => [...prev, message]);
-      dispatch(updateSellerLastMessage(message));
-    };
-
-    socket.on("getMessage", handleMessage);
-
-    return () => {
-      socket.off("getMessage", handleMessage);
-    };
-  }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({
@@ -144,14 +127,27 @@ export default function SellerChatMessages() {
           <FiArrowLeft size={22} />
         </button>
 
-        <Image
-          src={user?.avatar?.url}
-          alt={"Avatar"}
-          width={52}
-          height={52}
-          unoptimized
-          className="h-13 w-13 rounded-full object-cover"
-        />
+        <div className="relative">
+          {user?.avatar?.url ? (
+            <Image
+              src={user.avatar.url}
+              alt="Avatar"
+              width={52}
+              height={52}
+              unoptimized
+              className="h-13 w-13 rounded-full object-cover"
+            />
+          ) : null}
+
+          <span
+            className={clsx(
+              "absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white",
+              onlineUsers?.find((u) => u?.userId == user?._id)
+                ? "bg-green-500"
+                : "bg-gray-400",
+            )}
+          />
+        </div>
 
         <div>
           <h2 className="font-semibold text-gray-900">{user?.name}</h2>

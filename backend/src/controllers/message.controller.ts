@@ -60,18 +60,17 @@ export const getMessages = async (
     return next(new AppError("Conversation not found", 404));
   }
 
+  const _id = req.user._id;
+
   if (
-    req.user._id.toString() != conversation.seller.toString() &&
-    req.user._id.toString() != conversation.user.toString()
+    _id.toString() != conversation.seller.toString() &&
+    _id.toString() != conversation.user.toString()
   )
     throw new AppError("Unauthorized", 403);
 
   const messages = await Message.find({
     conversation: conversation._id,
   }).sort({ createdAt: 1 });
-  // .populate("sender")
-
-  // console.log(await Message.countDocuments());
 
   res.status(200).json({
     success: true,

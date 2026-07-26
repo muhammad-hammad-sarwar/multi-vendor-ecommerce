@@ -8,7 +8,6 @@ import {
   setConversation,
   updateLastMessageUser,
 } from "@/redux/slices/conversations";
-import { addMessage } from "@/redux/slices/message";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -52,13 +51,16 @@ export default function CurrentConversationPage() {
         formData.append("text", message);
       }
       if (file?.name) {
-        console.log(file);
         formData.append("image", file);
       }
 
-      const { data } = await api.post(`/messages/${params.slug}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const { data } = await api.post(
+        `/messages/user/${params.slug}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        },
+      );
       socket.emit("sendMessage", {
         messageId: data?.message?._id,
         senderId: user?._id,
@@ -96,7 +98,7 @@ export default function CurrentConversationPage() {
     (async () => {
       setLoading(true);
       try {
-        const res = await api.get(`/messages/${params?.slug}`);
+        const res = await api.get(`/messages/user/${params?.slug}`);
         setMessages(res?.data?.messages);
       } catch (error) {
         setError(error?.response?.data?.message);
@@ -124,9 +126,6 @@ export default function CurrentConversationPage() {
         message?.conversation != conversationId
       )
         return;
-      console.log(message);
-      console.log(conversation);
-      console.log(conversationId);
       setMessages((prev) => [...prev, message]);
       dispatch(updateLastMessageUser(message));
     };

@@ -11,6 +11,11 @@ interface Conversation {
   lastMessageAt: Date;
 }
 
+interface IOnlineUser {
+  userId: string;
+  socketId: string;
+}
+
 interface ConversationState {
   loading: boolean;
   error: string | null;
@@ -22,6 +27,10 @@ interface ConversationState {
   sellerError: string | null;
   sellerConversations: Conversation[];
   sellerConversation: Conversation | null;
+
+  // Online
+  onlineUsers: IOnlineUser[]; // For sellers
+  onlineSellers: IOnlineUser[]; // For users
 }
 
 const initialState: ConversationState = {
@@ -35,15 +44,27 @@ const initialState: ConversationState = {
   sellerError: null,
   sellerConversations: null,
   sellerConversation: null,
+  onlineUsers: null,
+  onlineSellers: null,
 };
 
 const conversationSlice = createSlice({
   name: "conversation",
   initialState,
   reducers: {
+    // Online Users and Sellers
+    setSellerOnlineUsers(state, action) {
+      state.onlineUsers = action.payload;
+      // console.log(state.onlineUsers);
+    },
+
+    setUserOnlineSellers(state, action) {
+      state.onlineSellers = action.payload;
+    },
+
     updateLastMessageUser: (state, action) => {
       const message = action.payload;
-      console.log(message);
+      // console.log(message);
 
       const index = state.conversations.findIndex(
         (c) => c._id === message.conversation,
@@ -140,6 +161,9 @@ const conversationSlice = createSlice({
 });
 
 export const {
+  setSellerOnlineUsers,
+  setUserOnlineSellers,
+
   setConversation,
   createConversationStart,
   createConversationSuccess,
