@@ -114,7 +114,7 @@ io.on("connection", (socket) => {
         conversation,
         createdAt,
       });
-      console.log(message);
+      console.log("Outside the if", message);
       const receiver = getUser(receiverId);
 
       if (!messages[receiverId]) {
@@ -124,6 +124,7 @@ io.on("connection", (socket) => {
       }
 
       if (receiver) {
+        console.log(receiver);
         io.to(receiver?.socketId).emit("getMessage", message);
       }
     },

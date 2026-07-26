@@ -4,8 +4,8 @@ import api from "@/axios/api";
 import { MessageSkeleton } from "@/components/Conversation/MessageSkeleton";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
 import {
-  setConversation,
-  updateLastMessage,
+  setSellerConversation,
+  updateSellerLastMessage,
 } from "@/redux/slices/conversations";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
@@ -21,9 +21,10 @@ export default function SellerChatMessages() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { shop } = useAppSelector((state) => state.shop);
-  const { conversation, conversations } = useAppSelector(
-    (state) => state.conversation,
-  );
+  const {
+    sellerConversation: conversation,
+    sellerConversations: conversations,
+  } = useAppSelector((state) => state.conversation);
 
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -44,7 +45,6 @@ export default function SellerChatMessages() {
         formData.append("text", message);
       }
       if (file?.name) {
-        console.log(file);
         formData.append("image", file);
       }
 
@@ -60,7 +60,7 @@ export default function SellerChatMessages() {
         createdAt: data?.message?.createdAt,
         image: data?.message?.image,
       });
-      dispatch(updateLastMessage(data?.message));
+      dispatch(updateSellerLastMessage(data?.message));
       setMessages((prev) => [...prev, data?.message]);
     } catch (error) {
       toast.error(error?.response?.data?.message);
@@ -104,15 +104,16 @@ export default function SellerChatMessages() {
     const conversation = conversations?.find((c) => c._id === conversationId);
 
     if (conversation) {
-      dispatch(setConversation(conversation));
+      dispatch(setSellerConversation(conversation));
     }
   }, [conversationId, conversations]);
 
   useEffect(() => {
     const handleMessage = (message) => {
+      if (message?.receiverId != shop?._id || !Boolean(shop?._id)) return;
       console.log(message);
       setMessages((prev) => [...prev, message]);
-      dispatch(updateLastMessage(message));
+      dispatch(updateSellerLastMessage(message));
     };
 
     socket.on("getMessage", handleMessage);

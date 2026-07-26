@@ -57,4 +57,10 @@ shopRouter.delete(
   catchAsync(shopController.deleteWithdrawMethod),
 );
 
+shopRouter.get(
+  "/conversations",
+  isSeller,
+  catchAsync(shopController.getAllConversations),
+);
+
 export default shopRouter;

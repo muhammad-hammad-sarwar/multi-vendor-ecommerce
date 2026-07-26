@@ -9,6 +9,7 @@ import { Product } from "../models/product.model.js";
 import { Event } from "../models/event.model.js";
 import { Withdraw } from "../models/withdraw.model.js";
 import { deleteFromCloudinary } from "../utils/deleteFile.js";
+import { Conversation } from "../models/conversation.model.js";
 
 export const signUp = async (
   req: Request,
@@ -362,5 +363,20 @@ export const deleteWithdrawMethod = async (req: Request, res: Response) => {
     success: true,
     message: "Withdrawal method deleted successfully",
     shop: await Shop.findById(req.user._id).select("+isVerified"),
+  });
+};
+
+export const getAllConversations = async (req: Request, res: Response) => {
+  if (!req.user) throw new AppError("Please login to continue", 400);
+
+  const conversations = await Conversation.find({ seller: req.user._id })
+    .sort({ lastMessageAt: -1 })
+    .populate("user", "name avatar")
+    .populate("seller", "name avatar");
+
+  res.json({
+    success: true,
+    message: "Conversations fetched successfully",
+    conversations,
   });
 };

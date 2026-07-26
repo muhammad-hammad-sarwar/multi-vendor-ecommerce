@@ -34,19 +34,9 @@ export default function ProtectedGuard({
     (roles.includes("seller") && isSeller) ||
     (roles.includes("admin") && user?.role === "admin");
 
-  console.log({
-    roles: roles,
-    hasAccess: hasAccess,
-    isSeller: isSeller,
-    shop: isSeller,
-    shopLoading: shopLoading,
-    shopInitialized: shopInitialized,
-  });
-
   useEffect(() => {
     if (!userInitialized || !shopInitialized) return;
     if (!hasAccess) {
-      console.log(isSeller, shop, shopError, shopLoading);
       router.replace("/");
     }
   }, [hasAccess, router, userInitialized, shopInitialized]);

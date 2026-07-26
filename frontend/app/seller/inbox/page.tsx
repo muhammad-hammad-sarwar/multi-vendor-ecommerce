@@ -5,31 +5,49 @@ import { useParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
 import { formatDistanceToNow } from "date-fns";
 import {
-  setConversation,
-  updateLastMessage,
+  setSellerConversation,
+  updateSellerLastMessage,
 } from "@/redux/slices/conversations";
 import { useEffect, useState } from "react";
 import { socket } from "@/socket/socket";
 import { ConversationListSkeleton } from "@/components/Conversation/ConversationListSkeleton";
+import clsx from "clsx";
 
 export default function Inbox() {
   const params = useParams();
   const dispatch = useAppDispatch();
   const [onlineUsers, setOnlineUsers] = useState([]);
-  const { conversations, loading, error } = useAppSelector(
-    (state) => state.conversation,
-  );
+  const { shop } = useAppSelector((state) => state.shop);
+  const {
+    sellerConversations: conversations,
+    sellerLoading: loading,
+    sellerError: error,
+  } = useAppSelector((state) => state.conversation);
 
   useEffect(() => {
-    socket.on("getUsers", (users) => {
-      setOnlineUsers(users);
-    });
+    const handleUsers = () => {
+      socket.on("getUsers", (users) => {
+        setOnlineUsers(users);
+      });
+    };
 
-    socket.on("getMessage", (message) => {
-      console.log(message);
-      dispatch(updateLastMessage(message));
-    });
-  }, []);
+    const handleMessage = () => {
+      socket.on("getMessage", (message) => {
+        if (
+          message?.receiverId != shop?._id ||
+          !Boolean(shop?._id) ||
+          message.conversation !== params?.slug
+        )
+          return;
+        dispatch(updateSellerLastMessage(message));
+      });
+    };
+
+    return () => {
+      socket.off("getUsers", handleUsers);
+      socket.off("getMessage", handleMessage);
+    };
+  }, [shop?._id, params?.slug]);
 
   if (loading || (!error && !conversations))
     return <ConversationListSkeleton />;
@@ -55,7 +73,7 @@ export default function Inbox() {
             return (
               <Link
                 key={conversation._id}
-                onClick={() => dispatch(setConversation(conversation))}
+                onClick={() => dispatch(setSellerConversation(conversation))}
                 href={`/seller/inbox/${conversation._id}`}
                 className={`flex items-center gap-4 border-b px-5 py-4 transition ${
                   isActive ? "bg-green-50" : "hover:bg-gray-50"
@@ -71,9 +89,14 @@ export default function Inbox() {
                     className="h-13 w-13 rounded-full object-cover"
                   />
 
-                  {onlineUsers.find((u) => u.userId == user?._id) && (
-                    <span className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white bg-green-500" />
-                  )}
+                  <span
+                    className={clsx(
+                      "absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white",
+                      onlineUsers.find((u) => u.userId == user?._id)
+                        ? "bg-green-500"
+                        : "bg-gray-400",
+                    )}
+                  />
                 </div>
 
                 <div className="min-w-0 flex-1">

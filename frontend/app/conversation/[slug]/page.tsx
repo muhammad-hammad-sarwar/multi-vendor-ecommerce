@@ -6,7 +6,7 @@ import { getMessages } from "@/redux/actions/message";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
 import {
   setConversation,
-  updateLastMessage,
+  updateLastMessageUser,
 } from "@/redux/slices/conversations";
 import { addMessage } from "@/redux/slices/message";
 import Image from "next/image";
@@ -28,8 +28,7 @@ export default function CurrentConversationPage() {
   const conversationId = params.slug;
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const { isAuthenticated, user } = useAppSelector((state) => state.user);
-  const { isSeller, shop } = useAppSelector((state) => state.shop);
+  const { user } = useAppSelector((state) => state.user);
   const { conversation, conversations } = useAppSelector(
     (state) => state.conversation,
   );
@@ -69,7 +68,7 @@ export default function CurrentConversationPage() {
         image: data?.message?.image,
         createdAt: data?.message?.createdAt,
       });
-      dispatch(updateLastMessage(data?.message));
+      dispatch(updateLastMessageUser(data?.message));
       setMessages((prev) => [...prev, data?.message]);
     } catch (error) {
       toast.error(error?.response?.data?.message);
@@ -119,8 +118,17 @@ export default function CurrentConversationPage() {
 
   useEffect(() => {
     const handleMessage = (message) => {
+      if (
+        message?.receiverId != user?._id ||
+        !Boolean(user?._id) ||
+        message?.conversation != conversationId
+      )
+        return;
+      console.log(message);
+      console.log(conversation);
+      console.log(conversationId);
       setMessages((prev) => [...prev, message]);
-      dispatch(updateLastMessage(message));
+      dispatch(updateLastMessageUser(message));
     };
 
     socket.on("getMessage", handleMessage);
@@ -128,7 +136,7 @@ export default function CurrentConversationPage() {
     return () => {
       socket.off("getMessage", handleMessage);
     };
-  }, []);
+  }, [user?._id, conversationId]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({

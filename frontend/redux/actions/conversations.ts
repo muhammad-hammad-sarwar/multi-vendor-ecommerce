@@ -6,12 +6,14 @@ import {
   getConversationsFailure,
   getConversationsStart,
   getConversationsSuccess,
+  getSellerConversationsFailure,
+  getSellerConversationsStart,
+  getSellerConversationsSuccess,
 } from "../slices/conversations";
 import { AppDispatch } from "../store";
 
 export const createConversation =
   (payload) => async (dispatch: AppDispatch) => {
-    // payload = {sellerId, userId}
     try {
       dispatch(createConversationStart());
 
@@ -34,5 +36,17 @@ export const getConversations = () => async (dispatch: AppDispatch) => {
     dispatch(getConversationsSuccess(res.data.conversations));
   } catch (error) {
     dispatch(getConversationsFailure(error?.response?.data?.message));
+  }
+};
+
+export const getSellerConversations = () => async (dispatch: AppDispatch) => {
+  try {
+    dispatch(getSellerConversationsStart());
+
+    const res = await api.get("/shop/conversations");
+
+    dispatch(getSellerConversationsSuccess(res.data.conversations));
+  } catch (error) {
+    dispatch(getSellerConversationsFailure(error?.response?.data?.message));
   }
 };

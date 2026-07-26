@@ -16,6 +16,12 @@ interface ConversationState {
   error: string | null;
   conversation: Conversation | null;
   conversations: Conversation[];
+
+  // Seller
+  sellerLoading: boolean;
+  sellerError: string | null;
+  sellerConversations: Conversation[];
+  sellerConversation: Conversation | null;
 }
 
 const initialState: ConversationState = {
@@ -23,13 +29,19 @@ const initialState: ConversationState = {
   error: null,
   conversation: null,
   conversations: null,
+
+  // Seller
+  sellerLoading: false,
+  sellerError: null,
+  sellerConversations: null,
+  sellerConversation: null,
 };
 
 const conversationSlice = createSlice({
   name: "conversation",
   initialState,
   reducers: {
-    updateLastMessage: (state, action) => {
+    updateLastMessageUser: (state, action) => {
       const message = action.payload;
       console.log(message);
 
@@ -46,8 +58,30 @@ const conversationSlice = createSlice({
       // removes the current convo and then add it at top
       state.conversations.unshift(conversation);
     },
+
+    updateSellerLastMessage: (state, action) => {
+      const message = action.payload;
+
+      const index = state.sellerConversations.findIndex(
+        (c) => c._id === message.conversation,
+      );
+
+      if (index === -1) return;
+
+      state.sellerConversations[index].lastMessage = message.text;
+      state.sellerConversations[index].lastMessageAt = message.createdAt;
+
+      const conversation = state.sellerConversations.splice(index, 1)[0];
+      // removes the current convo and then add it at top
+      state.sellerConversations.unshift(conversation);
+    },
+
     setConversation: (state, action) => {
       state.conversation = action.payload;
+    },
+
+    setSellerConversation: (state, action) => {
+      state.sellerConversation = action.payload;
     },
 
     createConversationStart(state) {
@@ -82,6 +116,22 @@ const conversationSlice = createSlice({
       toast.error(action.payload);
     },
 
+    getSellerConversationsStart(state) {
+      state.sellerLoading = true;
+      state.sellerError = null;
+    },
+
+    getSellerConversationsSuccess(state, action) {
+      state.sellerLoading = false;
+      state.sellerConversations = action.payload;
+    },
+
+    getSellerConversationsFailure(state, action) {
+      state.sellerLoading = false;
+      state.sellerError = action.payload;
+      toast.error(action.payload);
+    },
+
     clearConversation(state) {
       state.conversation = null;
       state.error = null;
@@ -98,7 +148,13 @@ export const {
   getConversationsSuccess,
   getConversationsFailure,
   clearConversation,
-  updateLastMessage,
+  updateLastMessageUser,
+
+  getSellerConversationsStart,
+  getSellerConversationsSuccess,
+  getSellerConversationsFailure,
+  setSellerConversation,
+  updateSellerLastMessage,
 } = conversationSlice.actions;
 
 export default conversationSlice.reducer;

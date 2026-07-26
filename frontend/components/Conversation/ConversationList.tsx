@@ -8,6 +8,7 @@ import { ConversationListSkeleton } from "./ConversationListSkeleton";
 import { setConversation } from "@/redux/slices/conversations";
 import { useEffect, useState } from "react";
 import { socket } from "@/socket/socket";
+import clsx from "clsx";
 
 export default function ConversationList() {
   const params = useParams();
@@ -61,10 +62,16 @@ export default function ConversationList() {
                     unoptimized
                     className="h-13 w-13 rounded-full object-cover"
                   />
-
-                  {onlineUsers.find((u) => u.userId == seller?._id) && (
-                    <span className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white bg-green-500" />
-                  )}
+                  (
+                  <span
+                    className={clsx(
+                      "absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white",
+                      onlineUsers.find((u) => u.userId == seller?._id)
+                        ? "bg-green-500"
+                        : "bg-gray-400",
+                    )}
+                  />
+                  )
                 </div>
 
                 <div className="min-w-0 flex-1">
