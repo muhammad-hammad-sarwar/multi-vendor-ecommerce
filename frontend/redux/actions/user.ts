@@ -11,10 +11,6 @@ import {
 } from "../slices/user";
 import { loadShopFailed, loadShopStart, loadShopSuccess } from "../slices/shop";
 
-export const addUserWhileLogin = (user) => (dispatch: AppDispatch) => {
-  dispatch(addUser(user));
-};
-
 export const loadUserProfile = () => async (dispatch: AppDispatch) => {
   try {
     dispatch(loadUserStart());

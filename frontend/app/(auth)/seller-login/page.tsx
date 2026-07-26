@@ -3,10 +3,10 @@ import api from "@/axios/api";
 import GuestGuard from "@/components/Guards/GuestGuard";
 import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
 import { loadShop } from "@/redux/actions/user";
-import { useAppDispatch } from "@/redux/hooks/hooks";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { toast } from "react-toastify";
 
@@ -16,10 +16,12 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isVisible, setIsVisible] = useState(false);
+  const { isSeller, shop } = useAppSelector((state) => state.shop);
   const dispatch = useAppDispatch();
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (loading) return;
     try {
       setLoading(true);
       const result = await api.post("/shop/login", { email, password });
@@ -34,6 +36,12 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (isSeller) {
+      router.push(`/shop/${shop?._id}`);
+    }
+  }, [router, isSeller]);
 
   return (
     <GuestGuard blockedRoles={["seller"]}>

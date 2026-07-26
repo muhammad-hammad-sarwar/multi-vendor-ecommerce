@@ -24,7 +24,7 @@ export function WishlistDrawer({
         className="fixed inset-0 bg-black/40 z-40"
       />
 
-      <div className="fixed right-0 top-0 h-full w-full sm:w-100 bg-white z-50 shadow-lg flex flex-col">
+      <div className="fixed right-0 top-0 h-full w-9/12 sm:w-100 bg-white z-50 shadow-lg flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
           <h2 className="font-semibold text-lg flex items-center gap-2">

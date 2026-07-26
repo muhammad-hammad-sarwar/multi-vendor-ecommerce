@@ -3,6 +3,8 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import api from "@/axios/api";
 import Link from "next/link";
+import { toast } from "react-toastify";
+import ButtonLoader from "../Layout/ButtonLoader/ButtonLoader";
 
 export default function Verify() {
   const searchParams = useSearchParams();
@@ -12,6 +14,7 @@ export default function Verify() {
 
   const [status, setStatus] = useState("loading");
   const [email, setEmail] = useState("");
+  const [resendLoading, setResendLoading] = useState(false);
 
   useEffect(() => {
     const verify = async () => {
@@ -22,7 +25,9 @@ export default function Verify() {
           await api.post("/shop/verify", { uid, seller_token: sellerToken });
         }
         setStatus("success");
+        toast.success("Verification Success! Please Login to continue");
       } catch (err) {
+        toast.error(err?.response?.data?.message);
         setStatus("failed");
       }
     };
@@ -31,10 +36,19 @@ export default function Verify() {
   }, []);
 
   const resend = async () => {
-    if (token) {
-      await api.post("/auth/resend-verification", { email, uid });
-    } else if (sellerToken) {
-      await api.post("/shop/resend-verification", { email, uid });
+    setResendLoading(true);
+    try {
+      if (token) {
+        await api.post("/auth/resend-verification", { email, uid });
+      } else if (sellerToken) {
+        await api.post("/shop/resend-verification", { email, uid });
+      }
+
+      toast.success("Email Sent Successfully. Please click on provided link.");
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    } finally {
+      setResendLoading(false);
     }
     setStatus("resent");
   };
@@ -113,9 +127,10 @@ export default function Verify() {
 
             <button
               onClick={resend}
+              disabled={resendLoading}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium transition"
             >
-              Resend Verification
+              {resendLoading ? <ButtonLoader /> : "Resend Verification"}
             </button>
           </div>
         )}

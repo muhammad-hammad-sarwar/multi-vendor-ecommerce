@@ -92,40 +92,29 @@ io.on("connection", (socket) => {
   });
 
   const messages = {};
-  socket.on(
-    "sendMessage",
-    ({
-      messageId,
-      senderId,
-      receiverId,
-      text,
-      image,
-      conversation,
-      createdAt,
-    }) => {
-      const message = createMessage({
-        messageId,
-        senderId,
-        receiverId,
-        text,
-        image,
-        conversation,
-        createdAt,
-      });
-      const receiver = getUser(receiverId);
+  socket.on("sendMessage", (payload) => {
+    console.log("========== SEND MESSAGE ==========");
+    const message = createMessage(payload);
+    const receiverId = payload?.receiverId;
+    const receiver = getUser(receiverId);
+    console.log("Receiver ID:", receiverId);
 
-      if (!messages[receiverId]) {
-        messages[receiverId] = [message];
-      } else {
-        messages[receiverId].push(message);
-      }
+    console.log("Users:", users);
 
-      if (receiver) {
-        console.log("RECEIVER FOUND", message);
-        io.to(receiver?.socketId).emit("getMessage", message);
-      }
-    },
-  );
+    if (!messages[receiverId]) {
+      console.log("Found receiver:", receiver);
+      messages[receiverId] = [message];
+    } else {
+      messages[receiverId].push(message);
+    }
+
+    if (receiver) {
+      console.log("Emitting to:", receiver.socketId);
+      io.to(receiver.socketId).emit("getMessage", payload);
+    } else {
+      console.log("Receiver NOT found");
+    }
+  });
 
   socket.on("messageSeen", ({ senderId, receiverId, messageId }) => {
     const user = getUser(senderId);

@@ -34,6 +34,7 @@ export default function SignUpPage() {
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (loading) return;
     const formData = new FormData();
     if (avatar) formData.append("avatar", avatar);
     formData.append("email", email);

@@ -25,7 +25,7 @@ export const createCoupon = async (req: Request, res: Response) => {
 
   // const { success, data, error } = createCouponSchema.safeParse(req.body);
   // if (!success) throw new AppError(error?.issues?.[0].message, 400);
-  console.log("pass");
+  // console.log("pass");
 
   const existingCoupon = await Coupon.findOne({
     name: name.trim().toUpperCase(),

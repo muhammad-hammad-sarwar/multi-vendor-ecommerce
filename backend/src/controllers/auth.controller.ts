@@ -39,7 +39,7 @@ export const signUp = async (
   try {
     await sendEmail(
       email,
-      `${process.env?.NODE_ENV === "development" ? "http://localhost:3000" : "https://multi-vendor-ecommerce-fe.vercel.app"}/verify?uid=${newUser._id}&token=${verifyTokenHash}`,
+      `${process.env?.NODE_ENV === "development" ? "http://localhost:3000" : "https://multi-vendor-ecommerce-fe.vercel.app"}/verify?uid=${newUser._id}&token=${verifyTokenHashUUID}`,
     );
   } catch (error) {
     throw new AppError("Error sending email: Please retry Verification", 500);

@@ -60,7 +60,7 @@ export default function ProductModal({
   return (
     <div
       onClick={() => setOpen(false)}
-      className="scroll-y-auto fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4"
+      className="fixed inset-0 z-50 bg-black/50 overflow-y-auto flex items-start md:items-center justify-center p-4"
     >
       <div
         onClick={(e) => e.stopPropagation()}

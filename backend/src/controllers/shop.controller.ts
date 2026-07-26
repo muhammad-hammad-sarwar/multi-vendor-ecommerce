@@ -256,7 +256,7 @@ export const deleteEventById = async (req: Request, res: Response) => {
 
 export const getShopInfo = async (req: Request, res: Response) => {
   const { id } = req.params;
-  console.log("params from get shop info", req.params);
+  // console.log("params from get shop info", req.params);
   if (!id) throw new AppError("Shop id is required", 400);
 
   const shop = await Shop.findById(id);

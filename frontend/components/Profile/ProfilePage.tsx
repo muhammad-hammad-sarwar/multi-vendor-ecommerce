@@ -61,7 +61,7 @@ export default function ProfilePage() {
 
   return (
     <section className=" flex p-3 md:px-10 md:py-6">
-      <aside className="bg-white border-r w-16 md:w-60 flex flex-col h-90 md:h-100 rounded-lg">
+      <aside className="bg-white border-r w-16 md:w-60 flex flex-col h-100 rounded-lg">
         {user && user.role === "admin" && (
           <Link href={"/admin/dashboard"}>
             <button

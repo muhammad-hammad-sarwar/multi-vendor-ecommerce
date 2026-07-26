@@ -15,7 +15,7 @@ export default function SignUpPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [avatar, setAvatar] = useState<File | null>(null);
-  const { isSeller } = useAppSelector((state) => state.shop);
+  const { isAuthenticated } = useAppSelector((state) => state.user);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -26,7 +26,7 @@ export default function SignUpPage() {
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (loading || isSeller) return;
+    if (loading || isAuthenticated) return;
     const formData = new FormData();
     if (avatar) formData.append("avatar", avatar);
     formData.append("email", email);

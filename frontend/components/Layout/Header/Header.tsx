@@ -233,7 +233,15 @@ export default function Header() {
             />
           </Link>
 
-          <BsCart onClick={() => setCartOpen(true)} className="text-xl" />
+          <div
+            onClick={() => setCartOpen(true)}
+            className="cursor-pointer relative"
+          >
+            <BsCart className="text-2xl" />
+            <div className="absolute -top-1 -right-1 text-white bg-green-600 rounded-full w-4 h-4 text-sm flex items-center justify-center">
+              {cartItems?.length}
+            </div>
+          </div>
         </div>
       </header>
 
@@ -251,7 +259,21 @@ export default function Header() {
         }`}
       >
         <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="font-semibold text-lg">Menu</h2>
+          <div
+            onClick={() => {
+              setWishlistOpen(true);
+              setOpen(false);
+            }}
+            className="cursor-pointer relative"
+          >
+            <CgHeart
+              size={24}
+              className="cursor-pointer hover:text-red-500 transition"
+            />
+            <div className="absolute -top-1 -right-2 text-white bg-green-600 rounded-full w-5 h-5 text-sm flex items-center justify-center">
+              {wishlist?.length}
+            </div>
+          </div>
           <button onClick={() => setOpen(false)} className="text-xl">
             ✕
           </button>
@@ -322,9 +344,11 @@ export default function Header() {
         </nav>
 
         <div className="mt-auto p-4 flex flex-col gap-3">
-          <button className="bg-black text-white py-2 rounded-lg">
-            Become a Seller
-          </button>
+          <Link className="block cursor-pointer" href={"/seller-login"}>
+            <button className="bg-black w-full text-white py-2 rounded-lg">
+              Become a Seller
+            </button>
+          </Link>
 
           {isAuthenticated ? (
             <Link onClick={() => setOpen(false)} href={"/profile"}>
@@ -335,7 +359,6 @@ export default function Header() {
                   src={user?.avatar?.url}
                   alt="avatar"
                   className="object-cover"
-                  unoptimized // remove this when use cloudinary
                 />
               </div>
             </Link>

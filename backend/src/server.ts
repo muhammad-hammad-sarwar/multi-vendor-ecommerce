@@ -81,7 +81,7 @@ app.use(errorMiddleware);
 if (process.env.NODE_ENV === "development") {
   connectDB().then(() => {
     app.listen(8000, () => {
-      console.log("Server Running at 8000");
+      // console.log("Server Running at 8000");
     });
   });
 } else {

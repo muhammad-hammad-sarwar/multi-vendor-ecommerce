@@ -2,11 +2,11 @@
 import api from "@/axios/api";
 import GuestGuard from "@/components/Guards/GuestGuard";
 import ButtonLoader from "@/components/Layout/ButtonLoader/ButtonLoader";
-import { addUserWhileLogin } from "@/redux/actions/user";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
+import { addUser } from "@/redux/slices/user";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FiMail, FiLock, FiEye, FiEyeOff } from "react-icons/fi";
 import { toast } from "react-toastify";
 
@@ -26,8 +26,7 @@ export default function LoginPage() {
       setLoading(true);
       const res = await api.post("/auth/login", { email, password });
       toast.success("Logged In successfully");
-      dispatch(addUserWhileLogin(res.data?.user));
-      router.push("/");
+      dispatch(addUser(res.data?.user));
     } catch (error) {
       toast.error(
         `${error.response?.data?.message || "Failed to Login. Please try again Later"}`,
@@ -36,6 +35,12 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/profile");
+    }
+  }, [router, isAuthenticated]);
 
   return (
     <GuestGuard blockedRoles={["user", "admin"]}>

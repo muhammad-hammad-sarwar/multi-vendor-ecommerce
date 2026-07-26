@@ -32,7 +32,7 @@ export default function CartDrawer({
 
       <div
         className={
-          "fixed right-0 top-0 h-full w-full sm:w-100 bg-white z-50 shadow-lg flex flex-col"
+          "fixed right-0 top-0 h-full w-9/12 sm:w-100 bg-white z-50 shadow-lg flex flex-col"
         }
       >
         <div className="flex items-center justify-between p-4 border-b">

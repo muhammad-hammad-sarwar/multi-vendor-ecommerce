@@ -47,6 +47,7 @@ export default function ProductDetailsPage() {
   );
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const [qty, setQty] = useState(1);
 
   const related = isEvent
     ? allEvents?.filter(
@@ -216,16 +217,45 @@ export default function ProductDetailsPage() {
                 </span>
               </p>
             ) : (
-              <button
-                onClick={() =>
-                  dispatch(
-                    addToCart({ ...product, isEvent: isEvent === "true" }),
-                  )
-                }
-                className="cursor-pointer bg-black text-white px-6 py-2 rounded-lg flex items-center gap-2"
-              >
-                <FiShoppingCart /> Add to Cart
-              </button>
+              <>
+                <div className="flex items-center border rounded-lg overflow-hidden">
+                  <button
+                    onClick={() => setQty((q) => Math.max(1, q - 1))}
+                    className="cursor-pointer px-3 py-2 bg-gray-100"
+                  >
+                    -
+                  </button>
+
+                  <span className="px-4">{qty}</span>
+
+                  <button
+                    onClick={() =>
+                      setQty((q) => {
+                        if (q < product?.stock) return q + 1;
+                        return q;
+                      })
+                    }
+                    className="cursor-pointer px-3 py-2 bg-gray-100"
+                  >
+                    +
+                  </button>
+                </div>
+
+                <button
+                  onClick={() =>
+                    dispatch(
+                      addToCart({
+                        ...product,
+                        isEvent: isEvent === "true",
+                        quantity: qty,
+                      }),
+                    )
+                  }
+                  className="cursor-pointer bg-black text-white px-6 py-2 rounded-lg flex items-center gap-2"
+                >
+                  <FiShoppingCart /> Add to Cart
+                </button>
+              </>
             )}
 
             {isFavourite ? (
@@ -283,7 +313,7 @@ export default function ProductDetailsPage() {
 
             <button
               onClick={handleMessage}
-              className="ml-auto bg-black text-white h-10 w-30 rounded-lg cursor-pointer"
+              className="ml-auto bg-black text-white h-10 px-2 md:px-0 w-30 rounded-lg cursor-pointer"
             >
               {conversationLoading ? <ButtonLoader /> : "Message Seller"}
             </button>
@@ -371,7 +401,7 @@ export default function ProductDetailsPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-x-10 gap-y-5 text-right">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-5 text-right">
                   <div>
                     <p className="text-xs uppercase tracking-wide text-gray-500">
                       Joined On
