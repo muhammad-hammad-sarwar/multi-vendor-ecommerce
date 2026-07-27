@@ -61,7 +61,7 @@ app.get("/", (req: Request, res: Response) => {
   res.json({ success: true, message: "Hello from Backend" });
 });
 
-app.use("/uploads", express.static("uploads"));
+// app.use("/uploads", express.static("uploads"));
 app.use("/auth", authRouter);
 app.use("/shop", shopRouter);
 app.use("/products", productRouter);

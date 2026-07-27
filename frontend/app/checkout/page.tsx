@@ -14,6 +14,8 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import { AlertTriangle } from "lucide-react";
 import ProtectedGuard from "@/components/Guards/ProtectedGuard";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 export default function CheckoutPage() {
   const [step, setStep] = useState(1);
@@ -21,6 +23,7 @@ export default function CheckoutPage() {
   const { cartItems } = useAppSelector((state) => state.cart);
   const [orderData, setOrderData] = useState(null);
   const [stripeApiKey, setStripeApiKey] = useState("");
+  const router = useRouter();
 
   const getStripeApiKey = async () => {
     const res = await api.get("/payment/api-key");
@@ -39,6 +42,15 @@ export default function CheckoutPage() {
   );
   const shippingPrice = 0.1 * subTotal;
   const totalPrice = subTotal + shippingPrice;
+
+  useEffect(() => {
+    if (totalPrice == 0) {
+      toast.error(
+        "You dont have any cart item. Please Shop Before checking out.",
+      );
+      router.push("/products");
+    }
+  }, [totalPrice]);
 
   return (
     <>

@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
 import { formatDistanceToNow } from "date-fns";
 import { setSellerConversation } from "@/redux/slices/conversations";
 import { ConversationListSkeleton } from "@/components/Conversation/ConversationListSkeleton";
+import { CiImageOn } from "react-icons/ci";
 import clsx from "clsx";
 
 export default function Inbox() {
@@ -78,8 +79,18 @@ export default function Inbox() {
                     )}
                   </div>
 
-                  <p className="truncate text-sm text-gray-500">
-                    {conversation?.lastMessage || "Start a conversation"}
+                  <p
+                    className={clsx(
+                      "truncate text-sm",
+                      conversation?.lastMessage === "Image"
+                        ? "flex items-center gap-1 text-gray-700"
+                        : "text-gray-500",
+                    )}
+                  >
+                    {conversation?.lastMessage === "Image" && (
+                      <CiImageOn size={14} />
+                    )}{" "}
+                    {conversation?.lastMessage || "Start a Conversation"}
                   </p>
                 </div>
               </Link>

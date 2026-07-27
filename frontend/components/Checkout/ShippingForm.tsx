@@ -238,6 +238,11 @@ export default function ShippingForm({
             return;
           }
 
+          if (totalPrice === 0) {
+            toast.error("Cant Proceed Empty Cart.");
+            return;
+          }
+
           const shippingInfo = { address1, address2, zipCode, country, city };
           const orderData = {
             email,

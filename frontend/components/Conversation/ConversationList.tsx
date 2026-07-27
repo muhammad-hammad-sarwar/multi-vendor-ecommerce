@@ -12,6 +12,7 @@ import {
 import { useEffect, useState } from "react";
 import { socket } from "@/socket/socket";
 import clsx from "clsx";
+import { CiImageOn } from "react-icons/ci";
 
 export default function ConversationList() {
   const params = useParams();
@@ -100,8 +101,18 @@ export default function ConversationList() {
                     )}
                   </div>
 
-                  <p className="truncate text-sm text-gray-500">
-                    {conversation.lastMessage || "Start a conversation"}
+                  <p
+                    className={clsx(
+                      "truncate text-sm",
+                      conversation?.lastMessage === "Image"
+                        ? "flex items-center gap-1 text-gray-700"
+                        : "text-gray-500",
+                    )}
+                  >
+                    {conversation?.lastMessage === "Image" && (
+                      <CiImageOn size={14} />
+                    )}{" "}
+                    {conversation?.lastMessage || "Start a Conversation"}
                   </p>
                 </div>
               </Link>

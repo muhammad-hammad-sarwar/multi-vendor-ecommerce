@@ -49,7 +49,10 @@ export default function CurrentConversationPage() {
       const formData = new FormData();
       if (message.trim()) {
         formData.append("text", message);
+      } else {
+        formData.append("text", "Image");
       }
+
       if (file?.name) {
         formData.append("image", file);
       }
@@ -145,7 +148,18 @@ export default function CurrentConversationPage() {
 
   if (loading || (!error && !messages) || !conversation)
     return <MessageSkeleton />;
-  if (error) return <>{error}</>;
+  if (error)
+    return (
+      <>
+        <button
+          onClick={() => router.push("/conversation")}
+          className="cursor-pointer hover:bg-gray-100 w-8 h-8 flex items-center justify-center rounded-full"
+        >
+          <FiArrowLeft size={22} />
+        </button>{" "}
+        {error}
+      </>
+    );
 
   const seller = conversation?.seller;
   return (

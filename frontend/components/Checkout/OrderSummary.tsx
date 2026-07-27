@@ -80,7 +80,7 @@ export default function OrderSummary({
 
           <button
             onClick={applyCoupon}
-            className="rounded-lg bg-blue-600 px-5 text-white hover:bg-blue-700 transition"
+            className="rounded-lg bg-blue-600 w-4/12 cursor-pointer text-white hover:bg-blue-700 transition"
           >
             {loading ? <ButtonLoader /> : "Apply"}
           </button>

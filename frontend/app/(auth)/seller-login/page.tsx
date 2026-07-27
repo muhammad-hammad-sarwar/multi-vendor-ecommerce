@@ -125,13 +125,13 @@ export default function LoginPage() {
                 Remember me
               </label>
 
-              <Link
-                href="/forgot-password"
+              {/* <Link
+                href="/seller-forgot-password"
                 aria-label="Forgot password page"
                 className="text-blue-600 hover:underline"
               >
                 Forgot password?
-              </Link>
+              </Link> */}
             </div>
 
             <button

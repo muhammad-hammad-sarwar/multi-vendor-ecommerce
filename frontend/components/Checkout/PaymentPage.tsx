@@ -20,11 +20,11 @@ export default function PaymentPage({ fullName: name, amount, setStep }) {
       title: "Credit / Debit Card",
       description: "Pay securely with Stripe",
     },
-    {
-      id: "COD",
-      title: "Cash on Delivery",
-      description: "Pay when your order arrives",
-    },
+    // {
+    //   id: "COD",
+    //   title: "Cash on Delivery",
+    //   description: "Pay when your order arrives",
+    // },
     {
       id: "Bank",
       title: "Bank Transfer",

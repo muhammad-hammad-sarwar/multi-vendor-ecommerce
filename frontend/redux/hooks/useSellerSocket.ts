@@ -15,7 +15,7 @@ export const useSellerSocket = () => {
     if (!shop?._id) return;
 
     const handleUsers = (users) => {
-      dispatch(setSellerOnlineUsers(users));
+      dispatch(setSellerOnlineUsers(users?.length > 0 ? users : []));
     };
 
     const handleMessage = (message) => {

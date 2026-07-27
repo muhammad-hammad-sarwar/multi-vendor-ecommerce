@@ -7,7 +7,7 @@ export const MessageBubble = ({ msg, currentSenderId }) => {
       key={msg._id}
       className={`flex ${isMine ? "justify-end" : "justify-start"}`}
     >
-      {msg?.text ? (
+      {msg?.text != "Image" ? (
         <div
           className={`max-w-[75%] rounded-2xl px-4 py-3 text-sm wrap-break-word ${
             isMine

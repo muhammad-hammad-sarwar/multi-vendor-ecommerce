@@ -46,7 +46,10 @@ export default function SellerChatMessages() {
       const formData = new FormData();
       if (message.trim()) {
         formData.append("text", message);
+      } else {
+        formData.append("text", "Image");
       }
+
       if (file?.name) {
         formData.append("image", file);
       }
@@ -100,10 +103,6 @@ export default function SellerChatMessages() {
     if (!conversationId || !conversations?.length) return;
     const conversation = conversations?.find((c) => c._id === conversationId);
     if (conversation) dispatch(setSellerConversation(conversation));
-
-    // return () => {
-    //   dispatch(setSellerConversation(null));
-    // };
   }, [conversationId, conversations]);
 
   useEffect(() => {

@@ -7,7 +7,7 @@ const steps = ["Shipping", "Payment", "Success"];
 
 export default function CheckoutSteps({ currentStep }: Props) {
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-between md:justify-center">
       {steps.map((step, index) => {
         const active = index + 1 <= currentStep;
 
@@ -16,7 +16,7 @@ export default function CheckoutSteps({ currentStep }: Props) {
             <div className="flex flex-col items-center">
               <span
                 className={clsx(
-                  "mt-2 w-30 h-10 text-lg flex items-center justify-center rounded-2xl",
+                  "mt-2 w-26 md:w-30 h-10 text-lg flex items-center justify-center rounded-2xl",
                   active
                     ? "bg-green-600 border-green-600 text-white"
                     : "bg-green-300/50 border-gray-300 text-green-700",
@@ -29,7 +29,7 @@ export default function CheckoutSteps({ currentStep }: Props) {
             {index !== steps.length - 1 && (
               <div
                 className={clsx(
-                  "w-24 md:w-40 h-1 rounded-full",
+                  "hidden md:block w-24 md:w-40 h-1 rounded-full",
                   currentStep > index + 1 ? "bg-green-600" : "bg-gray-300",
                 )}
               />

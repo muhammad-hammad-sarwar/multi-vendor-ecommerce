@@ -1,5 +1,4 @@
 "use client";
-import { useAppSelector } from "@/redux/hooks/hooks";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { useState } from "react";
@@ -17,6 +16,7 @@ export default function ShopDetailsInfo({
   events,
 }) {
   const [activeTab, setActiveTab] = useState<Tab>("products");
+
   return (
     <main className="flex-1">
       <div className="mb-8 flex flex-col gap-4 md:gap-0 md:flex-row items-center justify-between rounded-2xl border bg-white p-6 shadow-sm">
