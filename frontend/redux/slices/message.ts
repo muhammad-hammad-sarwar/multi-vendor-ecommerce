@@ -50,6 +50,14 @@ const messageSlice = createSlice({
       state.userMessagesLoading = true;
     },
 
+    appendSellerMessage(state, action) {
+      if (state.sellerMessages == null) {
+        state.sellerMessages = [];
+      }
+
+      state.sellerMessages.push(action.payload);
+    },
+
     getMessagesSuccess(state, action) {
       if (action.payload?.role === "seller") {
         state.sellerMessagesLoading = false;
@@ -71,9 +79,9 @@ const messageSlice = createSlice({
       toast.error(action.payload?.error);
     },
 
-    clearConversation(state) {
-      // state.messages = null;
-      // state.error = null;
+    clearSellerConversation(state) {
+      state.sellerMessages = null;
+      state.sellerMessagesError = null;
     },
   },
 });
@@ -82,7 +90,8 @@ export const {
   getMessagesStart,
   getMessagesSuccess,
   getMessagesFailure,
-  clearConversation,
+  appendSellerMessage,
+  clearSellerConversation,
 } = messageSlice.actions;
 
 export default messageSlice.reducer;

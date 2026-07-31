@@ -86,7 +86,6 @@ const conversationSlice = createSlice({
       const index = state.sellerConversations.findIndex(
         (c) => c._id === message.conversation,
       );
-
       if (index === -1) return;
 
       state.sellerConversations[index].lastMessage = message.text;

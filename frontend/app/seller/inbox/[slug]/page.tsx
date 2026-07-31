@@ -15,6 +15,7 @@ import { toast } from "react-toastify";
 import { MessageBubble } from "@/components/Conversation/MessageBubble";
 import clsx from "clsx";
 import { getMessages } from "@/redux/actions/message";
+import { appendSellerMessage } from "@/redux/slices/message";
 
 export default function SellerChatMessages() {
   const params = useParams();
@@ -72,7 +73,8 @@ export default function SellerChatMessages() {
       });
 
       dispatch(updateSellerLastMessage(data?.message));
-      // setMessages((prev) => [...prev, data?.message]);
+      if (conversationId === data?.message?.conversation)
+        dispatch(appendSellerMessage(data?.message));
     } catch (error) {
       toast.error(error?.response?.data?.message);
     } finally {

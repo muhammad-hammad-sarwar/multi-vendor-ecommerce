@@ -25,7 +25,7 @@ The application is split into a frontend application and a backend API. The fron
 | Backend    | Express.js + TypeScript | Clear structure for routing, middleware, and domain-based controllers               | Requires more discipline around types and structure                                 |
 | Database   | MongoDB + Mongoose      | Flexible for product, user, order, and shop documents                               | Less strict than relational schemas for complex joins                               |
 | Auth       | JWT + bcrypt            | Simple and practical for cookie-based sessions and role checks                      | Needs careful route protection and token handling                                   |
-| Payments   | Stripe                  | Standard choice for ecommerce checkout and payment flow                             | External dependency and webhook reliability requirements                            |
+| Payments   | Stripe                  | Standard choice for ecommerce checkout and payment flow                             |                                                                                     |
 | Media      | Cloudinary + Multer     | Better than local storage for image handling in a real app                          | Adds a third-party integration and upload dependency                                |
 | Realtime   | Socket.io               | Fits the chat use case well for real-time conversations                             | Requires careful reconnection and state management                                  |
 | Deployment | Vercel                  | Suitable for shipping the frontend and backend services with a lightweight setup    | Some production behaviors depend on environment and platform-specific configuration |
@@ -47,9 +47,10 @@ flowchart LR
     FE --> WS[Socket.io]
     WS --> API
 
-    Stripe --> Webhook[Payment Webhook / Retry Logic]
-    Webhook --> API
+    Stripe
 ```
+
+<!-- Webhook[Payment Webhook / Retry Logic] -->
 
 This diagram shows the main data flow. The important production concern here is not only the happy path, but also what happens when external services fail or when state updates happen out of order.
 

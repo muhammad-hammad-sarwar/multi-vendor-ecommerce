@@ -32,7 +32,7 @@ export default function ConversationList() {
   useEffect(() => {
     const handleMessage = (message) => {
       if (message?.receiverId != user?._id || !Boolean(user?._id)) return;
-      console.log("GetMessage", message);
+      // console.log("GetMessage", message);
       dispatch(updateLastMessageUser(message));
     };
 
