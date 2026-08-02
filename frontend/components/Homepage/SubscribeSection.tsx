@@ -7,7 +7,6 @@ export default function SubscribeSection() {
 
   const handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(email);
   };
 
   return (

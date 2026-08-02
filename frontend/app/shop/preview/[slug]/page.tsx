@@ -29,7 +29,6 @@ export default function ShopPage() {
     );
 
   let totalRatings = reviews.reduce((sum, r) => sum + r?.rating, 0);
-  console.log(totalRatings);
 
   useEffect(() => {
     dispatch(loadCurrentShopInfo(params?.slug));

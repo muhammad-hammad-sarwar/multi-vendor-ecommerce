@@ -52,22 +52,19 @@ const conversationSlice = createSlice({
   name: "conversation",
   initialState,
   reducers: {
-    // Online Users and Sellers
-    setSellerOnlineUsers(state, action) {
+    setOnlineUsers(state, action) {
       state.onlineUsers = action.payload;
-      // console.log(state.onlineUsers);
     },
 
-    setUserOnlineSellers(state, action) {
+    setOnlineSellers(state, action) {
       state.onlineSellers = action.payload;
     },
 
     updateLastMessageUser: (state, action) => {
       const message = action.payload;
-      // console.log(message);
 
       const index = state.conversations.findIndex(
-        (c) => c._id === message.conversation,
+        (c) => c?._id === message?.conversation,
       );
 
       if (index === -1) return;
@@ -84,7 +81,7 @@ const conversationSlice = createSlice({
       const message = action.payload;
 
       const index = state.sellerConversations.findIndex(
-        (c) => c._id === message.conversation,
+        (c) => c?._id === message?.conversation,
       );
       if (index === -1) return;
 
@@ -160,9 +157,6 @@ const conversationSlice = createSlice({
 });
 
 export const {
-  setSellerOnlineUsers,
-  setUserOnlineSellers,
-
   setConversation,
   createConversationStart,
   createConversationSuccess,
@@ -178,6 +172,8 @@ export const {
   getSellerConversationsFailure,
   setSellerConversation,
   updateSellerLastMessage,
+  setOnlineUsers,
+  setOnlineSellers,
 } = conversationSlice.actions;
 
 export default conversationSlice.reducer;

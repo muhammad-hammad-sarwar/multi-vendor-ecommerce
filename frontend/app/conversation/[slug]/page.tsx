@@ -1,8 +1,7 @@
 "use client";
-import { socket } from "@/socket/socket";
+import { userSocket as socket, userSocket } from "@/socket/socket";
 import api from "@/axios/api";
 import { MessageSkeleton } from "@/components/Conversation/MessageSkeleton";
-import { getMessages } from "@/redux/actions/message";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
 import {
   setConversation,
@@ -72,6 +71,7 @@ export default function CurrentConversationPage() {
         conversation: conversationId,
         image: data?.message?.image,
         createdAt: data?.message?.createdAt,
+        receiver: "seller", // to differentiate at getMessage
       });
       dispatch(updateLastMessageUser(data?.message));
       setMessages((prev) => [...prev, data?.message]);
@@ -114,23 +114,36 @@ export default function CurrentConversationPage() {
   useEffect(() => {
     if (!conversationId || !conversations?.length) return;
 
-    const conversation = conversations?.find((c) => c._id === conversationId);
+    const conversation = conversations?.find((c) => c?._id === conversationId);
 
     if (conversation) {
       dispatch(setConversation(conversation));
     }
   }, [conversationId, conversations]);
+  useEffect(() => {
+    const onConnect = () => {
+      // console.log("SELLER CONNECTED", userSocket.id);
+    };
+
+    const onDisconnect = (reason) => {
+      // console.log("SELLER DISCONNECTED", reason);
+    };
+
+    userSocket.on("connect", onConnect);
+    userSocket.on("disconnect", onDisconnect);
+
+    return () => {
+      userSocket.off("connect", onConnect);
+      userSocket.off("disconnect", onDisconnect);
+    };
+  }, []);
 
   useEffect(() => {
     const handleMessage = (message) => {
-      if (
-        message?.receiverId != user?._id ||
-        !Boolean(user?._id) ||
-        message?.conversation != conversationId
-      )
-        return;
-      setMessages((prev) => [...prev, message]);
+      if (message?.receiverId != user?._id || !Boolean(user?._id)) return;
       dispatch(updateLastMessageUser(message));
+      if (conversationId != message?.conversation) return;
+      setMessages((prev) => [...prev, message]);
     };
 
     socket.on("getMessage", handleMessage);

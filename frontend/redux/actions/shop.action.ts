@@ -65,7 +65,6 @@ export const updateShopAvatar =
   (formData: FormData) => async (dispatch: AppDispatch) => {
     try {
       dispatch(updateShopAvatarStart());
-      console.log(formData.get("avatar"));
       const res = await api.put("/shop/avatar", formData, {
         withCredentials: true,
       });

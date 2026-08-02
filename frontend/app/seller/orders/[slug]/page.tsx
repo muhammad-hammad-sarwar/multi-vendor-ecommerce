@@ -41,7 +41,6 @@ export default function OrderDetails() {
       dispatch(getAllOrders(true));
       dispatch(addShop(res.data?.shop));
     } catch (error) {
-      console.log("Error from refund status", error);
       toast.error(error?.response?.data?.message);
     } finally {
       setOrderLoading(false);

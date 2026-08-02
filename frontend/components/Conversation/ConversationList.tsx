@@ -9,43 +9,25 @@ import {
   setConversation,
   updateLastMessageUser,
 } from "@/redux/slices/conversations";
-import { useEffect, useState } from "react";
-import { socket } from "@/socket/socket";
+import { useEffect } from "react";
+import { userSocket as socket } from "@/socket/socket";
 import clsx from "clsx";
 import { CiImageOn } from "react-icons/ci";
 
 export default function ConversationList() {
   const params = useParams();
   const dispatch = useAppDispatch();
-  const [onlineUsers, setOnlineUsers] = useState([]);
+  // const [onlineUsers, setOnlineUsers] = useState([]);
   const { user } = useAppSelector((state) => state.user);
-  const { conversations, loading, error } = useAppSelector(
-    (state) => state.conversation,
-  );
+  const {
+    onlineSellers: onlineUsers,
+    conversations,
+    loading,
+    error,
+  } = useAppSelector((state) => state.conversation);
 
-  useEffect(() => {
-    socket.on("getUsers", (users) => {
-      setOnlineUsers(users);
-    });
-  }, []);
-
-  useEffect(() => {
-    const handleMessage = (message) => {
-      if (message?.receiverId != user?._id || !Boolean(user?._id)) return;
-      // console.log("GetMessage", message);
-      dispatch(updateLastMessageUser(message));
-    };
-
-    socket.on("getMessage", handleMessage);
-
-    return () => {
-      socket.off("getMessage", handleMessage);
-    };
-  }, [user?._id]);
-
-  if (loading || (!error && !conversations)) {
+  if (loading || (!error && !conversations))
     return <ConversationListSkeleton />;
-  }
 
   return (
     <div className="flex h-full flex-col">
@@ -84,7 +66,7 @@ export default function ConversationList() {
                   <span
                     className={clsx(
                       "absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white",
-                      onlineUsers.find((u) => u.userId == seller?._id)
+                      onlineUsers?.find((u) => u?.userId == seller?._id)
                         ? "bg-green-500"
                         : "bg-gray-400",
                     )}

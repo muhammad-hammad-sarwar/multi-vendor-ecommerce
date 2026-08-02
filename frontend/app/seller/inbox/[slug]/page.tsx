@@ -1,5 +1,5 @@
 "use client";
-import { socket } from "@/socket/socket";
+import { sellerSocket as socket } from "@/socket/socket";
 import api from "@/axios/api";
 import { MessageSkeleton } from "@/components/Conversation/MessageSkeleton";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
@@ -62,6 +62,7 @@ export default function SellerChatMessages() {
           headers: { "Content-Type": "multipart/form-data" },
         },
       );
+
       socket.emit("sendMessage", {
         messageId: data?.message?._id,
         senderId: shop?._id,
@@ -70,6 +71,7 @@ export default function SellerChatMessages() {
         conversation: conversationId,
         createdAt: data?.message?.createdAt,
         image: data?.message?.image,
+        receiver: "user",
       });
 
       dispatch(updateSellerLastMessage(data?.message));

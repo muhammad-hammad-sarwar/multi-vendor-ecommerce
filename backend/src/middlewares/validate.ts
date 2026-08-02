@@ -9,7 +9,6 @@ export const validate =
 
     if (!result.success) {
       //   const errors = result.error.errors.map((err) => err.message);
-      console.log(result.error.message);
       const error = "Error";
       return next(new AppError(error, 400));
     }

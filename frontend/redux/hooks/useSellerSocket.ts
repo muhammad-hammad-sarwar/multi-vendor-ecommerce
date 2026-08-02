@@ -1,9 +1,9 @@
 "use client";
 import { useEffect } from "react";
-import { socket } from "@/socket/socket";
+import { sellerSocket as socket } from "@/socket/socket";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
 import {
-  setSellerOnlineUsers,
+  setOnlineUsers,
   updateSellerLastMessage,
 } from "@/redux/slices/conversations";
 import { appendSellerMessage } from "../slices/message";
@@ -16,32 +16,63 @@ export const useSellerSocket = () => {
   useEffect(() => {
     if (!shop?._id) return;
 
-    const handleUsers = (users) => {
-      dispatch(setSellerOnlineUsers(users?.length > 0 ? users : []));
+    const onConnect = () => {
+      socket.emit("addUser", {
+        id: shop._id,
+        role: "seller",
+      });
     };
 
+    const onDisconnect = (reason: string) => {};
+
+    const onReconnect = (attempt: number) => {
+      socket.emit("addUser", {
+        id: shop._id,
+        role: "seller",
+      });
+    };
+
+    socket.on("connect", onConnect);
+    socket.on("disconnect", onDisconnect);
+    socket.io.on("reconnect", onReconnect);
+
+    if (!socket.connected) {
+      socket.connect();
+    } else {
+      onConnect();
+    }
+
+    const handleUsers = (users) => {
+      dispatch(setOnlineUsers(users?.length > 0 ? users : []));
+    };
+
+    socket.on("getUsers", handleUsers);
+
+    return () => {
+      socket.off("connect", onConnect);
+      socket.off("disconnect", onDisconnect);
+      socket.io.off("reconnect", onReconnect);
+      socket.off("getUsers", handleUsers);
+
+      socket.disconnect();
+    };
+  }, [shop?._id]);
+
+  useEffect(() => {
+    if (!shop?._id) return;
+
     const handleMessage = (message) => {
-      // Ignore messages not meant for this seller
-      console.log("Message from useSellerSocket.ts", message);
       if (message.receiverId !== shop._id) return;
 
       dispatch(updateSellerLastMessage(message));
-      console.log("message.conversation", message.conversation);
-      console.log("sellerConversation?._id", sellerConversation?._id);
-      console.log(
-        "message.conversation === sellerConversation?._id",
-        message.conversation === sellerConversation?._id,
-      );
       if (message.conversation === sellerConversation?._id) {
         dispatch(appendSellerMessage(message));
       }
     };
 
-    socket.on("getUsers", handleUsers);
     socket.on("getMessage", handleMessage);
 
     return () => {
-      socket.off("getUsers", handleUsers);
       socket.off("getMessage", handleMessage);
     };
   }, [dispatch, shop?._id, sellerConversation?._id]);

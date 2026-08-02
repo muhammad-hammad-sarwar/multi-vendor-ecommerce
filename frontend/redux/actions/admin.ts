@@ -102,7 +102,6 @@ export const deleteProduct = (id: string) => async (dispatch: any) => {
 
 export const deleteEvent = (id: string) => async (dispatch: any) => {
   try {
-    console.log(id);
     dispatch(deleteEventStart());
 
     await api.delete(`/admin/events/${id}`);

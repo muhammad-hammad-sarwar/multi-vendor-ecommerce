@@ -93,7 +93,6 @@ export const updateUserProfileAddresses =
 export const deleteUserProfileAddress =
   (payload) => async (dispatch: AppDispatch) => {
     try {
-      console.log(payload);
       dispatch(updateProfileStart());
       const res = await api.delete(`/profile/addresses/${payload}`, {
         withCredentials: true,

@@ -23,7 +23,7 @@ import { logout } from "@/redux/slices/user";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks/hooks";
 import { LuLayoutDashboard } from "react-icons/lu";
 import Link from "next/link";
-import { socket } from "@/socket/socket";
+import { userSocket as socket } from "@/socket/socket";
 
 const tabs = [
   { name: "Profile", icon: FiUser },
