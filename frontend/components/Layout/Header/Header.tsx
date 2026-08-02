@@ -344,11 +344,26 @@ export default function Header() {
         </nav>
 
         <div className="mt-auto p-4 flex flex-col gap-3">
-          <Link className="block cursor-pointer" href={"/seller-login"}>
-            <button className="bg-black w-full text-white py-2 rounded-lg">
-              Become a Seller
-            </button>
-          </Link>
+          {isSeller ? (
+            <Link
+              href={`/shop/${shop?._id}`}
+              className="flex sm:hidden items-center justify-center bg-[#000000] text-white hover:bg-gray-800 text-sm md:text-base font-bold px-4 py-3 rounded-lg transition"
+            >
+              Your Shop <ChevronRightIcon />
+            </Link>
+          ) : (
+            <Link
+              href={"/seller-login"}
+              className="flex sm:hidden items-center justify-center bg-[#000000] text-white hover:bg-gray-800 text-sm md:text-base font-bold px-4 py-3 rounded-lg transition"
+            >
+              Become a Seller{" "}
+              {shopInitialized ? (
+                <ChevronRightIcon className="ml-2" />
+              ) : (
+                <Loader2 className="ml-2 animate-spin" />
+              )}
+            </Link>
+          )}
 
           {isAuthenticated ? (
             <Link onClick={() => setOpen(false)} href={"/profile"}>

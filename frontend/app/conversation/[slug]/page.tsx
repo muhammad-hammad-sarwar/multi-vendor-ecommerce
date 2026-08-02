@@ -223,11 +223,11 @@ export default function CurrentConversationPage() {
         )}
       </div>
 
-      <div className="border-t p-4">
-        <div className="flex items-center gap-3 rounded-full border px-4 py-2">
+      <div className="border-t pt-2 sm:p-4">
+        <div className="flex items-center gap-2 rounded-full border px-3 py-2 sm:gap-3 sm:px-4">
           <button
             onClick={() => fileRef.current?.click()}
-            className="cursor-pointer text-gray-600 hover:text-black"
+            className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full text-gray-600 transition hover:bg-gray-100 hover:text-black"
           >
             <FiImage size={22} />
           </button>
@@ -245,17 +245,17 @@ export default function CurrentConversationPage() {
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
-            className="flex-1 bg-transparent outline-none"
+            className="min-w-0 flex-1 bg-transparent text-sm outline-none sm:text-base"
           />
 
           <button
             disabled={createMessageLoading}
             onClick={() => handleSubmit()}
             className={clsx(
-              "flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-white transition",
+              "flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white transition",
               createMessageLoading
-                ? "bg-gray-400 hover:bg-gray-500 hover:cursor-not-allowed"
-                : "bg-green-600 hover:bg-green-700",
+                ? "cursor-not-allowed bg-gray-400"
+                : "cursor-pointer bg-green-600 hover:bg-green-700",
             )}
           >
             <FiSend size={18} />
