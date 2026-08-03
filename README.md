@@ -137,7 +137,6 @@ In a product-led company, these outcomes matter as much as the code quality itse
 - React
 - Redux Toolkit
 - Tailwind CSS
-- Material UI
 - Socket.io client
 - React Toastify
 
@@ -147,49 +146,18 @@ A custom backend was chosen instead of a full BaaS provider because marketplace-
 
 ## Challenges and Solutions
 
-This is the most important part of the project because most of the real work was about making flows behave correctly rather than just adding screens.
+This is one of the most important parts of the project because most of the real work was about making the flows behave correctly rather than just adding screens.
 
-### 1. Authentication and verification were unreliable at first
-
-The symptom was that account verification and session handling were not stable enough for a real user flow. Users could reach inconsistent states, especially around login and protected routes.
-
-The approach taken was to tighten the auth flow around route guards, session loading, and verification handling. The result was a more predictable authentication lifecycle for both users and sellers.
-
-### 2. Seller and user state often conflicted
-
-The symptom was that seller-specific and user-specific data could interfere with each other, especially in profile loading and chat-related state. This caused confusing UI behavior and made the app feel less reliable.
-
-The fix was to separate state ownership more clearly and initialize role-specific flows independently. That made the experience more consistent when switching between buyer and seller contexts.
-
-### 3. Chat behavior was fragile during real use
-
-The symptom was that conversations and message state were not always consistent when both parties were active. This made the chat experience feel unstable.
-
-The improvement was to structure conversation loading and socket-based updates more deliberately and keep message state separate from other UI state. This reduced stale or duplicated behavior.
-
-### 4. File uploads needed a production-ready path
-
-The symptom was that local image handling was not a good long-term solution for a marketplace. It would be hard to scale and difficult to maintain.
-
-The solution was to move the app toward Cloudinary-backed uploads for product and profile images. That made media handling much more practical for real use.
-
-### 5. Protected routes and access control needed to be stricter
-
-The symptom was that logged-in users or sellers could still reach pages that should have been blocked for their current role. This created poor UX and made the app feel less secure.
-
-The fix was to apply route guards more carefully and redirect users to the appropriate destination based on their current session state.
-
-### 6. Seller balance and withdrawal flow needed better state updates
-
-The symptom was that after a seller-related action, the UI could show stale or incomplete balance information.
-
-The fix was to refresh seller-specific state after actions that affect balances or withdrawals so the UI reflects the latest state more consistently.
-
-### 7. Mobile layout issues made some flows harder to use
-
-The symptom was that profile sections, cards, and action buttons were not always comfortable to use on smaller screens.
-
-The solution was to improve spacing, layout, and screen behavior so the main flows became easier to use on mobile devices.
+| Challenge                                                                                      | Solution                                                                                                                                                                         |
+| ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Authentication and verification were unreliable at first.                                      | The auth flow was tightened around route guards, session loading, and verification handling to create a more predictable login and access experience for both users and sellers. |
+| Seller and user state often conflicted.                                                        | Role-specific state ownership was separated more clearly, and buyer/seller flows were initialized independently to reduce UI conflicts.                                          |
+| Chat behavior was fragile during real use.                                                     | Conversation loading and socket-based updates were structured more carefully, and message state was kept separate from other UI state to reduce stale or duplicated behavior.    |
+| File uploads needed a production-ready path.                                                   | The app was moved toward Cloudinary-backed uploads for products and profile images, making media handling more scalable and maintainable.                                        |
+| Protected routes and access control needed to be stricter.                                     | Route guards were applied more carefully so users and sellers are redirected to the appropriate pages based on their current role and session state.                             |
+| Seller balance and withdrawal flow needed better state updates.                                | Seller-specific state is refreshed after actions that affect balances or withdrawals so the UI reflects the latest information more consistently.                                |
+| Mobile layout issues made some flows harder to use.                                            | Spacing, layout, and screen behavior were improved so the main flows became easier to use on smaller screens.                                                                    |
+| Socket reliability was inconsistent when using a single connection for both sellers and users. | Separate socket connections were created for users and sellers so realtime chat and updates became more reliable and consistent.                                                 |
 
 ## Database ERD
 
