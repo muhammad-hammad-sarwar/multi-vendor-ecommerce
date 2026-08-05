@@ -33,26 +33,129 @@ The application is split into a frontend application and a backend API. The fron
 ## Architecture Diagram
 
 ```mermaid
-flowchart LR
-    U[Customer] --> FE[Frontend]
-    S[Seller] --> FE
-    A[Admin] --> FE
+flowchart TB
+    subgraph CLIENT_LAYER ["Frontend Application (Client Layer)"]
+        direction LR
+        subgraph CUSTOMER_UI ["Customer App"]
+            C_Auth["Authentication\n(User Login / Signup)"]
+            C_Browse["Browse Products & Events"]
+            C_Cart["Cart & Wishlist"]
+            C_Checkout["Checkout & Payment"]
+            C_Chat["Customer Chat"]
+        end
 
-    FE --> API[Express API]
-    API --> DB[(MongoDB)]
-    API --> Stripe[Stripe]
-    API --> Cloud[Cloudinary]
-    API --> Mail[Email Service]
+        subgraph SELLER_UI ["Seller Dashboard"]
+            S_Auth["Authentication\n(Seller Login / Signup)"]
+            S_Prod["Manage Products"]
+            S_Event["Manage Events"]
+            S_Order["Process Orders"]
+            S_Chat["Seller Chat"]
+            S_Withdraw["Withdrawal Requests"]
+        end
 
-    FE --> WS[Socket.io]
-    WS --> API
+        subgraph ADMIN_UI ["Admin Dashboard"]
+            A_Manage["Oversee Users & Sellers"]
+            A_Orders["Oversee All Orders"]
+            A_Withdraw["Approve Withdrawals"]
+            A_Stats["Platform Analytics"]
+        end
+    end
 
-    Stripe
+    subgraph PROTOCOLS ["Communication Protocols"]
+        HTTP["HTTP / HTTPS REST API (Port 8000)"]
+        WS["WebSocket / Socket.io (Port 8080)"]
+    end
+
+    subgraph BACKEND_LAYER ["Backend Services"]
+        subgraph EXPRESS_API ["Express REST API Backend (Main API)"]
+            direction TB
+            subgraph AUTH_MODULES ["Authentication & User Management"]
+                AuthR["/auth (auth.route.ts)\nUser Register, Login, Activation"]
+                ShopR["/shop (shop.route.ts)\nSeller Register, Login, Shop Profile"]
+                ProfileR["/profile (profile.route.ts)\nUser Profile & Addresses"]
+            end
+
+            subgraph CATALOG_MODULES ["Catalog & Promotional"]
+                ProdR["/products (product.route.ts)\nProduct CRUD & Reviews"]
+                EventR["/events (event.route.ts)\nEvent Creation & Listing"]
+                CouponR["/coupon (coupon.route.ts)\nDiscount Codes"]
+            end
+
+            subgraph ECOMMERCE_MODULES ["Commerce & Transactions"]
+                OrderR["/orders (order.route.ts)\nOrder Creation, Shipping, Refunds"]
+                PayR["/payment (payment.route.ts)\nStripe Payment Intent"]
+                WithdrawR["/withdraw (withdraw.route.ts)\nSeller Payouts & Admin Approval"]
+            end
+
+            subgraph CHAT_STORAGE ["Persistent Messaging"]
+                ConvR["/conversations (conversation.route.ts)\nChat Session History"]
+                MsgR["/messages (message.route.ts)\nPersistent Chat Messages"]
+            end
+
+            subgraph ADMIN_MODULES ["Administration"]
+                AdminR["/admin (admin.route.ts)\nPlatform Oversight & Moderation"]
+            end
+        end
+
+        subgraph SOCKET_SERVER ["Socket.io Real-Time Backend (Port 8080)"]
+            direction TB
+            UserReg["Active User Registry\n(addUser / removeUser)"]
+            LiveMsg["Instant Message Handler\n(sendMessage / getMessage)"]
+            ReadRec["Read Receipts\n(messageSeen)"]
+            LivePreview["Last Message Updater\n(updateLastMessage)"]
+        end
+    end
+
+    subgraph EXTERNAL_SERVICES ["Databases & External Cloud Services"]
+        MongoDB[("MongoDB Database\n(Users, Shops, Products,\nOrders, Messages, etc.)")]
+        Stripe["Stripe Gateway\n(Payment Intents & Refunds)"]
+        Cloudinary["Cloudinary Storage\n(Product Media & Attachments)"]
+        EmailService["Email Service / Nodemailer\n(Activation Codes & Alerts)"]
+    end
+
+    %% Client Layer to Protocols
+    CUSTOMER_UI -- "REST Requests" --> HTTP
+    SELLER_UI -- "REST Requests" --> HTTP
+    ADMIN_UI -- "REST Requests" --> HTTP
+
+    C_Chat -- "WebSockets" --> WS
+    S_Chat -- "WebSockets" --> WS
+
+    %% Protocols to Backends
+    HTTP --> EXPRESS_API
+    WS --> SOCKET_SERVER
+
+    %% External Integrations
+    EXPRESS_API --> MongoDB
+    EXPRESS_API --> Stripe
+    EXPRESS_API --> Cloudinary
+    EXPRESS_API --> EmailService
 ```
 
-<!-- Webhook[Payment Webhook / Retry Logic] -->
+### Detailed Architectural Breakdown
 
-This diagram shows the main data flow. The important production concern here is not only the happy path, but also what happens when external services fail or when state updates happen out of order.
+#### 1. Microservice Separation: Express API vs Socket Backend
+- **Express REST API Backend (`Port 8000`)**: Primary backend managing authentication, product catalog, orders, payment webhooks, database persistence (MongoDB), file uploads (Cloudinary), and email services.
+- **Socket.io Real-Time Server (`Port 8080`)**: Dedicated microservice managing WebSocket connections, active user socket registries (`addUser`/`removeUser`), low-latency messaging (`sendMessage`/`getMessage`), read receipts (`messageSeen`), and real-time chat list updates (`updateLastMessage`).
+
+#### 2. Express Route & Domain Capabilities (`backend/src/routes/`)
+- **`auth.route.ts` (`/auth`)**: User Registration, Email Activation token verification, Login, Logout.
+- **`shop.route.ts` (`/shop`)**: Seller Sign up, Seller Activation, Login, Shop Profile updates.
+- **`product.route.ts` (`/products`)**: Create product (Seller), View/Filter product catalog (User), Shop specific products, Reviews.
+- **`event.route.ts` (`/events`)**: Create event promotions (Seller), View active events (User).
+- **`profile.route.ts` (`/profile`)**: Manage user profile data, delivery addresses, password updates.
+- **`coupon.route.ts` (`/coupon`)**: Seller discount code creation and checkout validation.
+- **`payment.route.ts` (`/payment`)**: Stripe payment intent initialization & checkout key handling.
+- **`order.route.ts` (`/orders`)**: Order creation, order tracking (Processing $\rightarrow$ Shipping $\rightarrow$ Delivered), refund handling.
+- **`conversation.route.ts` (`/conversations`)**: Fetch & create active chat sessions between users and shops.
+- **`message.route.ts` (`/messages`)**: Save and fetch chat message history.
+- **`withdraw.route.ts` (`/withdraw`)**: Seller payout request creation and Admin approval workflow.
+- **`admin.route.ts` (`/admin`)**: Admin oversight, manage users/sellers, monitor orders and system metrics.
+
+#### 3. Role Responsibilities
+- **Customer**: Browse products & events, manage Cart & Wishlist, checkout via Stripe, chat live with shops.
+- **Seller**: Manage shop catalog (products & events), issue coupons, process order states, submit withdrawal requests, chat live with customers.
+- **Admin**: System-wide oversight over users, sellers, products, and orders; approve or reject seller withdrawal requests.
 
 ## Key Features
 
